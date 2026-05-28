@@ -1,0 +1,14 @@
+OceansBase Minpaku Demo
+Copyright 2026 OceansBase / Kazushi Ikeda
+
+This repository is published as a portfolio sample by OceansBase.
+External service integrations (Stripe, RemoteLOCK, Airbnb) are mocked.
+This is not a production-ready system.
+
+For commercial use, redistribution, or derivative works for commercial
+purposes, please contact OceansBase: https://oceans-base.com/contact
+
+本リポジトリは OceansBase の制作サンプルとして公開しています。
+外部サービス連携（Stripe / RemoteLOCK / Airbnb）はモックです。
+本番運用には追加の実装・契約・法令対応が必要です。
+商用利用・改変による商用配布は事前にご相談ください。

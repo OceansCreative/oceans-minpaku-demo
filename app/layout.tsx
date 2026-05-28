@@ -5,8 +5,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Oceans Minpaku Demo',
-  description:
-    'Sample vacation rental (minpaku) booking & operations system. Built by OceansBase.',
+  description: 'Sample vacation rental (minpaku) booking & operations system. Built by OceansBase.',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

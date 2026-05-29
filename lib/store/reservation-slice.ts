@@ -19,7 +19,6 @@ import type {
   Room,
 } from '@/types';
 
-
 export interface ReservationSlice {
   property: Property;
   rooms: Room[];

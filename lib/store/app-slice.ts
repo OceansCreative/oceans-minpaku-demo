@@ -1,7 +1,6 @@
 import type { SliceCreator } from './types';
 import type { LanguageCode } from '@/types';
 
-
 /**
  * Cross-cutting application state — language, demo-mode flag, hydration tracking.
  * Domain data lives in its own slice (reservation, pricing, policy).

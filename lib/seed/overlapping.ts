@@ -1,4 +1,3 @@
-
 import { seedGuests } from './guests';
 import { seedRooms } from './property';
 

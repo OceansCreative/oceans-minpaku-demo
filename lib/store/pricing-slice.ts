@@ -3,7 +3,6 @@ import { seedPricingRules } from '@/lib/seed';
 import type { SliceCreator } from './types';
 import type { PricingRule } from '@/types';
 
-
 export interface PricingSlice {
   pricingRules: PricingRule[];
   upsertPricingRule: (rule: PricingRule) => void;

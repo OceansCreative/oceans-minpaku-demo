@@ -6,7 +6,6 @@
 import type { AppStore } from './store-type';
 import type { StateCreator } from 'zustand';
 
-
 export type SliceCreator<TSlice> = StateCreator<
   AppStore,
   [['zustand/persist', unknown]],

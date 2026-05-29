@@ -3,7 +3,6 @@ import { seedCancellationPolicy, seedReminderTemplates } from '@/lib/seed';
 import type { SliceCreator } from './types';
 import type { CancellationPolicy, ReminderTemplate } from '@/types';
 
-
 export interface PolicySlice {
   cancellationPolicy: CancellationPolicy[];
   reminderTemplates: ReminderTemplate[];

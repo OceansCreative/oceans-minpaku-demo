@@ -3,25 +3,35 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-import { createAppSlice, type AppSlice } from './app-slice';
+import { createAppSlice } from './app-slice';
+import { createReservationSlice } from './reservation-slice';
+
+import type { AppStore } from './store-type';
+
+export type { AppStore } from './store-type';
+export const STORE_NAME = 'oceans-minpaku-store';
 
 /**
  * Root Zustand store. Persisted to `localStorage` so the guest flow and the admin
  * console share the same demo state — approving a reservation in /admin shows
  * up immediately on the guest's status page.
  *
- * Domain slices (reservation, pricing, policy) are merged in by the slice-specific
- * commits that follow this one.
+ * Slices merged so far: app, reservation. Pricing / policy slices land in
+ * follow-up commits.
  */
-export type AppStore = AppSlice;
-
-export const STORE_NAME = 'oceans-minpaku-store';
-
 export const useAppStore = create<AppStore>()(
   persist(
-    (...a) => ({
-      ...createAppSlice(...a),
-    }),
+    (...a) => {
+      const [, get] = a;
+      return {
+        ...createAppSlice(...a),
+        ...createReservationSlice(...a),
+        // Override resetToSeed so it rebuilds every slice atomically.
+        resetToSeed: () => {
+          get().resetReservationSlice();
+        },
+      };
+    },
     {
       name: STORE_NAME,
       version: 1,

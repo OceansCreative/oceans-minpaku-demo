@@ -6,6 +6,8 @@
  * Add new slice intersections here as they land.
  */
 import type { AppSlice } from './app-slice';
+import type { PolicySlice } from './policy-slice';
+import type { PricingSlice } from './pricing-slice';
 import type { ReservationSlice } from './reservation-slice';
 
-export type AppStore = AppSlice & ReservationSlice;
+export type AppStore = AppSlice & ReservationSlice & PricingSlice & PolicySlice;

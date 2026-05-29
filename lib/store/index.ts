@@ -4,6 +4,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 import { createAppSlice } from './app-slice';
+import { createPolicySlice } from './policy-slice';
+import { createPricingSlice } from './pricing-slice';
 import { createReservationSlice } from './reservation-slice';
 
 import type { AppStore } from './store-type';
@@ -16,8 +18,7 @@ export const STORE_NAME = 'oceans-minpaku-store';
  * console share the same demo state — approving a reservation in /admin shows
  * up immediately on the guest's status page.
  *
- * Slices merged so far: app, reservation. Pricing / policy slices land in
- * follow-up commits.
+ * Slices merged: app, reservation, pricing, policy.
  */
 export const useAppStore = create<AppStore>()(
   persist(
@@ -26,9 +27,14 @@ export const useAppStore = create<AppStore>()(
       return {
         ...createAppSlice(...a),
         ...createReservationSlice(...a),
+        ...createPricingSlice(...a),
+        ...createPolicySlice(...a),
         // Override resetToSeed so it rebuilds every slice atomically.
         resetToSeed: () => {
-          get().resetReservationSlice();
+          const state = get();
+          state.resetReservationSlice();
+          state.resetPricingSlice();
+          state.resetPolicySlice();
         },
       };
     },

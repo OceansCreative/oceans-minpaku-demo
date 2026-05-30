@@ -4,6 +4,8 @@ import { Compass, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { useAppStore } from '@/lib/store';
+import { DEFAULT_TOUR_STEPS } from '@/lib/tour/steps';
+import { useTour } from '@/lib/tour/TourProvider';
 import { cn } from '@/lib/utils/cn';
 
 interface WelcomeModalProps {
@@ -19,6 +21,7 @@ interface WelcomeModalProps {
 export function WelcomeModal({ onStartTour }: WelcomeModalProps) {
   const hasSeen = useAppStore((s) => s.hasSeenOnboarding);
   const markSeen = useAppStore((s) => s.markOnboardingSeen);
+  const { start } = useTour();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -39,6 +42,7 @@ export function WelcomeModal({ onStartTour }: WelcomeModalProps) {
   function startTour() {
     markSeen();
     setOpen(false);
+    start(DEFAULT_TOUR_STEPS);
     onStartTour?.();
   }
 

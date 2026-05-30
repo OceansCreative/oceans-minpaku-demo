@@ -6,6 +6,50 @@ All notable changes to this project will be documented here. Format loosely foll
 
 ## [Unreleased]
 
+## [1.0.0] — Phases 2–10: Full app
+
+### Added
+
+- **Phase 2 — Branding shell**: OceansBase floating badge, footer with contact CTA,
+  demo disclaimer banner, welcome modal for first-time visitors, self-tour
+  framework (`lib/tour/`).
+- **Phase 3 — Guest flow**: property landing, room listing, room detail,
+  multi-step booking flow (date range picker with availability colours, time,
+  parking slot, dynamic pricing review, guest info form, mock Stripe payment,
+  request submission), reservation status page with passcode reveal.
+- **Phase 4 — Admin core**: mock authentication (demo / demo) + login screen,
+  admin shell with sidebar, reservation list with status/source filters,
+  reservation detail with approve / reject actions, RemoteLOCK passcode
+  display on approval, pending-count badge in the sidebar.
+- **Phase 5 — Calendar & anti-double-booking**: full month calendar with
+  source-based colouring, conflicts panel, enhanced red warning UI listing the
+  specific conflicting reservations, approval-side guard test (4 cases), iCal
+  lag tooltip explaining the approval-gate strategy.
+- **Phase 6 — Dashboard & sales**: today's check-in/out widget, last-30-day
+  occupancy widget, monthly sales widget, 180-day-cap counter, sales
+  aggregation page with day/month/year + range filter (Recharts stacked bars).
+- **Phase 7 — Operations**: pricing-rule CRUD, cancellation policy CRUD,
+  cancellation flow with deposit deduction + refund preview, reminder template
+  CRUD, guest message thread UI, passcode management (reissue / revoke), OTA
+  settings page with Airbnb iCal URL config, Booking.com & Agoda expansion
+  placeholders.
+- **Phase 8 — Compliance mock**: guest register page with the §8 required
+  fields, ICT identity verification upload mock, CSV export for the register,
+  inline compliance notes covering §6 / §8 / §2-3 obligations.
+- **Phase 9 — i18n & responsive**: next-intl provider with ja / en /
+  partial zh / ko translation bundles, language switcher in the guest header,
+  mobile drawer for the admin sidebar, responsive guest header + hero.
+- **Phase 10 — Tour & polish**: self-tour steps wired to the welcome modal,
+  sample-data reset page, Noto Sans JP + Cormorant Garamond fonts via
+  `next/font`, README screenshots + mermaid architecture diagram + demo
+  scenario + design decisions, Japanese README, `docs/portfolio/case-study.md`
+  for the OceansBase Sanity feed.
+
+### Changed
+
+- 27 unit tests → 31 unit tests (added approval-overlap guard suite in Phase 5).
+- Zustand store grew from 4 slices to 6 (`messages`, `guestRegister` added).
+
 ## [0.1.0] — Phase 1: Domain & mock infrastructure
 
 ### Added

@@ -4,6 +4,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 import { createAppSlice } from './app-slice';
+import { createMessagesSlice } from './messages-slice';
 import { createPolicySlice } from './policy-slice';
 import { createPricingSlice } from './pricing-slice';
 import { createReservationSlice } from './reservation-slice';
@@ -29,12 +30,14 @@ export const useAppStore = create<AppStore>()(
         ...createReservationSlice(...a),
         ...createPricingSlice(...a),
         ...createPolicySlice(...a),
+        ...createMessagesSlice(...a),
         // Override resetToSeed so it rebuilds every slice atomically.
         resetToSeed: () => {
           const state = get();
           state.resetReservationSlice();
           state.resetPricingSlice();
           state.resetPolicySlice();
+          state.resetMessagesSlice();
         },
       };
     },

@@ -41,5 +41,31 @@
     "prev": "Back",
     "submit": "Request reservation",
     "submitting": "Submitting..."
+  },
+  "Admin": {
+    "navDashboard": "Dashboard",
+    "navReservations": "Reservations",
+    "navCalendar": "Calendar",
+    "navMessages": "Messages",
+    "navReminders": "Reminders",
+    "navSales": "Sales",
+    "navPasscodes": "Passcodes",
+    "navPricing": "Pricing",
+    "navCancellation": "Cancellation",
+    "navOta": "OTA",
+    "navGuestRegister": "Guest register",
+    "navSettings": "Sample data",
+    "signOut": "Sign out",
+    "loginTitle": "Admin sign in",
+    "loginInvalid": "Invalid credentials (use demo / demo)",
+    "approve": "Approve (Stripe capture)",
+    "reject": "Reject (Stripe cancel)",
+    "cancel": "Cancel this reservation",
+    "doubleBookingWarning": "Possible double booking — approval is disabled",
+    "todayCheckIn": "Today's check-ins",
+    "todayCheckOut": "Today's check-outs",
+    "occupancy": "Occupancy (last 30 days)",
+    "monthlySales": "Month-to-date sales",
+    "capCounter": "180-day cap counter"
   }
 }

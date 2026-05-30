@@ -41,5 +41,31 @@
     "prev": "ひとつ前へ",
     "submit": "予約をリクエストする",
     "submitting": "送信中..."
+  },
+  "Admin": {
+    "navDashboard": "ダッシュボード",
+    "navReservations": "予約管理",
+    "navCalendar": "カレンダー",
+    "navMessages": "ゲストメッセージ",
+    "navReminders": "リマインダー",
+    "navSales": "売上集計",
+    "navPasscodes": "パスコード管理",
+    "navPricing": "料金設定",
+    "navCancellation": "キャンセル設定",
+    "navOta": "OTA連携",
+    "navGuestRegister": "宿泊者名簿",
+    "navSettings": "サンプルデータ",
+    "signOut": "ログアウト",
+    "loginTitle": "管理画面ログイン",
+    "loginInvalid": "資格情報が正しくありません（demo / demo）",
+    "approve": "承認する（Stripe capture）",
+    "reject": "却下（Stripe cancel）",
+    "cancel": "この予約をキャンセル",
+    "doubleBookingWarning": "ダブルブッキングの恐れがあります — 承認は無効化されています",
+    "todayCheckIn": "本日チェックイン",
+    "todayCheckOut": "本日チェックアウト",
+    "occupancy": "稼働率（過去30日）",
+    "monthlySales": "今月の売上",
+    "capCounter": "年間 180 日 稼働カウンタ"
   }
 }

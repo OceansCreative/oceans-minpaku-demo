@@ -1,6 +1,6 @@
 'use client';
 
-import { AlertTriangle, ArrowLeft, CheckCircle2, Loader2, XCircle } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, CheckCircle2, KeyRound, Loader2, XCircle } from 'lucide-react';
 import Link from 'next/link';
 import { use, useState } from 'react';
 
@@ -133,6 +133,27 @@ export default function AdminReservationDetailPage({ params }: PageProps) {
         </Card>
         <Card title="ステータス">
           <Row label="現在">{reservation.status}</Row>
+        </Card>
+        <Card title="スマートロック">
+          {reservation.passcode ? (
+            <div className="space-y-2">
+              <p className="flex items-center gap-1.5 text-xs text-moss">
+                <KeyRound className="h-3.5 w-3.5" />
+                RemoteLOCK パスコード発行済み
+              </p>
+              <p className="rounded-md bg-ink px-3 py-2 text-center font-mono text-xl tracking-[0.3em] text-sand">
+                {reservation.passcode.code}
+              </p>
+              <p className="text-[10px] text-ink/50">
+                有効期間: {reservation.passcode.validFrom.slice(0, 16).replace('T', ' ')} 〜{' '}
+                {reservation.passcode.validUntil.slice(0, 16).replace('T', ' ')}
+              </p>
+            </div>
+          ) : (
+            <p className="text-sm text-ink/50">
+              承認時に RemoteLOCK へパスコード発行リクエストを送ります。
+            </p>
+          )}
         </Card>
       </div>
 

@@ -4,6 +4,7 @@ import { ArrowDownToLine, ArrowUpFromLine } from 'lucide-react';
 import Link from 'next/link';
 import { useMemo } from 'react';
 
+import { OccupancyWidget } from '@/components/admin/widgets/OccupancyWidget';
 import { useAppStore } from '@/lib/store';
 import { toIsoDate } from '@/lib/utils/dates';
 
@@ -29,6 +30,10 @@ export default function AdminDashboardPage() {
         <h1 className="font-serif text-2xl text-ink">ダッシュボード</h1>
         <p className="text-sm text-ink/60">本日のオペレーションを一目で把握できます。</p>
       </header>
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <OccupancyWidget />
+      </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         <TodaySection

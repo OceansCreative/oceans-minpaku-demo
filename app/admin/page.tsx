@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useMemo } from 'react';
 
 import { OccupancyWidget } from '@/components/admin/widgets/OccupancyWidget';
+import { SalesSummaryWidget } from '@/components/admin/widgets/SalesSummaryWidget';
 import { useAppStore } from '@/lib/store';
 import { toIsoDate } from '@/lib/utils/dates';
 
@@ -33,6 +34,7 @@ export default function AdminDashboardPage() {
 
       <div className="grid gap-4 md:grid-cols-3">
         <OccupancyWidget />
+        <SalesSummaryWidget />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">

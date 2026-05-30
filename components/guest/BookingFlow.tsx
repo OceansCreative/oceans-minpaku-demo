@@ -3,7 +3,7 @@
 import 'react-day-picker/style.css';
 
 import { ja } from 'date-fns/locale';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
+import { Calendar as CalendarIcon, Car, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { DayPicker, type DateRange } from 'react-day-picker';
 
@@ -33,10 +33,12 @@ const CHECK_OUT_OPTIONS: HHmm[] = ['09:00', '10:00', '11:00'];
 
 export function BookingFlow({ room }: BookingFlowProps) {
   const reservations = useAppStore((s) => s.reservations);
+  const parkingSlots = useAppStore((s) => s.parkingSlots);
   const [step, setStep] = useState<BookingStep>('dates');
   const [range, setRange] = useState<DateRange | undefined>();
   const [checkInTime, setCheckInTime] = useState<HHmm>('15:00');
   const [checkOutTime, setCheckOutTime] = useState<HHmm>('10:00');
+  const [parkingId, setParkingId] = useState<string | undefined>();
 
   const bookedDays = useMemo(
     () => collectBookedDays(reservations, room.id),
@@ -126,6 +128,48 @@ export function BookingFlow({ room }: BookingFlowProps) {
           </div>
         )}
 
+        {step === 'parking' && (
+          <div className="space-y-4">
+            <header className="flex items-center gap-2 text-sm text-ink/70">
+              <Car className="h-4 w-4 text-moss" />
+              <span>駐車場のご利用予定はありますか？</span>
+            </header>
+            <p className="text-[11px] text-ink/40">
+              当宿は最大10台まで駐車可能です。お一台あたり1区画をご予約いただきます（追加料金なし）。
+            </p>
+            <div className="grid grid-cols-5 gap-2 sm:grid-cols-10">
+              <button
+                type="button"
+                onClick={() => setParkingId(undefined)}
+                className={cn(
+                  'col-span-5 rounded-md border px-3 py-2 text-xs sm:col-span-10',
+                  parkingId === undefined
+                    ? 'border-ink bg-ink text-sand'
+                    : 'border-ink/15 bg-sand text-ink/70 hover:border-ink/30',
+                )}
+              >
+                利用しない
+              </button>
+              {parkingSlots.map((slot) => (
+                <button
+                  key={slot.id}
+                  type="button"
+                  onClick={() => setParkingId(slot.id)}
+                  className={cn(
+                    'rounded-md border py-2 text-xs',
+                    parkingId === slot.id
+                      ? 'border-ink bg-ink text-sand'
+                      : 'border-ink/15 bg-sand text-ink/70 hover:border-ink/30',
+                  )}
+                  aria-label={`駐車場区画 ${slot.label}`}
+                >
+                  {slot.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <StepNav
           current={step}
           onPrev={stepIndex > 0 ? goPrev : undefined}
@@ -143,6 +187,9 @@ export function BookingFlow({ room }: BookingFlowProps) {
             {range?.to ? `${toIsoDate(range.to)} ${checkOutTime}` : '— 未選択 —'}
           </Row>
           <Row label="泊数">{nights > 0 ? `${nights} 泊` : '—'}</Row>
+          <Row label="駐車場">
+            {parkingId ? (parkingSlots.find((p) => p.id === parkingId)?.label ?? '—') : 'なし'}
+          </Row>
         </dl>
         <p className="text-[11px] text-ink/40">
           駐車場・料金・ゲスト情報・決済は後続のステップで選択します。

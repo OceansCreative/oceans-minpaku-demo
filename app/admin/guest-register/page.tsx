@@ -1,6 +1,6 @@
 'use client';
 
-import { ClipboardCheck, Users } from 'lucide-react';
+import { CheckCircle2, ClipboardCheck, ScanLine, Upload, Users } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import { useAppStore } from '@/lib/store';
@@ -117,14 +117,24 @@ export default function AdminGuestRegisterPage() {
                     />
                   </td>
                   <td className="px-3 py-2 text-right">
-                    <button
-                      type="button"
-                      onClick={() => commit(r.id)}
-                      className="inline-flex items-center gap-1 rounded-md bg-ink px-2.5 py-1 text-[11px] text-sand hover:bg-ink/90"
-                    >
-                      <ClipboardCheck className="h-3 w-3" />
-                      記録
-                    </button>
+                    <div className="inline-flex items-center gap-1">
+                      <IdUploadButton
+                        uploaded={Boolean(merged.idImageUrl)}
+                        onUpload={() =>
+                          updateDraft(r.id, {
+                            idImageUrl: `https://picsum.photos/seed/id-${r.id}/400/250`,
+                          })
+                        }
+                      />
+                      <button
+                        type="button"
+                        onClick={() => commit(r.id)}
+                        className="inline-flex items-center gap-1 rounded-md bg-ink px-2.5 py-1 text-[11px] text-sand hover:bg-ink/90"
+                      >
+                        <ClipboardCheck className="h-3 w-3" />
+                        記録
+                      </button>
+                    </div>
                   </td>
                 </tr>
               );
@@ -141,6 +151,32 @@ export default function AdminGuestRegisterPage() {
         </table>
       </div>
     </div>
+  );
+}
+
+function IdUploadButton({ uploaded, onUpload }: { uploaded: boolean; onUpload: () => void }) {
+  if (uploaded) {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 text-[10px] text-emerald-700"
+        title="ICT本人確認: 身分証画像 + 顔写真 を取得済み"
+      >
+        <CheckCircle2 className="h-3 w-3" />
+        ICT本人確認 OK
+      </span>
+    );
+  }
+  return (
+    <button
+      type="button"
+      onClick={onUpload}
+      title="ICT本人確認のための身分証画像をアップロード（モック）"
+      className="inline-flex items-center gap-1 rounded-md border border-ink/15 px-2 py-1 text-[10px] text-ink/60 hover:bg-ink/[0.04]"
+    >
+      <Upload className="h-3 w-3" />
+      <ScanLine className="h-3 w-3" />
+      身分証 UP
+    </button>
   );
 }
 

@@ -54,3 +54,84 @@ export async function createPaymentIntent(
     createdAt: new Date().toISOString(),
   };
 }
+
+export interface CapturePaymentIntentInput {
+  intent: MockPaymentIntent;
+}
+
+/** Capture a previously-authorized intent (host approved the reservation). */
+export async function capturePaymentIntent({
+  intent,
+}: CapturePaymentIntentInput): Promise<MockPaymentIntent> {
+  if (intent.status !== 'authorized') {
+    throw new Error(
+      `capturePaymentIntent: expected status 'authorized', got '${intent.status}' for ${intent.id}`,
+    );
+  }
+  await simulateLatency();
+  return { ...intent, status: 'captured' };
+}
+
+/** Cancel (release) an authorization without capturing — host rejected the reservation. */
+export async function cancelPaymentIntent({
+  intent,
+}: CapturePaymentIntentInput): Promise<MockPaymentIntent> {
+  if (intent.status !== 'authorized') {
+    throw new Error(
+      `cancelPaymentIntent: expected status 'authorized', got '${intent.status}' for ${intent.id}`,
+    );
+  }
+  await simulateLatency();
+  return { ...intent, status: 'released' };
+}
+
+export interface RefundPaymentIntentInput {
+  intent: MockPaymentIntent;
+  /**
+   * JPY to refund. Defaults to the full amount.
+   * Pass less than `intent.amount` for a partial refund (e.g. cancellation policy keeps a deposit).
+   */
+  amount?: number;
+}
+
+export interface MockRefund {
+  id: string;
+  intentId: string;
+  amount: number;
+  /** Portion retained as a cancellation fee (intent.amount − refund.amount). */
+  retained: number;
+  createdAt: string;
+}
+
+/**
+ * Refund a captured intent. Supports partial refunds so the cancellation flow can
+ * retain a deposit per `CancellationPolicy.depositRate`.
+ */
+export async function refundPaymentIntent({
+  intent,
+  amount,
+}: RefundPaymentIntentInput): Promise<{ intent: MockPaymentIntent; refund: MockRefund }> {
+  if (intent.status !== 'captured') {
+    throw new Error(
+      `refundPaymentIntent: expected status 'captured', got '${intent.status}' for ${intent.id}`,
+    );
+  }
+  const refundAmount = amount ?? intent.amount;
+  if (refundAmount < 0 || refundAmount > intent.amount) {
+    throw new Error(
+      `refundPaymentIntent: amount ${refundAmount} out of range for intent ${intent.id} (max ${intent.amount})`,
+    );
+  }
+  await simulateLatency();
+  const refund: MockRefund = {
+    id: `re_mock_${Math.random().toString(36).slice(2, 10)}`,
+    intentId: intent.id,
+    amount: refundAmount,
+    retained: intent.amount - refundAmount,
+    createdAt: new Date().toISOString(),
+  };
+  return {
+    intent: { ...intent, status: 'refunded' },
+    refund,
+  };
+}

@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useMemo, type ReactNode } from 'react';
 
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils/cn';
@@ -48,7 +48,13 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const authed = useAppStore((s) => s.isAdminAuthenticated);
   const signOut = useAppStore((s) => s.signOutAdmin);
+  const reservations = useAppStore((s) => s.reservations);
   const isLoginRoute = pathname === '/admin/login';
+
+  const pendingCount = useMemo(
+    () => reservations.filter((r) => r.status === 'pending').length,
+    [reservations],
+  );
 
   useEffect(() => {
     if (!authed && !isLoginRoute) {
@@ -90,7 +96,18 @@ export function AdminShell({ children }: { children: ReactNode }) {
                   )}
                 >
                   <Icon className="h-4 w-4" />
-                  <span className="truncate">{item.label}</span>
+                  <span className="flex-1 truncate">{item.label}</span>
+                  {item.href === '/admin/reservations' && pendingCount > 0 && (
+                    <span
+                      className={cn(
+                        'rounded-full px-1.5 py-0.5 text-[10px] font-medium',
+                        active ? 'bg-sand text-ink' : 'bg-crimson text-sand',
+                      )}
+                      aria-label={`${pendingCount} 件の新規予約`}
+                    >
+                      {pendingCount}
+                    </span>
+                  )}
                 </Link>
               );
             })}

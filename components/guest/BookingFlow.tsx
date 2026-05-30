@@ -9,6 +9,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
+  CreditCard,
+  Lock,
   Receipt,
   UserRound,
 } from 'lucide-react';
@@ -61,6 +63,12 @@ export function BookingFlow({ room }: BookingFlowProps) {
     guestInfo.name.trim().length > 0 &&
     /.+@.+\..+/.test(guestInfo.email) &&
     guestInfo.phone.trim().length >= 6;
+
+  const [card, setCard] = useState({ number: '4242 4242 4242 4242', expiry: '12/29', cvc: '123' });
+  const cardLooksValid =
+    card.number.replaceAll(' ', '').length >= 12 &&
+    /^\d{2}\/\d{2}$/.test(card.expiry) &&
+    card.cvc.length >= 3;
 
   const bookedDays = useMemo(
     () => collectBookedDays(reservations, room.id),
@@ -228,6 +236,62 @@ export function BookingFlow({ room }: BookingFlowProps) {
           </div>
         )}
 
+        {step === 'payment' && quote && (
+          <div className="space-y-5">
+            <header className="flex items-center gap-2 text-sm text-ink/70">
+              <CreditCard className="h-4 w-4 text-moss" />
+              <span>お支払い方法（モック）</span>
+            </header>
+            <div className="rounded-2xl border border-ink/10 bg-sand p-5">
+              <div className="mb-4 flex items-center gap-2 rounded-md bg-moss/10 px-3 py-2 text-[11px] text-moss">
+                <Lock className="h-3.5 w-3.5" />
+                これはデモ用のフォームです。実際のカード情報は送信されません。
+              </div>
+              <div className="space-y-4">
+                <Field label="カード番号" required>
+                  <input
+                    type="text"
+                    value={card.number}
+                    onChange={(e) => setCard({ ...card, number: e.target.value })}
+                    className={inputClass}
+                    placeholder="4242 4242 4242 4242"
+                    autoComplete="cc-number"
+                    inputMode="numeric"
+                  />
+                </Field>
+                <div className="grid grid-cols-2 gap-4">
+                  <Field label="有効期限 (MM/YY)" required>
+                    <input
+                      type="text"
+                      value={card.expiry}
+                      onChange={(e) => setCard({ ...card, expiry: e.target.value })}
+                      className={inputClass}
+                      placeholder="12/29"
+                      autoComplete="cc-exp"
+                    />
+                  </Field>
+                  <Field label="CVC" required>
+                    <input
+                      type="text"
+                      value={card.cvc}
+                      onChange={(e) => setCard({ ...card, cvc: e.target.value })}
+                      className={inputClass}
+                      placeholder="123"
+                      autoComplete="cc-csc"
+                      inputMode="numeric"
+                    />
+                  </Field>
+                </div>
+              </div>
+              <p className="mt-4 border-t border-ink/10 pt-3 text-[11px] text-ink/50">
+                ご予約のリクエスト時点では <strong className="text-ink">与信のみ</strong>{' '}
+                を確保します（authorized）。ホストが承認した時点で正式に決済（captured）
+                となります。承認されなかった場合は決済されません。
+              </p>
+            </div>
+          </div>
+        )}
+
         {step === 'review' && quote && (
           <div className="space-y-4">
             <header className="flex items-center gap-2 text-sm text-ink/70">
@@ -321,7 +385,11 @@ export function BookingFlow({ room }: BookingFlowProps) {
                 ? guestInfoComplete
                   ? goNext
                   : undefined
-                : goNext
+                : step === 'payment'
+                  ? cardLooksValid
+                    ? goNext
+                    : undefined
+                  : goNext
           }
         />
       </section>

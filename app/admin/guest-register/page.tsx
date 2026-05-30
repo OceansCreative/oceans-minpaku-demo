@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckCircle2, ClipboardCheck, ScanLine, Upload, Users } from 'lucide-react';
+import { CheckCircle2, ClipboardCheck, Download, ScanLine, Upload, Users } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import { useAppStore } from '@/lib/store';
@@ -51,14 +51,61 @@ export default function AdminGuestRegisterPage() {
     });
   }
 
+  function exportCsv() {
+    const header = [
+      '予約ID',
+      '氏名',
+      '国籍',
+      '職業',
+      '旅券番号',
+      'チェックイン',
+      'チェックアウト',
+      '身分証',
+    ];
+    const rows = register.map((entry) => {
+      const reservation = reservations.find((r) => r.id === entry.reservationId);
+      return [
+        entry.reservationId,
+        entry.name,
+        entry.nationality,
+        entry.profession,
+        entry.passportNumber ?? '',
+        reservation?.checkIn ?? '',
+        reservation?.checkOut ?? '',
+        entry.idImageUrl ? '取得済み' : '未取得',
+      ];
+    });
+    const csv = [header, ...rows]
+      .map((r) => r.map((c) => `"${String(c).replaceAll('"', '""')}"`).join(','))
+      .join('\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `guest-register-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <div className="space-y-5">
-      <header>
-        <h1 className="font-serif text-2xl text-ink">宿泊者名簿</h1>
-        <p className="text-sm text-ink/60">
-          住宅宿泊事業法 §8 に基づく宿泊者の記録。氏名・国籍・連絡先・職業を記載し、3
-          年間保存します。
-        </p>
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="font-serif text-2xl text-ink">宿泊者名簿</h1>
+          <p className="text-sm text-ink/60">
+            住宅宿泊事業法 §8 に基づく宿泊者の記録。氏名・国籍・連絡先・職業を記載し、3
+            年間保存します。
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={exportCsv}
+          disabled={register.length === 0}
+          className="inline-flex items-center gap-1.5 rounded-md border border-ink/15 bg-sand px-3 py-1.5 text-xs text-ink/80 hover:bg-ink/[0.04] disabled:opacity-40"
+        >
+          <Download className="h-3.5 w-3.5" />
+          CSV エクスポート
+        </button>
       </header>
 
       <div className="overflow-hidden rounded-2xl border border-ink/10 bg-sand">

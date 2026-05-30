@@ -1,0 +1,27 @@
+{
+  "Nav": {
+    "rooms": "客房",
+    "access": "交通",
+    "admin": "后台"
+  },
+  "Common": {
+    "back": "返回",
+    "save": "保存",
+    "cancel": "取消",
+    "loading": "加载中..."
+  },
+  "Home": {
+    "tagline": "山阴的整栋出租 / 示范案例",
+    "headline": "在海风穿堂的老屋里，\n度过只属于您的时光。",
+    "viewRooms": "查看客房",
+    "concept": "关于这栋房子",
+    "conceptHeading": "和风现代整栋出租，共 4 间客房",
+    "amenitiesHeading": "设施"
+  },
+  "Rooms": {
+    "title": "客房",
+    "description": "四间客房各具景观与风格。",
+    "capacity": "最多 {count} 位入住",
+    "viewDetails": "查看详情"
+  }
+}

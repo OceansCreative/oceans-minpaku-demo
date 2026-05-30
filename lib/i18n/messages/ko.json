@@ -1,0 +1,27 @@
+{
+  "Nav": {
+    "rooms": "객실",
+    "access": "오시는 길",
+    "admin": "관리자"
+  },
+  "Common": {
+    "back": "돌아가기",
+    "save": "저장",
+    "cancel": "취소",
+    "loading": "불러오는 중..."
+  },
+  "Home": {
+    "tagline": "산인 지방의 단독 임대 / 샘플",
+    "headline": "바닷바람이 지나가는 옛집에서\n오롯한 시간을 보내세요.",
+    "viewRooms": "객실 보기",
+    "concept": "이 집에 대하여",
+    "conceptHeading": "와모던 단독 임대, 4실",
+    "amenitiesHeading": "시설"
+  },
+  "Rooms": {
+    "title": "객실",
+    "description": "4개의 객실은 각각 다른 풍경과 분위기를 가지고 있습니다.",
+    "capacity": "최대 {count}명",
+    "viewDetails": "상세 보기"
+  }
+}

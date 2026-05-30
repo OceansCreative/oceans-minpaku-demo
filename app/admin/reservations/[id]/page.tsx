@@ -1,10 +1,10 @@
 'use client';
 
-import { AlertTriangle, ArrowLeft, CheckCircle2, Loader2 } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, CheckCircle2, Loader2, XCircle } from 'lucide-react';
 import Link from 'next/link';
 import { use, useState } from 'react';
 
-import { approveReservation, detectOverlap } from '@/lib/services/reservation';
+import { approveReservation, detectOverlap, rejectReservation } from '@/lib/services/reservation';
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils/cn';
 
@@ -26,7 +26,7 @@ export default function AdminReservationDetailPage({ params }: PageProps) {
   const allReservations = useAppStore((s) => s.reservations);
   const upsertReservation = useAppStore((s) => s.upsertReservation);
 
-  const [busy, setBusy] = useState<'approve' | null>(null);
+  const [busy, setBusy] = useState<'approve' | 'reject' | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   if (!reservation || !room) {
@@ -58,6 +58,28 @@ export default function AdminReservationDetailPage({ params }: PageProps) {
       upsertReservation(result.reservation);
     } catch (e) {
       setError(e instanceof Error ? e.message : '承認に失敗しました');
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function handleReject() {
+    if (!reservation) return;
+    setBusy('reject');
+    setError(null);
+    try {
+      const intent: MockPaymentIntent = {
+        id: reservation.payment.intentId,
+        status: reservation.payment.status,
+        amount: reservation.amount,
+        depositHeld: reservation.payment.depositHeld,
+        metadata: {},
+        createdAt: reservation.createdAt,
+      };
+      const result = await rejectReservation(reservation, intent);
+      upsertReservation(result.reservation);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '却下に失敗しました');
     } finally {
       setBusy(null);
     }
@@ -139,8 +161,24 @@ export default function AdminReservationDetailPage({ params }: PageProps) {
             )}
             承認する（Stripe capture）
           </button>
+          <button
+            type="button"
+            onClick={handleReject}
+            disabled={busy !== null}
+            className={cn(
+              'inline-flex items-center gap-2 rounded-md border border-crimson/40 px-4 py-2 text-sm font-medium text-crimson',
+              'transition-colors hover:bg-crimson/10 disabled:cursor-not-allowed disabled:opacity-40',
+            )}
+          >
+            {busy === 'reject' ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <XCircle className="h-4 w-4" />
+            )}
+            却下（Stripe cancel）
+          </button>
           <p className="ml-auto self-center text-[11px] text-ink/50">
-            承認すると与信が捕捉され、決済が確定します。
+            承認で与信を捕捉、却下で与信を解除します。
           </p>
         </div>
       )}

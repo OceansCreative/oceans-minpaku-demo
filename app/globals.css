@@ -7,8 +7,30 @@
   --foreground: 31 32 36; /* ink */
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html,
 body {
   color: rgb(var(--foreground));
   background: rgb(var(--background));
+}
+
+@layer base {
+  body {
+    font-feature-settings: 'palt' 1;
+    letter-spacing: 0.01em;
+  }
+  h1,
+  h2,
+  h3 {
+    letter-spacing: 0.02em;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
 }

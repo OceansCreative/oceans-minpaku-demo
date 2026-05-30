@@ -3,8 +3,8 @@
 import { CheckCircle2, Clock3, Info, Loader2, Network, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
 
+import { OtaPlaceholderCard } from '@/components/admin/OtaPlaceholderCard';
 import { AIRBNB_ICAL_LAG_HOURS, fetchAirbnbCalendar } from '@/lib/mock/airbnb-ical';
-import { cn } from '@/lib/utils/cn';
 
 export default function AdminOtaPage() {
   const [icalUrl, setIcalUrl] = useState(
@@ -88,8 +88,16 @@ export default function AdminOtaPage() {
         </div>
       </section>
 
-      <Placeholder name="Booking.com" />
-      <Placeholder name="Agoda" />
+      <OtaPlaceholderCard
+        name="Booking.com"
+        protocol="Channel Manager API (XML) または partner API"
+        notes="在庫・料金・予約の双方向同期。Booking.com のレートプラン体系（Genius / Mobile レート）を取り込むためのレートプランマッピング層が別途必要。"
+      />
+      <OtaPlaceholderCard
+        name="Agoda"
+        protocol="YCS (Yield Control System) API"
+        notes="アジア圏比率が高いため繁忙期のサーチャージ自動反映を想定。Agoda 独自のホテルID・コンテンツAPI連携が前提。"
+      />
 
       <div className="flex items-start gap-2 rounded-md border border-ink/10 bg-ink/[0.02] px-4 py-2.5 text-[11px] text-ink/60">
         <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-moss" />
@@ -99,28 +107,5 @@ export default function AdminOtaPage() {
         </p>
       </div>
     </div>
-  );
-}
-
-function Placeholder({ name }: { name: string }) {
-  return (
-    <section
-      className={cn(
-        'space-y-2 rounded-2xl border border-dashed border-ink/15 bg-sand/40 p-5',
-        'text-ink/50',
-      )}
-    >
-      <header className="flex items-center gap-2 text-sm">
-        <Network className="h-4 w-4 text-ink/30" />
-        <span className="font-medium">{name}</span>
-        <span className="ml-auto rounded-full bg-ink/[0.05] px-2 py-0.5 text-[10px] uppercase">
-          拡張予定
-        </span>
-      </header>
-      <p className="text-xs">
-        {name} 連携枠です。本格運用ではチャネルマネージャ経由 / 直接API いずれかで
-        在庫・料金・予約を双方向同期します。
-      </p>
-    </section>
   );
 }

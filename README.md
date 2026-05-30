@@ -10,7 +10,10 @@
 > anti-double-booking, smart lock & OTA integration patterns. Built by
 > [OceansBase](https://oceans-base.com).
 
-<!-- TODO(phase-10): hero screenshot -->
+![和庵 山陰 — landing screenshot](./docs/portfolio/screenshots/hero-landing.png)
+
+> Screenshot placeholders live under `docs/portfolio/screenshots/`. Run the app
+> locally and replace them with real captures before posting to Pin.
 
 ## Live demo
 
@@ -45,11 +48,50 @@ No credentials required for the guest flow. For the admin side, sign in with `de
 
 ## Architecture
 
-<!-- TODO(phase-10): mermaid diagram of client / mock layer / store / external integrations -->
+```mermaid
+flowchart LR
+  subgraph Client[Next.js 15 App Router]
+    Guest[Guest pages\n/app/(guest)/]
+    Admin[Admin pages\n/app/admin/]
+  end
+  Store[(Zustand store\npersist → localStorage)]
+  subgraph Services[lib/services]
+    Resv[reservation service\ndetectOverlap + orchestration]
+    Pricing[pricing service\ndynamic rates + cancellation fee]
+  end
+  subgraph Mocks[lib/mock]
+    Stripe[stripe.ts]
+    RL[remotelock.ts]
+    Airbnb[airbnb-ical.ts]
+  end
+  External[(Stripe API\nRemoteLOCK\nAirbnb iCal)]
+
+  Guest -->|hooks| Store
+  Admin -->|hooks| Store
+  Guest --> Resv
+  Admin --> Resv
+  Admin --> Pricing
+  Resv --> Stripe
+  Resv --> RL
+  Admin --> Airbnb
+  Stripe -. swap in prod .-> External
+  RL -. swap in prod .-> External
+  Airbnb -. swap in prod .-> External
+```
+
+The mock layer (`lib/mock/`) is the only place that touches external services in
+this demo. Each file starts with a `// ===== MOCK: 本番では実API（◯◯）に差し替え =====`
+banner so production replacement is a search-and-swap.
 
 ## Screenshots
 
-<!-- TODO(phase-10): guest landing, booking calendar, admin dashboard, double-booking warning, mobile -->
+| Guest landing                                       | Booking calendar                                       | Admin dashboard                                       |
+| --------------------------------------------------- | ------------------------------------------------------ | ----------------------------------------------------- |
+| ![](./docs/portfolio/screenshots/guest-landing.png) | ![](./docs/portfolio/screenshots/booking-calendar.png) | ![](./docs/portfolio/screenshots/admin-dashboard.png) |
+
+| Double-booking warning                                       | Mobile                                       |
+| ------------------------------------------------------------ | -------------------------------------------- |
+| ![](./docs/portfolio/screenshots/double-booking-warning.png) | ![](./docs/portfolio/screenshots/mobile.png) |
 
 ## Quick start
 

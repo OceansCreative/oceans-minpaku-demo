@@ -9,6 +9,7 @@ import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils/cn';
 
 import type { MockPaymentIntent } from '@/lib/mock/stripe';
+import type { Reservation } from '@/types';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -106,7 +107,7 @@ export default function AdminReservationDetailPage({ params }: PageProps) {
       </header>
 
       {conflicts.length > 0 && reservation.status === 'pending' && (
-        <ConflictWarning conflictCount={conflicts.length} />
+        <ConflictWarning conflicts={conflicts} />
       )}
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -225,14 +226,37 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
   );
 }
 
-function ConflictWarning({ conflictCount }: { conflictCount: number }) {
+function ConflictWarning({ conflicts }: { conflicts: Reservation[] }) {
   return (
-    <div className="rounded-2xl border-2 border-crimson bg-crimson/5 px-5 py-4 text-sm text-crimson">
-      <p className="font-medium">⚠️ ダブルブッキングの恐れがあります</p>
-      <p className="mt-1 text-xs">
-        この期間には他に <strong>{conflictCount}</strong> 件の予約があります。
-        承認は安全のためブロックされています。
+    <div className="space-y-3 rounded-2xl border-2 border-crimson bg-crimson/5 px-5 py-4 text-sm text-crimson">
+      <p className="flex items-center gap-2 font-medium">
+        <AlertTriangle className="h-4 w-4" />
+        ダブルブッキングの恐れがあります — 承認は無効化されています
       </p>
+      <p className="text-xs">
+        この期間には他に <strong>{conflicts.length}</strong> 件の予約があります。
+        いずれかをキャンセル / 却下してから再度ご確認ください。
+      </p>
+      <ul className="space-y-1 text-xs">
+        {conflicts.map((c) => (
+          <li
+            key={c.id}
+            className="flex items-center justify-between rounded bg-sand/70 px-2 py-1.5 text-ink"
+          >
+            <span>
+              <code className="text-[11px] text-crimson">{c.id}</code> · {c.checkIn} → {c.checkOut}{' '}
+              · <span className="rounded bg-ink/[0.05] px-1.5 py-0.5 text-[10px]">{c.source}</span>{' '}
+              <span className="text-[10px] text-ink/40">/{c.status}</span>
+            </span>
+            <Link
+              href={`/admin/reservations/${c.id}`}
+              className="text-[11px] text-crimson hover:text-crimson/80"
+            >
+              開く →
+            </Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

@@ -1,5 +1,7 @@
-import { Globe, MapPin } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import Link from 'next/link';
+
+import { LanguageSwitcher } from '@/components/i18n/LanguageSwitcher';
 
 import type { ReactNode } from 'react';
 
@@ -22,14 +24,7 @@ export default function GuestLayout({ children }: { children: ReactNode }) {
               <MapPin className="-mt-0.5 mr-1 inline h-3.5 w-3.5" />
               アクセス
             </Link>
-            <button
-              type="button"
-              className="hidden items-center gap-1 rounded-md border border-ink/15 px-2.5 py-1 text-xs hover:bg-ink/5 sm:inline-flex"
-              aria-label="言語を切り替える"
-            >
-              <Globe className="h-3 w-3" />
-              JA
-            </button>
+            <LanguageSwitcher className="hidden sm:inline-flex" />
             <Link
               href="/admin"
               className="rounded-md bg-ink px-3 py-1.5 text-xs text-sand transition-colors hover:bg-ink/90"

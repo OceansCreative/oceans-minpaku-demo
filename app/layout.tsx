@@ -1,6 +1,7 @@
 import { DemoBanner } from '@/components/oceans-base/DemoBanner';
 import { FloatingBadge } from '@/components/oceans-base/FloatingBadge';
 import { SiteFooter } from '@/components/oceans-base/SiteFooter';
+import { TourOverlay } from '@/components/onboarding/TourOverlay';
 import { WelcomeModal } from '@/components/onboarding/WelcomeModal';
 import { AppProviders } from '@/components/providers/AppProviders';
 
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <SiteFooter />
           <FloatingBadge />
           <WelcomeModal />
+          <TourOverlay />
         </AppProviders>
       </body>
     </html>

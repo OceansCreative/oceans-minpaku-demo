@@ -27,16 +27,16 @@ export default function HomePage() {
           />
           <div className="absolute inset-0 bg-gradient-to-b from-ink/30 via-ink/40 to-ink/70" />
         </div>
-        <div className="mx-auto flex min-h-[68vh] max-w-6xl flex-col justify-end gap-6 px-6 py-16 text-sand">
-          <p className="text-xs uppercase tracking-[0.4em] text-sand/70">
+        <div className="mx-auto flex min-h-[60vh] max-w-6xl flex-col justify-end gap-4 px-5 py-12 text-sand sm:min-h-[68vh] sm:gap-6 sm:px-6 sm:py-16">
+          <p className="text-[10px] uppercase tracking-[0.4em] text-sand/70 sm:text-xs">
             One-house rental in 山陰 / Sample
           </p>
-          <h1 className="max-w-2xl font-serif text-4xl leading-tight md:text-6xl">
+          <h1 className="max-w-2xl font-serif text-3xl leading-tight sm:text-4xl md:text-6xl">
             海風の通る旧家で、
             <br />
             ひと組のための時間を。
           </h1>
-          <p className="max-w-xl text-sm leading-relaxed text-sand/80 md:text-base">
+          <p className="max-w-xl text-[13px] leading-relaxed text-sand/80 sm:text-sm md:text-base">
             {seedProperty.description}
           </p>
           <div className="flex flex-wrap items-center gap-3 pt-3">

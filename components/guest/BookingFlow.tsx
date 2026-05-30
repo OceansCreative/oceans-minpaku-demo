@@ -3,10 +3,18 @@
 import 'react-day-picker/style.css';
 
 import { ja } from 'date-fns/locale';
-import { Calendar as CalendarIcon, Car, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
+import {
+  Calendar as CalendarIcon,
+  Car,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Receipt,
+} from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { DayPicker, type DateRange } from 'react-day-picker';
 
+import { calculateStayTotal } from '@/lib/services/pricing';
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils/cn';
 import { nightsBetween, toIsoDate } from '@/lib/utils/dates';
@@ -34,6 +42,7 @@ const CHECK_OUT_OPTIONS: HHmm[] = ['09:00', '10:00', '11:00'];
 export function BookingFlow({ room }: BookingFlowProps) {
   const reservations = useAppStore((s) => s.reservations);
   const parkingSlots = useAppStore((s) => s.parkingSlots);
+  const pricingRules = useAppStore((s) => s.pricingRules);
   const [step, setStep] = useState<BookingStep>('dates');
   const [range, setRange] = useState<DateRange | undefined>();
   const [checkInTime, setCheckInTime] = useState<HHmm>('15:00');
@@ -47,6 +56,16 @@ export function BookingFlow({ room }: BookingFlowProps) {
 
   const nights =
     range?.from && range.to ? nightsBetween(toIsoDate(range.from), toIsoDate(range.to)) : 0;
+
+  const quote = useMemo(() => {
+    if (!range?.from || !range.to) return null;
+    return calculateStayTotal({
+      basePrice: room.basePrice,
+      checkIn: toIsoDate(range.from),
+      checkOut: toIsoDate(range.to),
+      rules: pricingRules,
+    });
+  }, [range?.from, range?.to, room.basePrice, pricingRules]);
 
   const canAdvanceFromDates = nights > 0;
   const stepIndex = STEPS.findIndex((s) => s.id === step);
@@ -128,6 +147,45 @@ export function BookingFlow({ room }: BookingFlowProps) {
           </div>
         )}
 
+        {step === 'review' && quote && (
+          <div className="space-y-4">
+            <header className="flex items-center gap-2 text-sm text-ink/70">
+              <Receipt className="h-4 w-4 text-moss" />
+              <span>料金の内訳をご確認ください</span>
+            </header>
+            <div className="overflow-hidden rounded-2xl border border-ink/10 bg-sand">
+              <ul className="divide-y divide-ink/5 text-sm">
+                {quote.rates.map((rate) => {
+                  const isPremium = rate.price !== room.basePrice;
+                  return (
+                    <li key={rate.date} className="flex items-center justify-between px-4 py-2.5">
+                      <div>
+                        <p className="text-ink">{rate.date}</p>
+                        {rate.appliedRules.length > 0 && (
+                          <p className="text-[11px] text-ink/40">
+                            適用ルール: {rate.appliedRules.join(', ')}
+                          </p>
+                        )}
+                      </div>
+                      <p className={cn('font-medium', isPremium ? 'text-moss' : 'text-ink')}>
+                        ¥{rate.price.toLocaleString()}
+                      </p>
+                    </li>
+                  );
+                })}
+              </ul>
+              <div className="flex items-center justify-between border-t border-ink/10 bg-ink/[0.02] px-4 py-3">
+                <span className="text-sm text-ink/70">合計（{quote.nights} 泊）</span>
+                <span className="font-serif text-xl text-ink">¥{quote.total.toLocaleString()}</span>
+              </div>
+            </div>
+            <p className="text-[11px] leading-relaxed text-ink/40">
+              週末・季節・直前予約などのルールが適用されると基本料金から変動します。
+              お支払いはご予約のリクエスト時に与信のみ確保し、ホストの承認をもって正式に決済されます。
+            </p>
+          </div>
+        )}
+
         {step === 'parking' && (
           <div className="space-y-4">
             <header className="flex items-center gap-2 text-sm text-ink/70">
@@ -190,6 +248,11 @@ export function BookingFlow({ room }: BookingFlowProps) {
           <Row label="駐車場">
             {parkingId ? (parkingSlots.find((p) => p.id === parkingId)?.label ?? '—') : 'なし'}
           </Row>
+          {quote && (
+            <Row label="合計">
+              <span className="font-serif text-base text-ink">¥{quote.total.toLocaleString()}</span>
+            </Row>
+          )}
         </dl>
         <p className="text-[11px] text-ink/40">
           駐車場・料金・ゲスト情報・決済は後続のステップで選択します。

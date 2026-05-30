@@ -4,6 +4,7 @@ import { ArrowDownToLine, ArrowUpFromLine } from 'lucide-react';
 import Link from 'next/link';
 import { useMemo } from 'react';
 
+import { CapCounterWidget } from '@/components/admin/widgets/CapCounterWidget';
 import { OccupancyWidget } from '@/components/admin/widgets/OccupancyWidget';
 import { SalesSummaryWidget } from '@/components/admin/widgets/SalesSummaryWidget';
 import { useAppStore } from '@/lib/store';
@@ -35,6 +36,7 @@ export default function AdminDashboardPage() {
       <div className="grid gap-4 md:grid-cols-3">
         <OccupancyWidget />
         <SalesSummaryWidget />
+        <CapCounterWidget />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">

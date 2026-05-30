@@ -191,4 +191,4 @@ mock-integration disclaimer.
 
 ## 日本語版
 
-日本語の README は [README_ja.md](./README_ja.md) を参照してください。（Phase 10 で整備）
+日本語版の README は [README_ja.md](./README_ja.md) を参照してください。

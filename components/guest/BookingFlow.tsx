@@ -10,6 +10,7 @@ import {
   ChevronRight,
   Clock,
   Receipt,
+  UserRound,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { DayPicker, type DateRange } from 'react-day-picker';
@@ -19,7 +20,7 @@ import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils/cn';
 import { nightsBetween, toIsoDate } from '@/lib/utils/dates';
 
-import type { HHmm, Reservation, Room } from '@/types';
+import type { HHmm, LanguageCode, Reservation, Room } from '@/types';
 
 interface BookingFlowProps {
   room: Room;
@@ -48,6 +49,18 @@ export function BookingFlow({ room }: BookingFlowProps) {
   const [checkInTime, setCheckInTime] = useState<HHmm>('15:00');
   const [checkOutTime, setCheckOutTime] = useState<HHmm>('10:00');
   const [parkingId, setParkingId] = useState<string | undefined>();
+  const [guestInfo, setGuestInfo] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    nationality: 'JP',
+    language: 'ja' as LanguageCode,
+  });
+
+  const guestInfoComplete =
+    guestInfo.name.trim().length > 0 &&
+    /.+@.+\..+/.test(guestInfo.email) &&
+    guestInfo.phone.trim().length >= 6;
 
   const bookedDays = useMemo(
     () => collectBookedDays(reservations, room.id),
@@ -147,6 +160,74 @@ export function BookingFlow({ room }: BookingFlowProps) {
           </div>
         )}
 
+        {step === 'info' && (
+          <div className="space-y-5">
+            <header className="flex items-center gap-2 text-sm text-ink/70">
+              <UserRound className="h-4 w-4 text-moss" />
+              <span>ご宿泊代表者の情報をご入力ください</span>
+            </header>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="お名前 / Name" required>
+                <input
+                  type="text"
+                  value={guestInfo.name}
+                  onChange={(e) => setGuestInfo({ ...guestInfo, name: e.target.value })}
+                  className={inputClass}
+                  placeholder="山田 太郎"
+                  autoComplete="name"
+                />
+              </Field>
+              <Field label="メールアドレス / Email" required>
+                <input
+                  type="email"
+                  value={guestInfo.email}
+                  onChange={(e) => setGuestInfo({ ...guestInfo, email: e.target.value })}
+                  className={inputClass}
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                />
+              </Field>
+              <Field label="電話番号 / Phone" required>
+                <input
+                  type="tel"
+                  value={guestInfo.phone}
+                  onChange={(e) => setGuestInfo({ ...guestInfo, phone: e.target.value })}
+                  className={inputClass}
+                  placeholder="+81-90-1234-5678"
+                  autoComplete="tel"
+                />
+              </Field>
+              <Field label="国籍 / Nationality">
+                <input
+                  type="text"
+                  value={guestInfo.nationality}
+                  onChange={(e) => setGuestInfo({ ...guestInfo, nationality: e.target.value })}
+                  className={inputClass}
+                  placeholder="JP"
+                />
+              </Field>
+              <Field label="連絡言語 / Language">
+                <select
+                  value={guestInfo.language}
+                  onChange={(e) =>
+                    setGuestInfo({ ...guestInfo, language: e.target.value as LanguageCode })
+                  }
+                  className={inputClass}
+                >
+                  <option value="ja">日本語</option>
+                  <option value="en">English</option>
+                  <option value="zh">中文</option>
+                  <option value="ko">한국어</option>
+                </select>
+              </Field>
+            </div>
+            <p className="text-[11px] text-ink/40">
+              ご入力いただいた情報は宿泊者名簿（民泊新法対応）として記録されます。
+              チェックイン時に身分証のご提示をお願いする場合があります。
+            </p>
+          </div>
+        )}
+
         {step === 'review' && quote && (
           <div className="space-y-4">
             <header className="flex items-center gap-2 text-sm text-ink/70">
@@ -231,7 +312,17 @@ export function BookingFlow({ room }: BookingFlowProps) {
         <StepNav
           current={step}
           onPrev={stepIndex > 0 ? goPrev : undefined}
-          onNext={step === 'dates' ? (canAdvanceFromDates ? goNext : undefined) : goNext}
+          onNext={
+            step === 'dates'
+              ? canAdvanceFromDates
+                ? goNext
+                : undefined
+              : step === 'info'
+                ? guestInfoComplete
+                  ? goNext
+                  : undefined
+                : goNext
+          }
         />
       </section>
 
@@ -359,6 +450,29 @@ function TimeChoice({
         ))}
       </div>
     </fieldset>
+  );
+}
+
+const inputClass =
+  'w-full rounded-md border border-ink/20 bg-sand px-3 py-2 text-sm text-ink placeholder:text-ink/30 focus:border-moss focus:outline-none focus:ring-1 focus:ring-moss';
+
+function Field({
+  label,
+  required,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="block space-y-1.5">
+      <span className="text-xs text-ink/60">
+        {label}
+        {required && <span className="ml-1 text-crimson">*</span>}
+      </span>
+      {children}
+    </label>
   );
 }
 

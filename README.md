@@ -111,11 +111,65 @@ admin: demo / demo
 
 ## Demo scenario
 
-<!-- TODO(phase-10): click-path for prospective clients and visitors -->
+1. **Browse rooms** at `/rooms`, open 月の間, and click "このお部屋を予約する".
+2. **Pick a date range** the calendar lets you book — past + already-booked nights
+   are greyed out automatically.
+3. Step through **time → parking → 料金確認 → ゲスト情報 → 決済 (mock card)** and
+   submit. You'll land on the reservation status page with a `pending` badge.
+4. **Sign in** at `/admin/login` with `demo` / `demo`. The sidebar shows a red
+   "1" badge on 予約管理.
+5. Open your new reservation and click **承認する** — Stripe captures, RemoteLOCK
+   issues a 6-digit passcode, and the guest-side status page flips to `approved`
+   with the code revealed.
+6. Now open the deliberately-conflicting demo pair: navigate to カレンダー and
+   click into `res-overlap-direct`. The approve button is disabled and a red
+   warning lists the existing Airbnb-sourced reservation it would collide with.
+7. Cancel an approved reservation to see the cancellation policy compute the
+   deposit retention and refund the difference.
+8. Try the **語切替え** (header globe icon) and watch the landing page swap into
+   English / 中文 / 한국어 (partial).
+9. Hit **サンプルデータ → リセット** in the admin sidebar to start over.
 
 ## Design decisions
 
-<!-- TODO(phase-10): 3–5 paragraphs on double-booking prevention, Stripe manual capture rationale, RemoteLOCK choice -->
+**Anti-double-booking is a defence-in-depth, not a single check.**
+Direct bookings claim inventory atomically at submit time via `requestReservation`.
+But Airbnb's iCal export updates every 2–4 hours, so an instant-book on Airbnb
+_can_ race our system. The approval gate is the final guard: `approveReservation`
+re-runs `detectOverlap` against the latest store snapshot, refuses to capture if
+anything new has landed, and surfaces a red warning to the host so they choose
+which booking to keep. The pure `detectOverlap` function lives in
+`lib/services/reservation.ts` and is covered by 12 unit tests including the
+adjacent-stay edge case (checkout day is free for the next guest).
+
+**Stripe manual capture matches the host's emotional model.**
+The host wants to vet the guest before committing the room. Auto-capture would
+either hold the inventory while the money sits in limbo or commit the money
+before the host says yes — both bad. Manual capture (`createPaymentIntent`
+without auto-capture) holds the authorization, lets the host approve or reject,
+and only takes the money on the host's explicit click. Cancellation routes
+through `refundPaymentIntent` with partial-refund support so the cancellation
+policy can retain a deposit.
+
+**RemoteLOCK over a custom key handoff.**
+Codes are stay-scoped (valid only from check-in time to check-out time), rotatable
+on guest request, and revoked on cancellation. The `lib/mock/remotelock.ts`
+surface mirrors the three operations we actually need — `issueCode`,
+`reissueCode`, `revokeCode` — so swapping in the real RemoteLOCK Connect API in
+production is a one-file change.
+
+**Zustand + persist, single store across guest and admin.**
+Because the demo lives entirely in the browser, approving on the admin side
+needs to be visible on the guest's status page immediately. A single Zustand
+store persisted to `localStorage` is the simplest thing that works. SSR safety
+is handled by `skipHydration: true` plus a client-side `hydrateAppStore()` in
+`AppProviders`.
+
+**Mock layer is the _only_ place external services are touched.**
+Every file under `lib/mock/` opens with `// ===== MOCK: 本番では実API（◯◯）に
+差し替え =====`. Replacing the demo with a real Stripe + RemoteLOCK + Airbnb
+deployment is a search-and-swap on those three files, not a refactor of the UI
+or the service layer.
 
 ## Disclaimer
 

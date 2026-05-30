@@ -1,0 +1,13 @@
+{
+  "Nav": {
+    "rooms": "Rooms",
+    "access": "Access",
+    "admin": "Admin"
+  },
+  "Common": {
+    "back": "Back",
+    "save": "Save",
+    "cancel": "Cancel",
+    "loading": "Loading..."
+  }
+}

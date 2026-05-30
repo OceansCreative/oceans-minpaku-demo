@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from 'react';
 
+import { IntlProvider } from '@/lib/i18n/IntlProvider';
 import { hydrateAppStore } from '@/lib/store';
 import { TourProvider } from '@/lib/tour/TourProvider';
 
@@ -26,5 +27,9 @@ export function AppProviders({ children }: AppProvidersProps) {
     });
   }, []);
 
-  return <TourProvider>{children}</TourProvider>;
+  return (
+    <IntlProvider>
+      <TourProvider>{children}</TourProvider>
+    </IntlProvider>
+  );
 }

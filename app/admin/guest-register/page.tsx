@@ -1,6 +1,14 @@
 'use client';
 
-import { CheckCircle2, ClipboardCheck, Download, ScanLine, Upload, Users } from 'lucide-react';
+import {
+  BookOpen,
+  CheckCircle2,
+  ClipboardCheck,
+  Download,
+  ScanLine,
+  Upload,
+  Users,
+} from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import { useAppStore } from '@/lib/store';
@@ -89,6 +97,7 @@ export default function AdminGuestRegisterPage() {
 
   return (
     <div className="space-y-5">
+      <ComplianceNotes />
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-serif text-2xl text-ink">宿泊者名簿</h1>
@@ -198,6 +207,39 @@ export default function AdminGuestRegisterPage() {
         </table>
       </div>
     </div>
+  );
+}
+
+function ComplianceNotes() {
+  return (
+    <section className="rounded-2xl border border-moss/30 bg-moss/[0.06] p-5 text-xs leading-relaxed text-ink/70">
+      <h2 className="mb-2 flex items-center gap-2 text-sm font-medium text-moss">
+        <BookOpen className="h-4 w-4" />
+        住宅宿泊事業法 (民泊新法) 対応メモ
+      </h2>
+      <ul className="list-disc space-y-1 pl-5">
+        <li>
+          <strong>§8 宿泊者名簿の備付義務</strong>: 氏名・住所・職業・宿泊日を記録し、3
+          年間保存。外国籍の宿泊者は旅券番号も必須。
+        </li>
+        <li>
+          <strong>§6 本人確認義務</strong>:
+          対面または「ICTを用いた方法」で本人確認を行う。ICT方式の場合、宿泊者が映像で旅券を提示する／顔写真を撮影するなどの方法が認められている。
+        </li>
+        <li>
+          <strong>§2-3 年間180日上限</strong>:
+          1年間（4月〜翌3月）で180日まで。ダッシュボードの稼働カウンタを参照。
+        </li>
+        <li>
+          <strong>都道府県への定期報告</strong>:
+          2ヶ月に1回、宿泊日数・宿泊者数・国籍別内訳を報告。本サンプルではCSVエクスポート機能で代替。
+        </li>
+      </ul>
+      <p className="mt-3 text-[11px] text-ink/40">
+        ※
+        本番運用前に管轄保健所への届出・標識掲示・苦情対応窓口の整備など、追加の運用要件があります。詳細は専門家にご相談ください。
+      </p>
+    </section>
   );
 }
 

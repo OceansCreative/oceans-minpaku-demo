@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
+import { ConflictsPanel } from '@/components/admin/ConflictsPanel';
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils/cn';
 
@@ -73,6 +74,7 @@ export default function AdminCalendarPage() {
         </div>
       </header>
 
+      <ConflictsPanel />
       <Legend />
 
       <div className="overflow-x-auto rounded-2xl border border-ink/10 bg-sand">

@@ -1,6 +1,8 @@
 import { DemoBanner } from '@/components/oceans-base/DemoBanner';
 import { FloatingBadge } from '@/components/oceans-base/FloatingBadge';
 import { SiteFooter } from '@/components/oceans-base/SiteFooter';
+import { WelcomeModal } from '@/components/onboarding/WelcomeModal';
+import { AppProviders } from '@/components/providers/AppProviders';
 
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
@@ -16,10 +18,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ja">
       <body className="flex min-h-screen flex-col bg-sand text-ink antialiased">
-        <DemoBanner />
-        <main className="flex-1">{children}</main>
-        <SiteFooter />
-        <FloatingBadge />
+        <AppProviders>
+          <DemoBanner />
+          <main className="flex-1">{children}</main>
+          <SiteFooter />
+          <FloatingBadge />
+          <WelcomeModal />
+        </AppProviders>
       </body>
     </html>
   );

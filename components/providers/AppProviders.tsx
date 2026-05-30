@@ -1,0 +1,28 @@
+'use client';
+
+import { useEffect, useState, type ReactNode } from 'react';
+
+import { hydrateAppStore } from '@/lib/store';
+
+interface AppProvidersProps {
+  children: ReactNode;
+}
+
+/**
+ * Client-side providers root.
+ * - Triggers Zustand's persist rehydrate exactly once after mount (we use
+ *   `skipHydration: true` so SSR doesn't observe localStorage).
+ * - Renders children either way; UI that needs the store should gate on its own
+ *   selectors rather than wait for hydrate.
+ */
+export function AppProviders({ children }: AppProvidersProps) {
+  const [, setHydrated] = useState(false);
+
+  useEffect(() => {
+    void hydrateAppStore().then(() => {
+      setHydrated(true);
+    });
+  }, []);
+
+  return <>{children}</>;
+}

@@ -4,20 +4,24 @@ import 'react-day-picker/style.css';
 
 import { ja } from 'date-fns/locale';
 import {
+  AlertTriangle,
   Calendar as CalendarIcon,
   Car,
   ChevronLeft,
   ChevronRight,
   Clock,
   CreditCard,
+  Loader2,
   Lock,
   Receipt,
   UserRound,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { DayPicker, type DateRange } from 'react-day-picker';
 
 import { calculateStayTotal } from '@/lib/services/pricing';
+import { requestReservation } from '@/lib/services/reservation';
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils/cn';
 import { nightsBetween, toIsoDate } from '@/lib/utils/dates';
@@ -43,9 +47,12 @@ const CHECK_IN_OPTIONS: HHmm[] = ['14:00', '15:00', '16:00', '17:00', '18:00'];
 const CHECK_OUT_OPTIONS: HHmm[] = ['09:00', '10:00', '11:00'];
 
 export function BookingFlow({ room }: BookingFlowProps) {
+  const router = useRouter();
   const reservations = useAppStore((s) => s.reservations);
   const parkingSlots = useAppStore((s) => s.parkingSlots);
   const pricingRules = useAppStore((s) => s.pricingRules);
+  const upsertGuest = useAppStore((s) => s.upsertGuest);
+  const upsertReservation = useAppStore((s) => s.upsertReservation);
   const [step, setStep] = useState<BookingStep>('dates');
   const [range, setRange] = useState<DateRange | undefined>();
   const [checkInTime, setCheckInTime] = useState<HHmm>('15:00');
@@ -69,6 +76,46 @@ export function BookingFlow({ room }: BookingFlowProps) {
     card.number.replaceAll(' ', '').length >= 12 &&
     /^\d{2}\/\d{2}$/.test(card.expiry) &&
     card.cvc.length >= 3;
+
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  async function handleSubmit() {
+    if (!range?.from || !range.to || !quote) return;
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const guestId = `guest-${Date.now().toString(36)}`;
+      upsertGuest({
+        id: guestId,
+        name: guestInfo.name,
+        email: guestInfo.email,
+        phone: guestInfo.phone,
+        nationality: guestInfo.nationality || undefined,
+        language: guestInfo.language,
+      });
+      const reservation = await requestReservation(
+        {
+          roomId: room.id,
+          guestId,
+          parkingSlotId: parkingId,
+          checkIn: toIsoDate(range.from),
+          checkOut: toIsoDate(range.to),
+          checkInTime,
+          checkOutTime,
+          amount: quote.total,
+          source: 'direct',
+        },
+        reservations,
+      );
+      upsertReservation(reservation);
+      router.push(`/reservations/${reservation.id}`);
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : '送信に失敗しました');
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   const bookedDays = useMemo(
     () => collectBookedDays(reservations, room.id),
@@ -373,23 +420,51 @@ export function BookingFlow({ room }: BookingFlowProps) {
           </div>
         )}
 
+        {submitError && (
+          <div className="flex items-start gap-2 rounded-md border border-crimson/30 bg-crimson/5 px-3 py-2 text-xs text-crimson">
+            <AlertTriangle className="mt-0.5 h-3.5 w-3.5" />
+            <p>{submitError}</p>
+          </div>
+        )}
+
         <StepNav
           current={step}
-          onPrev={stepIndex > 0 ? goPrev : undefined}
+          onPrev={stepIndex > 0 && !submitting ? goPrev : undefined}
           onNext={
-            step === 'dates'
-              ? canAdvanceFromDates
-                ? goNext
-                : undefined
-              : step === 'info'
-                ? guestInfoComplete
+            step === 'payment'
+              ? undefined
+              : step === 'dates'
+                ? canAdvanceFromDates
                   ? goNext
                   : undefined
-                : step === 'payment'
-                  ? cardLooksValid
+                : step === 'info'
+                  ? guestInfoComplete
                     ? goNext
                     : undefined
                   : goNext
+          }
+          submitting={submitting}
+          submitButton={
+            step === 'payment' ? (
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={!cardLooksValid || submitting}
+                className="inline-flex items-center gap-2 rounded-md bg-moss px-5 py-2.5 text-sm font-medium text-sand transition-colors hover:bg-moss/90 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    送信中...
+                  </>
+                ) : (
+                  <>
+                    予約をリクエストする
+                    <ChevronRight className="h-4 w-4" />
+                  </>
+                )}
+              </button>
+            ) : undefined
           }
         />
       </section>
@@ -452,10 +527,14 @@ function StepNav({
   current,
   onPrev,
   onNext,
+  submitting,
+  submitButton,
 }: {
   current: BookingStep;
   onPrev?: () => void;
   onNext?: () => void;
+  submitting?: boolean;
+  submitButton?: React.ReactNode;
 }) {
   return (
     <div className="flex items-center justify-between border-t border-ink/10 pt-4">
@@ -463,7 +542,8 @@ function StepNav({
         <button
           type="button"
           onClick={onPrev}
-          className="inline-flex items-center gap-1.5 text-xs text-ink/60 hover:text-ink"
+          disabled={submitting}
+          className="inline-flex items-center gap-1.5 text-xs text-ink/60 hover:text-ink disabled:opacity-30"
         >
           <ChevronLeft className="h-3.5 w-3.5" />
           ひとつ前へ
@@ -471,15 +551,17 @@ function StepNav({
       ) : (
         <span />
       )}
-      <button
-        type="button"
-        onClick={onNext}
-        disabled={!onNext}
-        className="inline-flex items-center gap-1.5 rounded-md bg-ink px-4 py-2 text-xs font-medium text-sand transition-colors hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-30"
-      >
-        次へ
-        <ChevronRight className="h-3.5 w-3.5" />
-      </button>
+      {submitButton ?? (
+        <button
+          type="button"
+          onClick={onNext}
+          disabled={!onNext || submitting}
+          className="inline-flex items-center gap-1.5 rounded-md bg-ink px-4 py-2 text-xs font-medium text-sand transition-colors hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-30"
+        >
+          次へ
+          <ChevronRight className="h-3.5 w-3.5" />
+        </button>
+      )}
     </div>
   );
   // The `current` arg keeps the signature stable as later commits gate Next per step.

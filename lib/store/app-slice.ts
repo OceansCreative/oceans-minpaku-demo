@@ -13,8 +13,12 @@ export interface AppSlice {
    */
   seedAnchorIso: string;
   hasSeenOnboarding: boolean;
+  /** Mock admin auth — credentials are checked against `demo` / `demo` in the login screen. */
+  isAdminAuthenticated: boolean;
   setLanguage: (language: LanguageCode) => void;
   markOnboardingSeen: () => void;
+  signInAdmin: () => void;
+  signOutAdmin: () => void;
   /** Reset every slice to seed values (admin "サンプルデータリセット" button). */
   resetToSeed: () => void;
 }
@@ -23,8 +27,11 @@ export const createAppSlice: SliceCreator<AppSlice> = (set) => ({
   language: 'ja',
   seedAnchorIso: new Date().toISOString(),
   hasSeenOnboarding: false,
+  isAdminAuthenticated: false,
   setLanguage: (language) => set({ language }),
   markOnboardingSeen: () => set({ hasSeenOnboarding: true }),
+  signInAdmin: () => set({ isAdminAuthenticated: true }),
+  signOutAdmin: () => set({ isAdminAuthenticated: false }),
   // Implemented by the root store so it can rebuild every slice atomically.
   resetToSeed: () => {
     // Wired up in lib/store/index.ts where the full slice set is in scope.

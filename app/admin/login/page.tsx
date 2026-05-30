@@ -2,11 +2,23 @@
 
 import { Lock, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 
 import { useAppStore } from '@/lib/store';
 
 export default function AdminLoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="grid min-h-[40vh] place-items-center text-sm text-ink/50">読み込み中…</div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const signInAdmin = useAppStore((s) => s.signInAdmin);

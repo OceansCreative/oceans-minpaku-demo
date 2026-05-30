@@ -3,29 +3,40 @@
 import 'react-day-picker/style.css';
 
 import { ja } from 'date-fns/locale';
-import { Calendar as CalendarIcon } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { DayPicker, type DateRange } from 'react-day-picker';
 
-import { detectOverlap } from '@/lib/services/reservation';
 import { useAppStore } from '@/lib/store';
+import { cn } from '@/lib/utils/cn';
 import { nightsBetween, toIsoDate } from '@/lib/utils/dates';
 
-import type { Reservation, Room } from '@/types';
+import type { HHmm, Reservation, Room } from '@/types';
 
 interface BookingFlowProps {
   room: Room;
 }
 
-/**
- * Multi-step guest booking flow. Each subsequent commit in Phase 3 layers another
- * step (time, parking, pricing, info, payment, submit) onto this component.
- *
- * Step 1 (this commit): date range selection with availability colors.
- */
+export type BookingStep = 'dates' | 'time' | 'parking' | 'review' | 'info' | 'payment' | 'done';
+
+const STEPS: { id: BookingStep; label: string }[] = [
+  { id: 'dates', label: '日程' },
+  { id: 'time', label: '時刻' },
+  { id: 'parking', label: '駐車場' },
+  { id: 'review', label: '料金確認' },
+  { id: 'info', label: 'ゲスト情報' },
+  { id: 'payment', label: '決済' },
+];
+
+const CHECK_IN_OPTIONS: HHmm[] = ['14:00', '15:00', '16:00', '17:00', '18:00'];
+const CHECK_OUT_OPTIONS: HHmm[] = ['09:00', '10:00', '11:00'];
+
 export function BookingFlow({ room }: BookingFlowProps) {
   const reservations = useAppStore((s) => s.reservations);
+  const [step, setStep] = useState<BookingStep>('dates');
   const [range, setRange] = useState<DateRange | undefined>();
+  const [checkInTime, setCheckInTime] = useState<HHmm>('15:00');
+  const [checkOutTime, setCheckOutTime] = useState<HHmm>('10:00');
 
   const bookedDays = useMemo(
     () => collectBookedDays(reservations, room.id),
@@ -35,74 +46,221 @@ export function BookingFlow({ room }: BookingFlowProps) {
   const nights =
     range?.from && range.to ? nightsBetween(toIsoDate(range.from), toIsoDate(range.to)) : 0;
 
+  const canAdvanceFromDates = nights > 0;
+  const stepIndex = STEPS.findIndex((s) => s.id === step);
+
+  function goNext() {
+    const next = STEPS[stepIndex + 1];
+    if (next) setStep(next.id);
+  }
+  function goPrev() {
+    const prev = STEPS[stepIndex - 1];
+    if (prev) setStep(prev.id);
+  }
+
   return (
     <div className="grid gap-8 md:grid-cols-[1.5fr,1fr]">
-      <section className="space-y-4">
-        <header className="flex items-center gap-2 text-sm text-ink/70">
-          <CalendarIcon className="h-4 w-4 text-moss" />
-          <span>チェックイン / アウトを選択してください</span>
-        </header>
+      <section className="space-y-6">
+        <StepIndicator current={step} />
 
-        <div className="overflow-x-auto rounded-2xl border border-ink/10 bg-sand p-4">
-          <DayPicker
-            mode="range"
-            numberOfMonths={2}
-            locale={ja}
-            disabled={[{ before: new Date() }, ...bookedDays.map((d) => new Date(d))]}
-            selected={range}
-            onSelect={setRange}
-            classNames={{
-              today: 'text-moss font-semibold',
-              selected: 'bg-ink text-sand',
-              range_start: 'bg-ink text-sand rounded-l-md',
-              range_end: 'bg-ink text-sand rounded-r-md',
-              range_middle: 'bg-ink/10 text-ink',
-              disabled: 'text-ink/20 line-through',
-            }}
-          />
-        </div>
+        {step === 'dates' && (
+          <div className="space-y-4">
+            <header className="flex items-center gap-2 text-sm text-ink/70">
+              <CalendarIcon className="h-4 w-4 text-moss" />
+              <span>チェックイン / アウトを選択してください</span>
+            </header>
+            <div className="overflow-x-auto rounded-2xl border border-ink/10 bg-sand p-4">
+              <DayPicker
+                mode="range"
+                numberOfMonths={2}
+                locale={ja}
+                disabled={[{ before: new Date() }, ...bookedDays.map((d) => new Date(d))]}
+                selected={range}
+                onSelect={setRange}
+                classNames={{
+                  today: 'text-moss font-semibold',
+                  selected: 'bg-ink text-sand',
+                  range_start: 'bg-ink text-sand rounded-l-md',
+                  range_end: 'bg-ink text-sand rounded-r-md',
+                  range_middle: 'bg-ink/10 text-ink',
+                  disabled: 'text-ink/20 line-through',
+                }}
+              />
+            </div>
+            <ul className="flex flex-wrap gap-3 text-[11px] text-ink/60">
+              <li className="inline-flex items-center gap-1.5">
+                <span className="inline-block h-3 w-3 rounded-sm bg-ink" /> 選択中
+              </li>
+              <li className="inline-flex items-center gap-1.5">
+                <span className="inline-block h-3 w-3 rounded-sm bg-ink/10" /> 滞在期間
+              </li>
+              <li className="inline-flex items-center gap-1.5">
+                <span className="inline-block h-3 w-3 rounded-sm border border-ink/30 bg-sand line-through" />
+                予約済み
+              </li>
+            </ul>
+          </div>
+        )}
 
-        <ul className="flex flex-wrap gap-3 text-[11px] text-ink/60">
-          <li className="inline-flex items-center gap-1.5">
-            <span className="inline-block h-3 w-3 rounded-sm bg-ink" />
-            選択中
-          </li>
-          <li className="inline-flex items-center gap-1.5">
-            <span className="inline-block h-3 w-3 rounded-sm bg-ink/10" />
-            滞在期間
-          </li>
-          <li className="inline-flex items-center gap-1.5">
-            <span className="inline-block h-3 w-3 rounded-sm border border-ink/30 bg-sand line-through" />
-            予約済み
-          </li>
-        </ul>
+        {step === 'time' && (
+          <div className="space-y-5">
+            <header className="flex items-center gap-2 text-sm text-ink/70">
+              <Clock className="h-4 w-4 text-moss" />
+              <span>チェックイン / アウトの時刻をお選びください</span>
+            </header>
+            <TimeChoice
+              label="チェックイン"
+              value={checkInTime}
+              onChange={setCheckInTime}
+              options={CHECK_IN_OPTIONS}
+            />
+            <TimeChoice
+              label="チェックアウト"
+              value={checkOutTime}
+              onChange={setCheckOutTime}
+              options={CHECK_OUT_OPTIONS}
+            />
+            <p className="text-[11px] leading-relaxed text-ink/40">
+              鍵のパスコードはチェックイン15分前から、チェックアウト時刻まで有効です。
+            </p>
+          </div>
+        )}
+
+        <StepNav
+          current={step}
+          onPrev={stepIndex > 0 ? goPrev : undefined}
+          onNext={step === 'dates' ? (canAdvanceFromDates ? goNext : undefined) : goNext}
+        />
       </section>
 
       <aside className="h-fit space-y-3 rounded-2xl border border-ink/10 bg-sand/60 p-5 text-sm">
         <p className="font-serif text-base text-ink">{room.name}</p>
         <dl className="space-y-2 text-xs text-ink/70">
-          <div className="flex justify-between">
-            <dt>チェックイン</dt>
-            <dd className="text-ink">{range?.from ? toIsoDate(range.from) : '— 未選択 —'}</dd>
-          </div>
-          <div className="flex justify-between">
-            <dt>チェックアウト</dt>
-            <dd className="text-ink">{range?.to ? toIsoDate(range.to) : '— 未選択 —'}</dd>
-          </div>
-          <div className="flex justify-between border-t border-ink/10 pt-2">
-            <dt>泊数</dt>
-            <dd className="text-ink">{nights > 0 ? `${nights} 泊` : '—'}</dd>
-          </div>
+          <Row label="チェックイン">
+            {range?.from ? `${toIsoDate(range.from)} ${checkInTime}` : '— 未選択 —'}
+          </Row>
+          <Row label="チェックアウト">
+            {range?.to ? `${toIsoDate(range.to)} ${checkOutTime}` : '— 未選択 —'}
+          </Row>
+          <Row label="泊数">{nights > 0 ? `${nights} 泊` : '—'}</Row>
         </dl>
         <p className="text-[11px] text-ink/40">
-          チェックイン/アウトの時刻、駐車場、料金の詳細は次のステップで選択します。
+          駐車場・料金・ゲスト情報・決済は後続のステップで選択します。
         </p>
       </aside>
     </div>
   );
 }
 
-/** Expand every approved/pending reservation into the individual nights it occupies. */
+function StepIndicator({ current }: { current: BookingStep }) {
+  const currentIdx = STEPS.findIndex((s) => s.id === current);
+  return (
+    <ol className="flex flex-wrap items-center gap-2 text-[11px] text-ink/50">
+      {STEPS.map((s, i) => {
+        const reached = i <= currentIdx;
+        const active = s.id === current;
+        return (
+          <li key={s.id} className="flex items-center gap-2">
+            <span
+              className={cn(
+                'inline-flex h-5 w-5 items-center justify-center rounded-full border text-[10px]',
+                reached ? 'border-ink bg-ink text-sand' : 'border-ink/30 text-ink/40',
+                active && 'ring-2 ring-moss/40',
+              )}
+            >
+              {i + 1}
+            </span>
+            <span className={cn(reached ? 'text-ink' : 'text-ink/40')}>{s.label}</span>
+            {i < STEPS.length - 1 && <ChevronRight className="h-3 w-3 text-ink/20" />}
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+function StepNav({
+  current,
+  onPrev,
+  onNext,
+}: {
+  current: BookingStep;
+  onPrev?: () => void;
+  onNext?: () => void;
+}) {
+  return (
+    <div className="flex items-center justify-between border-t border-ink/10 pt-4">
+      {onPrev ? (
+        <button
+          type="button"
+          onClick={onPrev}
+          className="inline-flex items-center gap-1.5 text-xs text-ink/60 hover:text-ink"
+        >
+          <ChevronLeft className="h-3.5 w-3.5" />
+          ひとつ前へ
+        </button>
+      ) : (
+        <span />
+      )}
+      <button
+        type="button"
+        onClick={onNext}
+        disabled={!onNext}
+        className="inline-flex items-center gap-1.5 rounded-md bg-ink px-4 py-2 text-xs font-medium text-sand transition-colors hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-30"
+      >
+        次へ
+        <ChevronRight className="h-3.5 w-3.5" />
+      </button>
+    </div>
+  );
+  // The `current` arg keeps the signature stable as later commits gate Next per step.
+  void current;
+}
+
+function TimeChoice({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: HHmm;
+  onChange: (v: HHmm) => void;
+  options: HHmm[];
+}) {
+  return (
+    <fieldset>
+      <legend className="mb-2 text-xs text-ink/60">{label}</legend>
+      <div className="flex flex-wrap gap-2">
+        {options.map((opt) => (
+          <button
+            key={opt}
+            type="button"
+            onClick={() => onChange(opt)}
+            className={cn(
+              'rounded-md border px-3 py-1.5 text-sm transition-colors',
+              value === opt
+                ? 'border-ink bg-ink text-sand'
+                : 'border-ink/15 bg-sand text-ink/70 hover:border-ink/30',
+            )}
+          >
+            {opt}
+          </button>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
+
+function Row({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex justify-between">
+      <dt>{label}</dt>
+      <dd className="text-ink">{children}</dd>
+    </div>
+  );
+}
+
 function collectBookedDays(reservations: Reservation[], roomId: string): string[] {
   const out: string[] = [];
   for (const r of reservations) {
@@ -118,6 +276,3 @@ function collectBookedDays(reservations: Reservation[], roomId: string): string[
   }
   return out;
 }
-
-// Re-export so the page can prove availability before submit (used in later commits).
-export { detectOverlap };

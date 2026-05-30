@@ -1,4 +1,5 @@
 import { FloatingBadge } from '@/components/oceans-base/FloatingBadge';
+import { SiteFooter } from '@/components/oceans-base/SiteFooter';
 
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
@@ -13,8 +14,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ja">
-      <body className="min-h-screen bg-sand text-ink antialiased">
-        {children}
+      <body className="flex min-h-screen flex-col bg-sand text-ink antialiased">
+        <main className="flex-1">{children}</main>
+        <SiteFooter />
         <FloatingBadge />
       </body>
     </html>

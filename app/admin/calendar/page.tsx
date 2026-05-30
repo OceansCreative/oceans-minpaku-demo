@@ -1,10 +1,11 @@
 'use client';
 
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Info } from 'lucide-react';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
 import { ConflictsPanel } from '@/components/admin/ConflictsPanel';
+import { AIRBNB_ICAL_LAG_HOURS } from '@/lib/mock/airbnb-ical';
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils/cn';
 
@@ -75,6 +76,18 @@ export default function AdminCalendarPage() {
       </header>
 
       <ConflictsPanel />
+      <div className="flex items-start gap-2 rounded-md border border-ink/10 bg-ink/[0.02] px-4 py-2.5 text-[11px] text-ink/60">
+        <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-moss" />
+        <p>
+          Airbnb iCal は上流側で{' '}
+          <strong>
+            {AIRBNB_ICAL_LAG_HOURS.min}〜{AIRBNB_ICAL_LAG_HOURS.max} 時間の遅延
+          </strong>{' '}
+          があるため、同期直後でも他チャネルの新規予約が反映されていない可能性があります。
+          そのため当システムでは <strong>承認制 + 承認時の在庫再チェック</strong>{' '}
+          を最終防波堤としています。
+        </p>
+      </div>
       <Legend />
 
       <div className="overflow-x-auto rounded-2xl border border-ink/10 bg-sand">

@@ -9,5 +9,37 @@
     "save": "Save",
     "cancel": "Cancel",
     "loading": "Loading..."
+  },
+  "Home": {
+    "tagline": "One-house rental in San'in / Sample",
+    "headline": "An old house on the sea breeze,\nyours alone for a while.",
+    "viewRooms": "View rooms",
+    "concept": "About the house",
+    "conceptHeading": "A Wa-modern whole-house rental, 4 rooms",
+    "amenitiesHeading": "Amenities"
+  },
+  "Rooms": {
+    "title": "Rooms",
+    "description": "Each of the four rooms has its own view and character.",
+    "capacity": "Up to {count} guests",
+    "viewDetails": "View details"
+  },
+  "RoomDetail": {
+    "basePrice": "Base rate",
+    "perNight": "/ night",
+    "bookThisRoom": "Book this room",
+    "approvalNote": "Bookings are confirmed only after the host approves your request."
+  },
+  "Booking": {
+    "stepDates": "Dates",
+    "stepTime": "Time",
+    "stepParking": "Parking",
+    "stepReview": "Review",
+    "stepInfo": "Guest info",
+    "stepPayment": "Payment",
+    "next": "Next",
+    "prev": "Back",
+    "submit": "Request reservation",
+    "submitting": "Submitting..."
   }
 }

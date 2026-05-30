@@ -9,5 +9,37 @@
     "save": "保存",
     "cancel": "キャンセル",
     "loading": "読み込み中..."
+  },
+  "Home": {
+    "tagline": "One-house rental in 山陰 / Sample",
+    "headline": "海風の通る旧家で、\nひと組のための時間を。",
+    "viewRooms": "お部屋を見る",
+    "concept": "施設の特徴",
+    "conceptHeading": "和モダンの一棟貸し、4室",
+    "amenitiesHeading": "館内設備"
+  },
+  "Rooms": {
+    "title": "お部屋一覧",
+    "description": "4室それぞれに異なる眺望と設えをご用意しています。",
+    "capacity": "最大 {count} 名",
+    "viewDetails": "詳細を見る"
+  },
+  "RoomDetail": {
+    "basePrice": "基本料金",
+    "perNight": "/ 泊",
+    "bookThisRoom": "このお部屋を予約する",
+    "approvalNote": "予約は申し込み後、ホストの承認をもって確定します。"
+  },
+  "Booking": {
+    "stepDates": "日程",
+    "stepTime": "時刻",
+    "stepParking": "駐車場",
+    "stepReview": "料金確認",
+    "stepInfo": "ゲスト情報",
+    "stepPayment": "決済",
+    "next": "次へ",
+    "prev": "ひとつ前へ",
+    "submit": "予約をリクエストする",
+    "submitting": "送信中..."
   }
 }

@@ -43,3 +43,9 @@ next-env.d.ts.bak
 .vscode/*
 !.vscode/extensions.json
 .idea
+
+# Screenshots are generated locally by `npm run screenshots` — see
+# docs/portfolio/screenshots/README.md. Don't commit binaries.
+docs/portfolio/screenshots/*.png
+docs/portfolio/screenshots/*.jpg
+docs/portfolio/screenshots/*.webp

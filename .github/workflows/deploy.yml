@@ -1,0 +1,46 @@
+name: Deploy
+
+# Path B per DEPLOY.md — use only if you'd rather route deploys through CI
+# than rely on the Vercel-GitHub integration.  Requires three repo secrets:
+#   VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID.
+#
+# This workflow is OPT-IN: it only runs when the secret VERCEL_TOKEN is set.
+# Path A users (the default) can leave the secret unset and this file becomes
+# a no-op.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Vercel (${{ github.event_name == 'push' && 'prod' || 'preview' }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: ${{ vars.VERCEL_DEPLOY_ENABLED == 'true' }}
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel environment
+        run: vercel pull --yes --environment=${{ github.event_name == 'push' && 'production' || 'preview' }} --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build for Vercel
+        run: vercel build ${{ github.event_name == 'push' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy
+        run: vercel deploy --prebuilt ${{ github.event_name == 'push' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}

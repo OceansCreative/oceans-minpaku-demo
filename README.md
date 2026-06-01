@@ -85,9 +85,23 @@ banner so production replacement is a search-and-swap.
 
 ## Screenshots
 
-The repo intentionally does not commit binary screenshots. See the live demo
-or generate them locally — paths to drop captures into are documented in
-[`docs/portfolio/screenshots/README.md`](./docs/portfolio/screenshots/README.md).
+Screenshots are generated locally by a Playwright script, not committed:
+
+```bash
+npm run screenshots:install   # one-time chromium download
+npm run screenshots:build     # build → start → capture → stop
+```
+
+Output lands in `docs/portfolio/screenshots/` — see
+[the script](./scripts/capture-screenshots.mjs) and
+[its README](./docs/portfolio/screenshots/README.md) to add or rearrange shots.
+
+## Deploy
+
+This repo is wired for Vercel. The recommended path is the Vercel-GitHub
+integration (5 minutes, no secrets in the repo). A GitHub-Actions-driven
+alternative is documented for the cases where you want it. See
+[**DEPLOY.md**](./DEPLOY.md) for both.
 
 ## Quick start
 

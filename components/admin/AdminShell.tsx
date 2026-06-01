@@ -150,7 +150,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
           type="button"
           onClick={() => setMobileOpen(true)}
           aria-label="メニューを開く"
-          className="fixed left-3 top-12 z-30 rounded-full bg-ink p-2 text-sand shadow-lg"
+          /* Below the DemoBanner (~30px) + 16px gap; z-25 so the demo banner /
+             welcome modal still sit above. */
+          className="fixed left-3 top-[68px] z-[25] rounded-full bg-ink p-2.5 text-sand shadow-lg ring-1 ring-sand/20"
         >
           <Menu className="h-4 w-4" />
         </button>

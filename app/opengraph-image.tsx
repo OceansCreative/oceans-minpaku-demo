@@ -79,16 +79,39 @@ export default async function OpengraphImage() {
       <div
         style={{
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-end',
+          flexDirection: 'column',
+          gap: 14,
           borderTop: '1px solid rgba(246,241,231,0.18)',
           paddingTop: 22,
         }}
       >
-        <span style={{ fontSize: 22, color: 'rgba(246,241,231,0.6)' }}>
-          Next.js 15 · TypeScript · Stripe · RemoteLOCK · Airbnb iCal
-        </span>
-        <span style={{ fontSize: 22, color: '#f6f1e7' }}>oceans-base.com</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 26, color: '#f6f1e7', fontWeight: 600, letterSpacing: 1 }}>
+            Live demo
+          </span>
+          <span style={{ fontSize: 26, color: '#5b6b4a' }}>→</span>
+          <span
+            style={{
+              fontSize: 24,
+              color: 'rgba(246,241,231,0.85)',
+              fontFamily: 'monospace',
+            }}
+          >
+            minpaku-demo.oceans-base.com
+          </span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-end',
+          }}
+        >
+          <span style={{ fontSize: 20, color: 'rgba(246,241,231,0.55)' }}>
+            Next.js 15 · TypeScript · Stripe · RemoteLOCK · Airbnb iCal
+          </span>
+          <span style={{ fontSize: 20, color: '#f6f1e7' }}>oceans-base.com</span>
+        </div>
       </div>
     </div>,
     { ...size },

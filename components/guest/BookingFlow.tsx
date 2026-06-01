@@ -150,7 +150,7 @@ export function BookingFlow({ room }: BookingFlowProps) {
   return (
     <div className="grid gap-8 md:grid-cols-[1.5fr,1fr]">
       <section className="space-y-6">
-        <StepIndicator current={step} />
+        <StepIndicator current={step} onJump={(target) => setStep(target)} />
 
         {step === 'dates' && (
           <div className="space-y-4">
@@ -496,25 +496,48 @@ export function BookingFlow({ room }: BookingFlowProps) {
   );
 }
 
-function StepIndicator({ current }: { current: BookingStep }) {
+function StepIndicator({
+  current,
+  onJump,
+}: {
+  current: BookingStep;
+  onJump: (target: BookingStep) => void;
+}) {
   const currentIdx = STEPS.findIndex((s) => s.id === current);
   return (
     <ol className="flex flex-wrap items-center gap-2 text-[11px] text-ink/50">
       {STEPS.map((s, i) => {
         const reached = i <= currentIdx;
         const active = s.id === current;
+        // Allow jumping back to any previously-reached step.
+        const jumpable = reached && !active;
+        const StepWrap = jumpable ? 'button' : 'span';
         return (
           <li key={s.id} className="flex items-center gap-2">
-            <span
+            <StepWrap
+              {...(jumpable
+                ? {
+                    type: 'button' as const,
+                    onClick: () => onJump(s.id),
+                    'aria-label': `${s.label} に戻る`,
+                  }
+                : {})}
               className={cn(
-                'inline-flex h-5 w-5 items-center justify-center rounded-full border text-[10px]',
-                reached ? 'border-ink bg-ink text-sand' : 'border-ink/30 text-ink/40',
-                active && 'ring-2 ring-moss/40',
+                'inline-flex items-center gap-1.5 rounded-full px-1 py-0.5 transition-colors',
+                jumpable && 'hover:bg-ink/[0.04]',
               )}
             >
-              {i + 1}
-            </span>
-            <span className={cn(reached ? 'text-ink' : 'text-ink/40')}>{s.label}</span>
+              <span
+                className={cn(
+                  'inline-flex h-5 w-5 items-center justify-center rounded-full border text-[10px]',
+                  reached ? 'border-ink bg-ink text-sand' : 'border-ink/30 text-ink/40',
+                  active && 'ring-2 ring-moss/40',
+                )}
+              >
+                {i + 1}
+              </span>
+              <span className={cn(reached ? 'text-ink' : 'text-ink/40')}>{s.label}</span>
+            </StepWrap>
             {i < STEPS.length - 1 && <ChevronRight className="h-3 w-3 text-ink/20" />}
           </li>
         );

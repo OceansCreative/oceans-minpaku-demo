@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, type ReactNode } from 'react';
+import { Toaster } from 'sonner';
 
 import { IntlProvider } from '@/lib/i18n/IntlProvider';
 import { hydrateAppStore } from '@/lib/store';
@@ -30,6 +31,18 @@ export function AppProviders({ children }: AppProvidersProps) {
   return (
     <IntlProvider>
       <TourProvider>{children}</TourProvider>
+      <Toaster
+        position="bottom-center"
+        toastOptions={{
+          style: {
+            background: '#1f2024',
+            color: '#f6f1e7',
+            border: '1px solid rgba(246,241,231,0.12)',
+            fontSize: '13px',
+          },
+        }}
+        richColors
+      />
     </IntlProvider>
   );
 }

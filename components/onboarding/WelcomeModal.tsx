@@ -32,6 +32,19 @@ export function WelcomeModal({ onStartTour }: WelcomeModalProps) {
     return () => clearTimeout(timer);
   }, [hasSeen]);
 
+  // ESC-to-dismiss while open. Doesn't run when the modal is closed.
+  useEffect(() => {
+    if (!open) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        markSeen();
+        setOpen(false);
+      }
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open, markSeen]);
+
   if (!open) return null;
 
   function close() {
@@ -51,9 +64,11 @@ export function WelcomeModal({ onStartTour }: WelcomeModalProps) {
       role="dialog"
       aria-modal
       aria-labelledby="welcome-modal-title"
+      onClick={close}
       className="fixed inset-0 z-[60] flex items-center justify-center bg-ink/40 px-4 backdrop-blur-sm"
     >
       <div
+        onClick={(e) => e.stopPropagation()}
         className={cn(
           'relative w-full max-w-lg overflow-hidden rounded-2xl bg-sand shadow-2xl',
           'animate-in fade-in zoom-in-95',

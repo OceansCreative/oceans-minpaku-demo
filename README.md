@@ -10,10 +10,8 @@
 > anti-double-booking, smart lock & OTA integration patterns. Built by
 > [OceansBase](https://oceans-base.com).
 
-![和庵 山陰 — landing screenshot](./docs/portfolio/screenshots/hero-landing.png)
-
-> Screenshot placeholders live under `docs/portfolio/screenshots/`. Run the app
-> locally and replace them with real captures before posting to Pin.
+> 📸 Screenshots are not committed in this repo — run the live demo, or follow
+> `docs/portfolio/screenshots/README.md` to capture and drop them in.
 
 ## Live demo
 
@@ -33,7 +31,9 @@ No credentials required for the guest flow. For the admin side, sign in with `de
   guard against the 2–4 hour iCal delay.
 - **住宅宿泊事業法 (Japanese vacation rental law) compliance UI** — guest register, ID upload,
   180-day cap counter.
-- **i18n** — full ja/en, partial zh/ko.
+- **i18n** — full ja/en (62 keys), zh/ko scaffolded at ~34% coverage with the
+  rest falling back to ja. The point is showing the rig, not shipping a
+  production translation.
 
 ## Tech stack
 
@@ -85,13 +85,9 @@ banner so production replacement is a search-and-swap.
 
 ## Screenshots
 
-| Guest landing                                       | Booking calendar                                       | Admin dashboard                                       |
-| --------------------------------------------------- | ------------------------------------------------------ | ----------------------------------------------------- |
-| ![](./docs/portfolio/screenshots/guest-landing.png) | ![](./docs/portfolio/screenshots/booking-calendar.png) | ![](./docs/portfolio/screenshots/admin-dashboard.png) |
-
-| Double-booking warning                                       | Mobile                                       |
-| ------------------------------------------------------------ | -------------------------------------------- |
-| ![](./docs/portfolio/screenshots/double-booking-warning.png) | ![](./docs/portfolio/screenshots/mobile.png) |
+The repo intentionally does not commit binary screenshots. See the live demo
+or generate them locally — paths to drop captures into are documented in
+[`docs/portfolio/screenshots/README.md`](./docs/portfolio/screenshots/README.md).
 
 ## Quick start
 

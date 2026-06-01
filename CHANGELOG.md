@@ -6,6 +6,47 @@ All notable changes to this project will be documented here. Format loosely foll
 
 ## [Unreleased]
 
+## [1.0.1] — Post-review fixes
+
+External review caught a class of regressions in v1.0.0 that CI missed because
+it ran in a single timezone. This release closes them.
+
+### Fixed
+
+- **Pricing date math was TZ-dependent.** `calculateNightlyRates` used
+  `getDay()` and `new Date(yyyymmdd)`, so on a runtime with `TZ=America/New_York`
+  the weekend matcher saw Thursday for Friday and the existing test fell over.
+  Switched the whole service to `getUTCDay` + `parseIsoDate` + `setUTCDate`.
+  CI grew a `TZ` matrix (UTC + Asia/Tokyo + America/New_York) so this class of
+  bug cannot regress unseen again.
+- **RemoteLOCK passcode `validFrom` / `validUntil` were 9 hours late.** The
+  approve flow and the overlap-demo seed joined the date and time literally
+  then appended `Z`, treating JST wall-clock as UTC. New
+  `joinPropertyDateTime()` in `lib/utils/dates.ts` writes the JST offset
+  (`+09:00`) explicitly and is used everywhere wall-clock meets ISO. Regression
+  tests added in `tests/utils/dates.test.ts`.
+
+### Changed
+
+- Drop the unused `'weekday'` pricing rule type. It was a copy-paste of
+  `'weekend'` that no seed, test, or UI ever used.
+- Remove the duplicate `PricingRule.type` field; UI now derives the label from
+  `condition.type` via a new `PricingRuleType` alias.
+- `nightsBetween` jsdoc said "Inclusive" but the implementation has always been
+  half-open. Fix the comment, not the maths.
+
+### Performance
+
+- `/admin/sales` First Load JS: **211 kB → 111 kB**. `recharts` is now
+  `next/dynamic`-loaded (`ssr: false`).
+
+### Docs
+
+- README no longer references screenshot files that aren't checked in (they
+  rendered as broken images on GitHub).
+- README is honest about zh/ko coverage (~34%, scaffolding).
+- `package.json` version bumped 0.1.0 → 1.0.1; v1.0.0 → 1.0.1 was the audit gap.
+
 ## [1.0.0] — Phases 2–10: Full app
 
 ### Added

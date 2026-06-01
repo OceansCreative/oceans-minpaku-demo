@@ -8,28 +8,24 @@ const BASE = 10_000;
 
 const weekendRule: PricingRule = {
   id: 'rule-weekend',
-  type: 'weekend',
   condition: { type: 'weekend', value: { weekdays: [5, 6] } },
   multiplier: 1.2,
 };
 
 const summerRule: PricingRule = {
   id: 'rule-summer',
-  type: 'season',
   condition: { type: 'season', value: { from: '07-20', to: '08-31' } },
   multiplier: 1.3,
 };
 
 const newYearRule: PricingRule = {
   id: 'rule-new-year',
-  type: 'season',
   condition: { type: 'season', value: { from: '12-29', to: '01-03' } },
   multiplier: 1.6,
 };
 
 const lastMinuteRule: PricingRule = {
   id: 'rule-last-minute',
-  type: 'leadtime',
   condition: { type: 'leadtime', value: { maxDaysBefore: 3 } },
   multiplier: 0.9,
 };

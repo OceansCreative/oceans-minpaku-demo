@@ -1,7 +1,13 @@
 /**
  * Pricing service. Pure functions for dynamic-pricing math and cancellation fees.
  * Stateless: pass in rules / policy and get back numbers. No I/O, no store access.
+ *
+ * All day/month arithmetic is performed in UTC so the result is independent of the
+ * runtime's `TZ`. This is critical for a property in JST whose CI runs in UTC and
+ * whose contributors may be anywhere.
  */
+
+import { parseIsoDate, toIsoDate } from '@/lib/utils/dates';
 
 import type { CancellationPolicy, IsoDate, PricingRule } from '@/types';
 
@@ -41,15 +47,14 @@ export function calculateNightlyRates(input: {
   if (input.checkOut <= input.checkIn) {
     throw new Error('calculateNightlyRates: checkOut must be after checkIn');
   }
-  const checkInDate = new Date(input.checkIn);
-  const checkOutDate = new Date(input.checkOut);
+  const checkInDate = parseIsoDate(input.checkIn);
+  const checkOutDate = parseIsoDate(input.checkOut);
   const ctx = input.context ?? {};
 
   const rates: NightlyRate[] = [];
   const cursor = new Date(checkInDate);
   while (cursor < checkOutDate) {
-    const dateIso = cursor.toISOString().slice(0, 10);
-    if (!dateIso) throw new Error('calculateNightlyRates: cursor produced empty date');
+    const dateIso = toIsoDate(cursor);
 
     const applied = input.rules.filter((rule) =>
       ruleAppliesToNight(rule, { night: new Date(cursor), checkIn: input.checkIn, context: ctx }),
@@ -60,7 +65,7 @@ export function calculateNightlyRates(input: {
       price: Math.round(input.basePrice * multiplier),
       appliedRules: applied.map((r) => r.id),
     });
-    cursor.setDate(cursor.getDate() + 1);
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
   }
   return rates;
 }
@@ -85,20 +90,21 @@ function ruleAppliesToNight(
   { night, checkIn, context }: { night: Date; checkIn: IsoDate; context: PriceContext },
 ): boolean {
   switch (rule.condition.type) {
-    case 'weekday':
-      return rule.condition.value.weekdays.includes(night.getDay());
     case 'weekend':
-      return rule.condition.value.weekdays.includes(night.getDay());
+      // UTC weekday so the result is TZ-independent (CI runs in UTC, the
+      // property is in JST; weekdays here are interpreted as the stay's *date*,
+      // not the runtime's localtime).
+      return rule.condition.value.weekdays.includes(night.getUTCDay());
     case 'season':
       return isInSeason(night, rule.condition.value.from, rule.condition.value.to);
     case 'leadtime': {
       const bookedAt = context.bookedAt ?? new Date();
-      const checkInDate = new Date(checkIn);
+      const checkInDate = parseIsoDate(checkIn);
       const leadDays = daysBetween(bookedAt, checkInDate);
       return leadDays <= rule.condition.value.maxDaysBefore;
     }
     case 'occupancy': {
-      const monthKey = night.toISOString().slice(0, 7); // 'YYYY-MM'
+      const monthKey = toIsoDate(night).slice(0, 7); // 'YYYY-MM'
       const occ = context.monthlyOccupancy?.[monthKey];
       if (occ === undefined) return false;
       return occ >= rule.condition.value.minOccupancyRate;
@@ -162,7 +168,7 @@ export function calculateCancellationFee(input: {
   if (input.amount < 0) {
     throw new Error('calculateCancellationFee: amount must be non-negative');
   }
-  const checkIn = new Date(`${input.checkInDate}T00:00:00.000Z`);
+  const checkIn = parseIsoDate(input.checkInDate);
   const cancelDay = new Date(
     Date.UTC(
       input.cancelledAt.getUTCFullYear(),

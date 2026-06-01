@@ -4,10 +4,9 @@ import { Plus, Tag, Trash2 } from 'lucide-react';
 
 import { useAppStore } from '@/lib/store';
 
-import type { PricingRule } from '@/types';
+import type { PricingRule, PricingRuleType } from '@/types';
 
-const TYPE_LABEL: Record<PricingRule['type'], string> = {
-  weekday: '曜日',
+const TYPE_LABEL: Record<PricingRuleType, string> = {
   weekend: '週末',
   season: 'シーズン',
   leadtime: '直前 / 早期',
@@ -23,7 +22,6 @@ export default function AdminPricingPage() {
     const id = `rule-${Math.random().toString(36).slice(2, 7)}`;
     upsertRule({
       id,
-      type: 'weekend',
       condition: { type: 'weekend', value: { weekdays: [5, 6] } },
       multiplier: 1.1,
     });
@@ -67,7 +65,7 @@ export default function AdminPricingPage() {
                 <td className="px-4 py-3 text-ink">
                   <span className="inline-flex items-center gap-1.5">
                     <Tag className="h-3.5 w-3.5 text-moss" />
-                    {TYPE_LABEL[rule.type]}
+                    {TYPE_LABEL[rule.condition.type]}
                   </span>
                 </td>
                 <td className="px-4 py-3 text-xs text-ink/70">
@@ -105,7 +103,6 @@ export default function AdminPricingPage() {
 function summarizeCondition(rule: PricingRule): string {
   const c = rule.condition;
   switch (c.type) {
-    case 'weekday':
     case 'weekend':
       return `weekdays: [${c.value.weekdays.join(',')}]`;
     case 'season':

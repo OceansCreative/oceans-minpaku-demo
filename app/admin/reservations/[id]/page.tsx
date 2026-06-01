@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { use, useState } from 'react';
+import { toast } from 'sonner';
 
 import { calculateCancellationFee } from '@/lib/services/pricing';
 import {
@@ -44,6 +45,7 @@ export default function AdminReservationDetailPage({ params }: PageProps) {
 
   const [busy, setBusy] = useState<'approve' | 'reject' | 'cancel' | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   if (!reservation || !room) {
     return <p className="text-sm text-ink/60">予約が見つかりませんでした。</p>;
@@ -61,7 +63,6 @@ export default function AdminReservationDetailPage({ params }: PageProps) {
     setBusy('approve');
     setError(null);
     try {
-      // Synthesize the captured-side intent from what's stored on the reservation.
       const intent: MockPaymentIntent = {
         id: reservation.payment.intentId,
         status: reservation.payment.status,
@@ -72,8 +73,13 @@ export default function AdminReservationDetailPage({ params }: PageProps) {
       };
       const result = await approveReservation(reservation, allReservations, intent);
       upsertReservation(result.reservation);
+      toast.success('予約を承認しました', {
+        description: `Stripe で ¥${reservation.amount.toLocaleString()} を確定、RemoteLOCK パスコード ${result.passcode.code} を発行しました。`,
+      });
     } catch (e) {
-      setError(e instanceof Error ? e.message : '承認に失敗しました');
+      const message = e instanceof Error ? e.message : '承認に失敗しました';
+      setError(message);
+      toast.error('承認に失敗しました', { description: message });
     } finally {
       setBusy(null);
     }
@@ -81,12 +87,7 @@ export default function AdminReservationDetailPage({ params }: PageProps) {
 
   async function handleCancel() {
     if (!reservation) return;
-    if (
-      !confirm(
-        'この予約をキャンセルしますか？キャンセルポリシーに基づいてデポジットを差し引き、Stripe からゲストへ返金します。',
-      )
-    )
-      return;
+    setShowCancelConfirm(false);
     setBusy('cancel');
     setError(null);
     try {
@@ -110,8 +111,13 @@ export default function AdminReservationDetailPage({ params }: PageProps) {
         cancellationFee: fee.feeAmount,
       });
       upsertReservation(result.reservation);
+      toast.success('予約をキャンセルしました', {
+        description: `¥${result.refund.amount.toLocaleString()} を返金（差引キャンセル料: ¥${fee.feeAmount.toLocaleString()}）。スマートロックのパスコードも失効しました。`,
+      });
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'キャンセルに失敗しました');
+      const message = e instanceof Error ? e.message : 'キャンセルに失敗しました';
+      setError(message);
+      toast.error('キャンセルに失敗しました', { description: message });
     } finally {
       setBusy(null);
     }
@@ -132,8 +138,13 @@ export default function AdminReservationDetailPage({ params }: PageProps) {
       };
       const result = await rejectReservation(reservation, intent);
       upsertReservation(result.reservation);
+      toast.success('予約を却下しました', {
+        description: 'Stripe の与信を解除しました。ゲスト側にも結果が反映されます。',
+      });
     } catch (e) {
-      setError(e instanceof Error ? e.message : '却下に失敗しました');
+      const message = e instanceof Error ? e.message : '却下に失敗しました';
+      setError(message);
+      toast.error('却下に失敗しました', { description: message });
     } finally {
       setBusy(null);
     }
@@ -222,7 +233,7 @@ export default function AdminReservationDetailPage({ params }: PageProps) {
         <CancellationPreview
           reservation={reservation}
           policy={cancellationPolicy}
-          onCancel={handleCancel}
+          onCancel={() => setShowCancelConfirm(true)}
           busy={busy === 'cancel'}
         />
       )}
@@ -265,6 +276,15 @@ export default function AdminReservationDetailPage({ params }: PageProps) {
             承認で与信を捕捉、却下で与信を解除します。
           </p>
         </div>
+      )}
+
+      {showCancelConfirm && (
+        <CancelConfirmDialog
+          reservation={reservation}
+          policy={cancellationPolicy}
+          onConfirm={handleCancel}
+          onDismiss={() => setShowCancelConfirm(false)}
+        />
       )}
     </div>
   );
@@ -347,6 +367,84 @@ function CancellationPreview({
         )}
         この予約をキャンセル
       </button>
+    </div>
+  );
+}
+
+function CancelConfirmDialog({
+  reservation,
+  policy,
+  onConfirm,
+  onDismiss,
+}: {
+  reservation: Reservation;
+  policy: CancellationPolicy[];
+  onConfirm: () => void;
+  onDismiss: () => void;
+}) {
+  const fee = calculateCancellationFee({
+    amount: reservation.amount,
+    checkInDate: reservation.checkIn,
+    cancelledAt: new Date(),
+    policy,
+  });
+  return (
+    <div
+      role="dialog"
+      aria-modal
+      aria-labelledby="cancel-dialog-title"
+      onClick={onDismiss}
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') onDismiss();
+      }}
+      className="fixed inset-0 z-[55] flex items-center justify-center bg-ink/40 px-4 backdrop-blur-sm"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-md space-y-4 rounded-2xl bg-sand p-6 shadow-2xl"
+      >
+        <div>
+          <h2 id="cancel-dialog-title" className="font-serif text-xl text-ink">
+            この予約をキャンセルしますか？
+          </h2>
+          <p className="mt-1 text-xs text-ink/60">キャンセル後の取り消しはできません。</p>
+        </div>
+        <dl className="space-y-1.5 rounded-md bg-ink/[0.03] px-4 py-3 text-xs">
+          <div className="flex justify-between">
+            <dt className="text-ink/50">合計</dt>
+            <dd className="text-ink">¥{reservation.amount.toLocaleString()}</dd>
+          </div>
+          <div className="flex justify-between">
+            <dt className="text-ink/50">キャンセル料</dt>
+            <dd className="text-crimson">- ¥{fee.feeAmount.toLocaleString()}</dd>
+          </div>
+          <div className="flex justify-between border-t border-ink/10 pt-1.5 font-medium">
+            <dt className="text-ink">返金</dt>
+            <dd className="text-ink">¥{fee.refundAmount.toLocaleString()}</dd>
+          </div>
+        </dl>
+        <p className="text-[11px] text-ink/50">
+          Stripe で {fee.refundAmount > 0 ? 'partial refund' : 'no-refund cancel'} を発行し、
+          RemoteLOCK のパスコードを失効させます。
+        </p>
+        <div className="flex justify-end gap-2 pt-2">
+          <button
+            type="button"
+            onClick={onDismiss}
+            className="rounded-md px-4 py-2 text-sm text-ink/70 hover:bg-ink/5"
+          >
+            戻る
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            className="inline-flex items-center gap-1.5 rounded-md bg-crimson px-4 py-2 text-sm font-medium text-sand hover:bg-crimson/90"
+          >
+            <XCircle className="h-4 w-4" />
+            キャンセルを確定
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

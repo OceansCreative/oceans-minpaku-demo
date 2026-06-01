@@ -2,6 +2,7 @@
 
 import { Database, RotateCcw } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 import { useAppStore } from '@/lib/store';
 
@@ -20,6 +21,7 @@ export default function AdminSettingsPage() {
     await new Promise((r) => setTimeout(r, 300));
     reset();
     setResetting(false);
+    toast.success('サンプルデータを初期状態に戻しました');
   }
 
   return (

@@ -2,6 +2,7 @@
 
 import { KeyRound, Loader2, RefreshCw, ShieldOff } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
 import { issueCode, revokeCode } from '@/lib/mock/remotelock';
 import { useAppStore } from '@/lib/store';
@@ -27,10 +28,15 @@ export default function AdminPasscodesPage() {
     setBusyId(reservationId);
     try {
       const fresh = await issueCode({
-        validFrom: `${r.checkIn}T${r.checkInTime}:00.000Z`,
-        validUntil: `${r.checkOut}T${r.checkOutTime}:00.000Z`,
+        validFrom: `${r.checkIn}T${r.checkInTime}:00+09:00`,
+        validUntil: `${r.checkOut}T${r.checkOutTime}:00+09:00`,
       });
       setReservationPasscode(reservationId, fresh);
+      toast.success('パスコードを再発行しました', { description: `新しいコード: ${fresh.code}` });
+    } catch (e) {
+      toast.error('再発行に失敗しました', {
+        description: e instanceof Error ? e.message : undefined,
+      });
     } finally {
       setBusyId(null);
     }
@@ -44,6 +50,11 @@ export default function AdminPasscodesPage() {
     try {
       await revokeCode({ passcode: r.passcode });
       setReservationPasscode(reservationId, undefined);
+      toast.success('パスコードを失効させました');
+    } catch (e) {
+      toast.error('失効に失敗しました', {
+        description: e instanceof Error ? e.message : undefined,
+      });
     } finally {
       setBusyId(null);
     }

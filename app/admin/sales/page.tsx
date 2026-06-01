@@ -1,20 +1,23 @@
 'use client';
 
 import { BarChart3, Filter } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { useMemo, useState } from 'react';
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Legend,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
 
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils/cn';
+
+// Lazy-load recharts so the rest of the admin shell stays close to the ~110kB
+// First Load JS budget that the other admin pages occupy. SSR is disabled
+// because ResponsiveContainer measures the DOM on mount.
+const SalesChart = dynamic(() => import('@/components/admin/SalesChart'), {
+  ssr: false,
+  loading: () => (
+    <div className="grid h-72 w-full place-items-center text-xs text-ink/40">
+      グラフを読み込み中…
+    </div>
+  ),
+});
 
 type Granularity = 'day' | 'month' | 'year';
 
@@ -121,32 +124,7 @@ export default function AdminSalesPage() {
           <BarChart3 className="h-4 w-4 text-moss" />
           売上推移（経路別積み上げ）
         </h2>
-        <div className="h-72 w-full">
-          <ResponsiveContainer>
-            <BarChart data={buckets}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.08)" />
-              <XAxis dataKey="key" stroke="rgba(0,0,0,0.5)" tick={{ fontSize: 11 }} />
-              <YAxis
-                stroke="rgba(0,0,0,0.5)"
-                tick={{ fontSize: 11 }}
-                tickFormatter={(v: number) => `¥${(v / 1000).toFixed(0)}k`}
-              />
-              <Tooltip
-                formatter={(v: number) => `¥${v.toLocaleString()}`}
-                contentStyle={{
-                  background: 'rgba(31,32,36,0.95)',
-                  border: 'none',
-                  borderRadius: 8,
-                  color: '#f6f1e7',
-                  fontSize: 12,
-                }}
-              />
-              <Legend wrapperStyle={{ fontSize: 12 }} />
-              <Bar dataKey="direct" stackId="src" fill="#3b82f6" name="Direct" />
-              <Bar dataKey="airbnb" stackId="src" fill="#ec4899" name="Airbnb" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        <SalesChart data={buckets} />
       </section>
 
       <p className="text-[11px] text-ink/40">※ キャンセル / 却下された予約は集計対象外です。</p>

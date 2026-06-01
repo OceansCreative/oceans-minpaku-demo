@@ -1,11 +1,33 @@
 'use client';
 
-import { BookOpenCheck, Mail, MessageSquare, Plus, Trash2 } from 'lucide-react';
+import { BookOpenCheck, Mail, MessageSquare, Pencil, Plus, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils/cn';
 
-import type { ReminderTemplate } from '@/types';
+import type { ReminderChannel, ReminderTemplate } from '@/types';
+
+const OFFSET_PRESETS: { label: string; value: string }[] = [
+  { label: 'チェックイン時', value: 'PT0S' },
+  { label: '前日', value: '-P1D' },
+  { label: '3日前', value: '-P3D' },
+  { label: '1週間前', value: '-P7D' },
+  { label: 'チェックイン2時間後', value: 'PT2H' },
+];
+
+function blankTemplate(): ReminderTemplate {
+  return {
+    id: `rem-${Math.random().toString(36).slice(2, 6)}`,
+    name: '新規テンプレート',
+    offset: '-P1D',
+    channel: 'message',
+    subject: '',
+    body: '',
+    enabled: false,
+  };
+}
 
 export default function AdminRemindersPage() {
   const templates = useAppStore((s) => s.reminderTemplates);
@@ -13,17 +35,18 @@ export default function AdminRemindersPage() {
   const remove = useAppStore((s) => s.removeReminderTemplate);
   const upsert = useAppStore((s) => s.upsertReminderTemplate);
 
-  function addStub() {
-    const id = `rem-${Math.random().toString(36).slice(2, 6)}`;
-    upsert({
-      id,
-      name: '新規テンプレート',
-      offset: '-P1D',
-      channel: 'message',
-      subject: '',
-      body: '',
-      enabled: false,
-    });
+  const [editing, setEditing] = useState<ReminderTemplate | null>(null);
+
+  function handleSave(t: ReminderTemplate) {
+    upsert(t);
+    toast.success('テンプレートを保存しました', { description: t.name });
+    setEditing(null);
+  }
+
+  function handleRemove(t: ReminderTemplate) {
+    if (!confirm(`「${t.name}」を削除しますか？`)) return;
+    remove(t.id);
+    toast.success('テンプレートを削除しました', { description: t.name });
   }
 
   return (
@@ -37,7 +60,7 @@ export default function AdminRemindersPage() {
         </div>
         <button
           type="button"
-          onClick={addStub}
+          onClick={() => setEditing(blankTemplate())}
           className="inline-flex items-center gap-1.5 rounded-md bg-ink px-3 py-1.5 text-xs text-sand hover:bg-ink/90"
         >
           <Plus className="h-3.5 w-3.5" />
@@ -75,7 +98,15 @@ export default function AdminRemindersPage() {
                 </label>
                 <button
                   type="button"
-                  onClick={() => remove(t.id)}
+                  onClick={() => setEditing(t)}
+                  aria-label={`${t.name} を編集`}
+                  className="rounded-md p-1.5 text-ink/60 hover:bg-ink/5 hover:text-ink"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleRemove(t)}
                   aria-label={`${t.name} を削除`}
                   className="rounded-md p-1.5 text-crimson/60 hover:bg-crimson/10 hover:text-crimson"
                 >
@@ -87,7 +118,20 @@ export default function AdminRemindersPage() {
             {t.body && <p className="whitespace-pre-line text-xs text-ink/60">{t.body}</p>}
           </article>
         ))}
+        {templates.length === 0 && (
+          <div className="rounded-2xl border border-dashed border-ink/15 bg-sand/40 px-6 py-10 text-center">
+            <BookOpenCheck className="mx-auto h-6 w-6 text-ink/30" />
+            <p className="mt-2 text-sm text-ink/50">テンプレートがありません。</p>
+            <p className="text-[11px] text-ink/40">
+              右上の「テンプレート追加」から作成してください。
+            </p>
+          </div>
+        )}
       </div>
+
+      {editing && (
+        <TemplateEditor template={editing} onSave={handleSave} onCancel={() => setEditing(null)} />
+      )}
     </div>
   );
 }
@@ -105,5 +149,136 @@ function channelLabel(t: ReminderTemplate): React.ReactNode {
       <MessageSquare className="h-3 w-3" />
       アプリ内メッセージ
     </span>
+  );
+}
+
+function TemplateEditor({
+  template,
+  onSave,
+  onCancel,
+}: {
+  template: ReminderTemplate;
+  onSave: (t: ReminderTemplate) => void;
+  onCancel: () => void;
+}) {
+  const [draft, setDraft] = useState<ReminderTemplate>(template);
+  return (
+    <div
+      role="dialog"
+      aria-modal
+      onClick={onCancel}
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') onCancel();
+      }}
+      className="fixed inset-0 z-[55] flex items-center justify-center bg-ink/40 px-4 backdrop-blur-sm"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="max-h-[90vh] w-full max-w-xl space-y-4 overflow-y-auto rounded-2xl bg-sand p-6 shadow-2xl"
+      >
+        <header>
+          <h2 className="font-serif text-lg text-ink">リマインダーを編集</h2>
+          <p className="text-xs text-ink/50">
+            ID: <code>{draft.id}</code>
+          </p>
+        </header>
+
+        <label className="block space-y-1.5">
+          <span className="text-xs text-ink/60">テンプレート名</span>
+          <input
+            type="text"
+            value={draft.name}
+            onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+            className="w-full rounded-md border border-ink/20 bg-sand px-3 py-2 text-sm"
+          />
+        </label>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="space-y-1.5">
+            <span className="text-xs text-ink/60">送信タイミング (ISO 8601 duration)</span>
+            <input
+              type="text"
+              value={draft.offset}
+              onChange={(e) => setDraft({ ...draft, offset: e.target.value })}
+              placeholder="-P1D"
+              className="w-full rounded-md border border-ink/20 bg-sand px-3 py-2 font-mono text-sm"
+            />
+            <div className="flex flex-wrap gap-1">
+              {OFFSET_PRESETS.map((p) => (
+                <button
+                  key={p.value}
+                  type="button"
+                  onClick={() => setDraft({ ...draft, offset: p.value })}
+                  className={`rounded-full border px-2 py-0.5 text-[10px] ${
+                    draft.offset === p.value
+                      ? 'border-ink bg-ink text-sand'
+                      : 'border-ink/15 text-ink/60 hover:bg-ink/5'
+                  }`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </label>
+          <label className="space-y-1.5">
+            <span className="text-xs text-ink/60">チャネル</span>
+            <select
+              value={draft.channel}
+              onChange={(e) => setDraft({ ...draft, channel: e.target.value as ReminderChannel })}
+              className="w-full rounded-md border border-ink/20 bg-sand px-3 py-2 text-sm"
+            >
+              <option value="email">メール</option>
+              <option value="message">アプリ内メッセージ</option>
+            </select>
+          </label>
+        </div>
+
+        <label className="block space-y-1.5">
+          <span className="text-xs text-ink/60">件名</span>
+          <input
+            type="text"
+            value={draft.subject}
+            onChange={(e) => setDraft({ ...draft, subject: e.target.value })}
+            className="w-full rounded-md border border-ink/20 bg-sand px-3 py-2 text-sm"
+          />
+        </label>
+
+        <label className="block space-y-1.5">
+          <span className="text-xs text-ink/60">本文</span>
+          <textarea
+            value={draft.body}
+            rows={5}
+            onChange={(e) => setDraft({ ...draft, body: e.target.value })}
+            className="w-full rounded-md border border-ink/20 bg-sand px-3 py-2 text-sm"
+          />
+        </label>
+
+        <label className="inline-flex items-center gap-2 text-xs text-ink/60">
+          <input
+            type="checkbox"
+            checked={draft.enabled}
+            onChange={(e) => setDraft({ ...draft, enabled: e.target.checked })}
+          />
+          有効にする（保存後すぐに自動送信の対象になります）
+        </label>
+
+        <div className="flex justify-end gap-2 pt-2">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="rounded-md px-4 py-2 text-sm text-ink/70 hover:bg-ink/5"
+          >
+            キャンセル
+          </button>
+          <button
+            type="button"
+            onClick={() => onSave(draft)}
+            className="rounded-md bg-ink px-4 py-2 text-sm font-medium text-sand hover:bg-ink/90"
+          >
+            保存
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

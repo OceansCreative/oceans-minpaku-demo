@@ -1,3 +1,5 @@
+import { joinPropertyDateTime } from '@/lib/utils/dates';
+
 import { seedGuests } from './guests';
 import { seedRooms } from './property';
 
@@ -53,8 +55,8 @@ export function createOverlapDemoReservations(today: Date): Reservation[] {
     payment: { intentId: 'pi_mock_overlap_airbnb', status: 'captured' },
     passcode: {
       code: '482915',
-      validFrom: shift(7) + 'T16:00:00.000Z',
-      validUntil: shift(9) + 'T10:00:00.000Z',
+      validFrom: joinPropertyDateTime(shift(7), '16:00'),
+      validUntil: joinPropertyDateTime(shift(9), '10:00'),
       issuedAt,
     },
     createdAt: issuedAt,

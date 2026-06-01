@@ -17,6 +17,7 @@ import {
   type MockPaymentIntent,
   type MockRefund,
 } from '@/lib/mock/stripe';
+import { joinPropertyDateTime } from '@/lib/utils/dates';
 
 import type { HHmm, IsoDate, IsoDateTime, Passcode, Reservation, ReservationSource } from '@/types';
 
@@ -150,9 +151,12 @@ export async function approveReservation(
   }
 
   const captured = await capturePaymentIntent({ intent });
+  // Passcode validity is anchored to the property's wall-clock (JST), not UTC.
+  // The previous `${date}T${time}:00.000Z` made JST 15:00 → UTC 15:00 → JST
+  // 24:00, so codes came alive 9 hours late.
   const passcode = await issueCode({
-    validFrom: `${reservation.checkIn}T${reservation.checkInTime}:00.000Z`,
-    validUntil: `${reservation.checkOut}T${reservation.checkOutTime}:00.000Z`,
+    validFrom: joinPropertyDateTime(reservation.checkIn, reservation.checkInTime),
+    validUntil: joinPropertyDateTime(reservation.checkOut, reservation.checkOutTime),
   });
 
   return {

@@ -35,9 +35,9 @@ date: 2026-05-30
 | 状態管理     | Zustand（`persist` で localStorage 永続化、ゲスト⇄管理で同一ストア共有）                      |
 | グラフ       | Recharts                                                                                      |
 | カレンダー   | react-day-picker（ゲスト側）／自前テーブル（管理側）                                          |
-| i18n         | next-intl（ja / en / partial zh / ko）                                                        |
+| i18n         | next-intl（ja / en フル、zh / ko は約 34% のスキャフォールド）                                |
 | 外部連携     | Stripe Payment Intents（manual capture）、RemoteLOCK Connect API、Airbnb Calendar iCal export |
-| テスト       | Vitest + Testing Library（27 ユニットテスト）                                                 |
+| テスト       | Vitest + Testing Library（37 ユニットテスト・3 タイムゾーン CI マトリクス）                   |
 | CI           | GitHub Actions（format / lint / typecheck / test / build）                                    |
 | ホスティング | Vercel                                                                                        |
 
@@ -48,7 +48,7 @@ date: 2026-05-30
 - 施設トップ + 部屋一覧 + 部屋詳細
 - 予約フロー（カレンダー → 時刻 → 駐車場 → 料金（動的）→ ゲスト情報 → 決済モック → リクエスト送信）
 - 予約ステータス画面（承認待ち → 確定 → スマートロックパスコード表示）
-- 多言語切替（ja / en / partial zh / ko）
+- 多言語切替（ja / en フル、zh / ko 部分）
 
 ### 管理側
 
@@ -75,6 +75,9 @@ date: 2026-05-30
   を走らせ、重複があれば赤い警告で承認をブロック
 - `detectOverlap` は純粋関数として切り出し、ユニットテスト 12 本でエッジケース
   （隣接ステイ・キャンセル/却下の扱い・自己重複の除外）をカバー
+- 承認ガード自体にも 4 本の独立したテストを置き、CI はその全てを
+  **UTC / Asia/Tokyo / America/New_York の 3 タイムゾーン**で並行に回す
+  ことで、`getDay()` 系の時差バグが将来再発しないよう仕掛けを残している
 
 ### 2. Stripe manual capture でホストの判断を待つ
 

@@ -51,29 +51,41 @@ export default function AdminMessagesPage() {
 
       <div className="grid h-[60vh] gap-4 md:grid-cols-[16rem,1fr]">
         <aside className="overflow-y-auto rounded-2xl border border-ink/10 bg-sand">
-          <ul className="divide-y divide-ink/5">
-            {threads.map((t) => {
-              const guest = guests.find((g) => g.id === t.guestId);
-              const room = rooms.find((rm) => rm.id === t.roomId);
-              return (
-                <li key={t.id}>
-                  <button
-                    type="button"
-                    onClick={() => setActiveId(t.id)}
-                    className={cn(
-                      'block w-full px-4 py-3 text-left text-xs hover:bg-ink/[0.02]',
-                      activeId === t.id && 'bg-ink/[0.06]',
-                    )}
-                  >
-                    <p className="text-ink">{guest?.name ?? '— 名なし —'}</p>
-                    <p className="text-[10px] text-ink/50">
-                      {room?.name} · {t.checkIn} → {t.checkOut}
-                    </p>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
+          {threads.length === 0 ? (
+            <div className="grid h-full place-items-center p-6 text-center">
+              <div>
+                <MessageSquare className="mx-auto h-6 w-6 text-ink/30" />
+                <p className="mt-2 text-xs text-ink/50">スレッドがありません</p>
+                <p className="mt-1 text-[10px] text-ink/40">
+                  予約が発生するとここにスレッドが並びます。
+                </p>
+              </div>
+            </div>
+          ) : (
+            <ul className="divide-y divide-ink/5">
+              {threads.map((t) => {
+                const guest = guests.find((g) => g.id === t.guestId);
+                const room = rooms.find((rm) => rm.id === t.roomId);
+                return (
+                  <li key={t.id}>
+                    <button
+                      type="button"
+                      onClick={() => setActiveId(t.id)}
+                      className={cn(
+                        'block w-full px-4 py-3 text-left text-xs hover:bg-ink/[0.02]',
+                        activeId === t.id && 'bg-ink/[0.06]',
+                      )}
+                    >
+                      <p className="text-ink">{guest?.name ?? '— 名なし —'}</p>
+                      <p className="text-[10px] text-ink/50">
+                        {room?.name} · {t.checkIn} → {t.checkOut}
+                      </p>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </aside>
 
         <section className="flex flex-col rounded-2xl border border-ink/10 bg-sand">

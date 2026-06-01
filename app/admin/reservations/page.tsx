@@ -153,8 +153,12 @@ export default function AdminReservationsPage() {
             })}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={8} className="px-4 py-8 text-center text-sm text-ink/40">
-                  条件に一致する予約はありません。
+                <td colSpan={8} className="px-4 py-12 text-center">
+                  <Filter className="mx-auto h-6 w-6 text-ink/30" />
+                  <p className="mt-2 text-sm text-ink/50">条件に一致する予約はありません</p>
+                  <p className="mt-1 text-[11px] text-ink/40">
+                    上のフィルタを「すべて」「全経路」に戻すと再表示されます。
+                  </p>
                 </td>
               </tr>
             )}

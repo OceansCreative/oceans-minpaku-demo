@@ -38,8 +38,34 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
-      - name: Test
-        run: npm run test
-
       - name: Build
         run: npm run build
+
+  test-matrix:
+    name: Test (TZ=${{ matrix.tz }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    strategy:
+      fail-fast: false
+      matrix:
+        # Lock down TZ-independence: the property is in JST, contributors are
+        # anywhere, GitHub runners default to UTC. If any of these three goes
+        # red, date math has regressed.
+        tz: [UTC, Asia/Tokyo, America/New_York]
+    env:
+      TZ: ${{ matrix.tz }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test
+        run: npm run test

@@ -8,10 +8,10 @@ surface.
 
 ```bash
 # First time only — downloads ~130 MB of headless Chromium
-npm run screenshots:install
+pnpm screenshots:install
 
 # Build the app, start it, capture, stop the server
-npm run screenshots:build
+pnpm screenshots:build
 ```
 
 Outputs to `docs/portfolio/screenshots/`:
@@ -26,15 +26,15 @@ Outputs to `docs/portfolio/screenshots/`:
 ## Against an already-running build
 
 ```bash
-npm run build && npm run start &
-npx wait-on http://localhost:3000
-npm run screenshots
+pnpm build && pnpm start &
+pnpm exec wait-on http://localhost:3000
+pnpm screenshots
 ```
 
 Or point at a remote (e.g. Vercel preview):
 
 ```bash
-SCREENSHOT_BASE_URL=https://minpaku-demo.oceans-base.com npm run screenshots
+SCREENSHOT_BASE_URL=https://minpaku-demo.oceans-base.com pnpm screenshots
 ```
 
 ## Customizing

@@ -39,8 +39,8 @@
 ## クイックスタート
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 - ゲスト: <http://localhost:3000>

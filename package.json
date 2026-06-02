@@ -2,6 +2,7 @@
   "name": "oceans-minpaku-demo",
   "version": "1.0.1",
   "private": true,
+  "packageManager": "pnpm@9.15.4",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -15,7 +16,7 @@
     "test:coverage": "vitest run --coverage",
     "screenshots": "node scripts/capture-screenshots.mjs",
     "screenshots:install": "playwright install chromium",
-    "screenshots:build": "npm run build && (npm run start & SERVER_PID=$! ; npx wait-on http://localhost:3000 && npm run screenshots ; kill $SERVER_PID 2>/dev/null || true)",
+    "screenshots:build": "pnpm build && (pnpm start & SERVER_PID=$! ; pnpm exec wait-on http://localhost:3000 && pnpm screenshots ; kill $SERVER_PID 2>/dev/null || true)",
     "prepare": "husky"
   },
   "dependencies": {

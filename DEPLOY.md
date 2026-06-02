@@ -50,7 +50,7 @@ every push.
    scope. Copy it.
 2. Find your `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID`:
    ```bash
-   npx vercel link               # follow the prompts to link to the project
+   pnpm dlx vercel link          # follow the prompts to link to the project
    cat .vercel/project.json      # prints orgId + projectId
    rm -rf .vercel                # don't commit this
    ```
@@ -74,8 +74,8 @@ the same commit and you'll waste a build.
 You don't need Vercel to verify the production build:
 
 ```bash
-npm run build
-npm run start
+pnpm build
+pnpm start
 # Open http://localhost:3000
 ```
 
@@ -87,7 +87,7 @@ features beyond `next/og`. It will run on:
 - **Cloudflare Pages** with the Next-on-Pages adapter (the OG route runs on
   Workers).
 - **Netlify** with the Next.js runtime.
-- **Self-hosted Node** behind any reverse proxy (`npm run build && npm run
+- **Self-hosted Node** behind any reverse proxy (`pnpm build && pnpm
 start` on a Node 22+ box).
 
 These are all out of scope for the OceansBase sample, but documented here so

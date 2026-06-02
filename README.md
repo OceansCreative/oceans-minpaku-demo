@@ -88,8 +88,8 @@ banner so production replacement is a search-and-swap.
 Screenshots are generated locally by a Playwright script, not committed:
 
 ```bash
-npm run screenshots:install   # one-time chromium download
-npm run screenshots:build     # build → start → capture → stop
+pnpm screenshots:install   # one-time chromium download
+pnpm screenshots:build     # build → start → capture → stop
 ```
 
 Output lands in `docs/portfolio/screenshots/` — see
@@ -106,8 +106,8 @@ alternative is documented for the cases where you want it. See
 ## Quick start
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) for the guest site and

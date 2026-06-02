@@ -6,6 +6,13 @@ import type { PricingRule } from '@/types';
 
 const BASE = 10_000;
 
+/** Next UTC calendar day as YYYY-MM-DD — handy for one-night check-out dates. */
+function nextDay(date: string): string {
+  const d = new Date(`${date}T00:00:00.000Z`);
+  d.setUTCDate(d.getUTCDate() + 1);
+  return d.toISOString().slice(0, 10);
+}
+
 const weekendRule: PricingRule = {
   id: 'rule-weekend',
   condition: { type: 'weekend', value: { weekdays: [5, 6] } },
@@ -28,6 +35,12 @@ const lastMinuteRule: PricingRule = {
   id: 'rule-last-minute',
   condition: { type: 'leadtime', value: { maxDaysBefore: 3 } },
   multiplier: 0.9,
+};
+
+const highOccupancyRule: PricingRule = {
+  id: 'rule-high-occupancy',
+  condition: { type: 'occupancy', value: { minOccupancyRate: 0.8 } },
+  multiplier: 1.25,
 };
 
 describe('calculateNightlyRates', () => {
@@ -106,6 +119,167 @@ describe('calculateNightlyRates', () => {
         rules: [],
       }),
     ).toThrow(/checkOut/);
+  });
+
+  it('keeps the stay date stable across a DST boundary (America/New_York spring-forward)', () => {
+    // 2026-03-08 is US spring-forward (02:00 → 03:00 local). UTC date math must
+    // not drop or duplicate a night when the suite runs under TZ=America/New_York.
+    const rates = calculateNightlyRates({
+      basePrice: BASE,
+      checkIn: '2026-03-07',
+      checkOut: '2026-03-10',
+      rules: [],
+    });
+    expect(rates.map((r) => r.date)).toEqual(['2026-03-07', '2026-03-08', '2026-03-09']);
+    expect(rates).toHaveLength(3);
+    expect(rates.every((r) => r.price === BASE)).toBe(true);
+  });
+});
+
+describe('leadtime rule', () => {
+  it('applies at exactly maxDaysBefore but not at maxDaysBefore + 1', () => {
+    // booked 3 days before check-in → leadDays === 3 === maxDaysBefore → applies
+    const exactly = calculateNightlyRates({
+      basePrice: BASE,
+      checkIn: '2026-06-04',
+      checkOut: '2026-06-05',
+      rules: [lastMinuteRule],
+      context: { bookedAt: new Date('2026-06-01T00:00:00.000Z') },
+    })[0];
+    expect(exactly?.appliedRules).toEqual(['rule-last-minute']);
+
+    // booked 4 days before → leadDays === 4 > maxDaysBefore → does NOT apply
+    const tooEarly = calculateNightlyRates({
+      basePrice: BASE,
+      checkIn: '2026-06-05',
+      checkOut: '2026-06-06',
+      rules: [lastMinuteRule],
+      context: { bookedAt: new Date('2026-06-01T00:00:00.000Z') },
+    })[0];
+    expect(tooEarly?.appliedRules).toEqual([]);
+  });
+
+  it('floors a bookedAt that carries a time component (proves the off-by-one fix)', () => {
+    // bookedAt is late on 2026-06-01 (23:30 UTC). Without flooring, the raw
+    // span to 2026-06-04 midnight is ~2.02 days → floor 2; with both sides
+    // floored to UTC midnight it is exactly 3 days, matching maxDaysBefore.
+    const rate = calculateNightlyRates({
+      basePrice: BASE,
+      checkIn: '2026-06-04',
+      checkOut: '2026-06-05',
+      rules: [lastMinuteRule],
+      context: { bookedAt: new Date('2026-06-01T23:30:00.000Z') },
+    })[0];
+    expect(rate?.appliedRules).toEqual(['rule-last-minute']);
+    expect(rate?.price).toBe(Math.round(BASE * 0.9));
+  });
+
+  it('throws when a leadtime rule is present but no bookedAt is supplied', () => {
+    expect(() =>
+      calculateNightlyRates({
+        basePrice: BASE,
+        checkIn: '2026-06-02',
+        checkOut: '2026-06-03',
+        rules: [lastMinuteRule],
+      }),
+    ).toThrow(/bookedAt/);
+  });
+});
+
+describe('occupancy rule', () => {
+  it('applies when month-of-stay occupancy meets the threshold', () => {
+    const rate = calculateNightlyRates({
+      basePrice: BASE,
+      checkIn: '2026-08-15',
+      checkOut: '2026-08-16',
+      rules: [highOccupancyRule],
+      context: { monthlyOccupancy: { '2026-08': 0.9 } },
+    })[0];
+    expect(rate?.appliedRules).toEqual(['rule-high-occupancy']);
+    expect(rate?.price).toBe(Math.round(BASE * 1.25));
+  });
+
+  it('applies at exactly the minimum occupancy rate (>=)', () => {
+    const rate = calculateNightlyRates({
+      basePrice: BASE,
+      checkIn: '2026-08-15',
+      checkOut: '2026-08-16',
+      rules: [highOccupancyRule],
+      context: { monthlyOccupancy: { '2026-08': 0.8 } },
+    })[0];
+    expect(rate?.appliedRules).toEqual(['rule-high-occupancy']);
+  });
+
+  it('does not apply below the threshold or when the month key is absent', () => {
+    const below = calculateNightlyRates({
+      basePrice: BASE,
+      checkIn: '2026-08-15',
+      checkOut: '2026-08-16',
+      rules: [highOccupancyRule],
+      context: { monthlyOccupancy: { '2026-08': 0.79 } },
+    })[0];
+    const missing = calculateNightlyRates({
+      basePrice: BASE,
+      checkIn: '2026-08-15',
+      checkOut: '2026-08-16',
+      rules: [highOccupancyRule],
+      context: { monthlyOccupancy: { '2026-07': 1 } },
+    })[0];
+    expect(below?.appliedRules).toEqual([]);
+    expect(missing?.appliedRules).toEqual([]);
+  });
+
+  it('derives the YYYY-MM month key from the night in UTC, not local time', () => {
+    // Night of 2026-08-31 must key into '2026-08' regardless of runtime TZ.
+    // Under TZ=America/New_York the local date of UTC-midnight is still Aug 31.
+    const rate = calculateNightlyRates({
+      basePrice: BASE,
+      checkIn: '2026-08-31',
+      checkOut: '2026-09-01',
+      rules: [highOccupancyRule],
+      context: { monthlyOccupancy: { '2026-08': 0.95, '2026-09': 0 } },
+    })[0];
+    expect(rate?.appliedRules).toEqual(['rule-high-occupancy']);
+  });
+});
+
+describe('season rule edges', () => {
+  const sameDayRule: PricingRule = {
+    id: 'rule-single-day',
+    condition: { type: 'season', value: { from: '08-15', to: '08-15' } },
+    multiplier: 2,
+  };
+
+  it('matches a single-day season where from === to', () => {
+    const onDay = calculateNightlyRates({
+      basePrice: BASE,
+      checkIn: '2026-08-15',
+      checkOut: '2026-08-16',
+      rules: [sameDayRule],
+    })[0];
+    const offDay = calculateNightlyRates({
+      basePrice: BASE,
+      checkIn: '2026-08-16',
+      checkOut: '2026-08-17',
+      rules: [sameDayRule],
+    })[0];
+    expect(onDay?.price).toBe(Math.round(BASE * 2));
+    expect(offDay?.price).toBe(BASE);
+  });
+
+  it('includes both wrap endpoints (12-29 and 01-03) and excludes just outside', () => {
+    const night = (date: string) =>
+      calculateNightlyRates({
+        basePrice: BASE,
+        checkIn: date,
+        checkOut: nextDay(date),
+        rules: [newYearRule],
+      })[0];
+
+    expect(night('2026-12-29')?.price).toBe(Math.round(BASE * 1.6)); // start endpoint
+    expect(night('2027-01-03')?.price).toBe(Math.round(BASE * 1.6)); // end endpoint
+    expect(night('2026-12-28')?.price).toBe(BASE); // day before start
+    expect(night('2027-01-04')?.price).toBe(BASE); // day after end
   });
 });
 

@@ -14,7 +14,11 @@ import type { CancellationPolicy, IsoDate, PricingRule } from '@/types';
 // ---------- Dynamic pricing ----------
 
 export interface PriceContext {
-  /** When the booking was made — drives lead-time rules. Defaults to "now". */
+  /**
+   * When the booking was made — drives lead-time rules. Required whenever a
+   * `leadtime` rule is present; there is no "now" fallback so pricing stays
+   * deterministic and TZ-independent.
+   */
   bookedAt?: Date;
   /** Month-of-stay occupancy as `YYYY-MM` → 0..1, drives occupancy rules. */
   monthlyOccupancy?: Record<string, number>;
@@ -98,9 +102,13 @@ function ruleAppliesToNight(
     case 'season':
       return isInSeason(night, rule.condition.value.from, rule.condition.value.to);
     case 'leadtime': {
-      const bookedAt = context.bookedAt ?? new Date();
+      if (!context.bookedAt) {
+        throw new Error(
+          'ruleAppliesToNight: a leadtime rule requires context.bookedAt (no "now" fallback)',
+        );
+      }
       const checkInDate = parseIsoDate(checkIn);
-      const leadDays = daysBetween(bookedAt, checkInDate);
+      const leadDays = daysBetween(context.bookedAt, checkInDate);
       return leadDays <= rule.condition.value.maxDaysBefore;
     }
     case 'occupancy': {
@@ -126,9 +134,20 @@ function isInSeason(night: Date, fromMmDd: string, toMmDd: string): boolean {
   return mmDd >= fromMmDd || mmDd <= toMmDd;
 }
 
+const MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+/** Floor a `Date` to UTC midnight, dropping any wall-clock time component. */
+function floorToUtcDay(d: Date): Date {
+  return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+}
+
+/**
+ * Whole UTC calendar days between `a` and `b` (`b - a`). Both inputs are floored
+ * to UTC midnight first, so a time component on either side can never push the
+ * lead-time count off by one.
+ */
 function daysBetween(a: Date, b: Date): number {
-  const MS_PER_DAY = 1000 * 60 * 60 * 24;
-  return Math.floor((b.getTime() - a.getTime()) / MS_PER_DAY);
+  return Math.round((floorToUtcDay(b).getTime() - floorToUtcDay(a).getTime()) / MS_PER_DAY);
 }
 
 // ---------- Cancellation fee ----------
@@ -169,16 +188,9 @@ export function calculateCancellationFee(input: {
     throw new Error('calculateCancellationFee: amount must be non-negative');
   }
   const checkIn = parseIsoDate(input.checkInDate);
-  const cancelDay = new Date(
-    Date.UTC(
-      input.cancelledAt.getUTCFullYear(),
-      input.cancelledAt.getUTCMonth(),
-      input.cancelledAt.getUTCDate(),
-    ),
-  );
-  const daysRemaining = Math.floor(
-    (checkIn.getTime() - cancelDay.getTime()) / (1000 * 60 * 60 * 24),
-  );
+  // Same convention as the lead-time rule: floor both sides to UTC midnight
+  // before differencing so a time component on cancelledAt can't shift the count.
+  const daysRemaining = daysBetween(input.cancelledAt, checkIn);
 
   if (input.policy.length === 0) {
     return { daysRemaining, feeAmount: 0, refundAmount: input.amount };

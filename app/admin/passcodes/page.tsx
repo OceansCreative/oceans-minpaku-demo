@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 
 import { issueCode, revokeCode } from '@/lib/mock/remotelock';
 import { useAppStore } from '@/lib/store';
+import { joinPropertyDateTime } from '@/lib/utils/dates';
 
 export default function AdminPasscodesPage() {
   const reservations = useAppStore((s) => s.reservations);
@@ -30,8 +31,8 @@ export default function AdminPasscodesPage() {
     setBusyId(reservationId);
     try {
       const fresh = await issueCode({
-        validFrom: `${r.checkIn}T${r.checkInTime}:00+09:00`,
-        validUntil: `${r.checkOut}T${r.checkOutTime}:00+09:00`,
+        validFrom: joinPropertyDateTime(r.checkIn, r.checkInTime),
+        validUntil: joinPropertyDateTime(r.checkOut, r.checkOutTime),
       });
       setReservationPasscode(reservationId, fresh);
       toast.success(t('reissueSuccess'), {

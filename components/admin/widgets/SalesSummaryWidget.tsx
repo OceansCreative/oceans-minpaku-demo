@@ -4,33 +4,18 @@ import { TrendingUp } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 
+import { salesInRange, type DateRange } from '@/lib/services/metrics';
 import { useAppStore } from '@/lib/store';
-import { toIsoDate } from '@/lib/utils/dates';
 
-/** Captured revenue this month + projected revenue from remaining approved stays. */
-export function SalesSummaryWidget() {
+/** Captured revenue + projected (approved, uncaptured) revenue over the window. */
+export function SalesSummaryWidget({ range }: { range: DateRange }) {
   const reservations = useAppStore((s) => s.reservations);
   const t = useTranslations('Admin');
 
-  const { captured, upcoming } = useMemo(() => {
-    const today = new Date();
-    const monthStart = toIsoDate(
-      new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1)),
-    );
-    const monthEnd = toIsoDate(
-      new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 1)),
-    );
-
-    let cap = 0;
-    let up = 0;
-    for (const r of reservations) {
-      if (r.checkIn >= monthStart && r.checkIn < monthEnd) {
-        if (r.payment.status === 'captured') cap += r.amount;
-        else if (r.status === 'approved') up += r.amount;
-      }
-    }
-    return { captured: cap, upcoming: up };
-  }, [reservations]);
+  const { captured, upcoming } = useMemo(
+    () => salesInRange(reservations, range),
+    [reservations, range],
+  );
 
   return (
     <section className="space-y-3 rounded-2xl border border-ink/10 bg-sand p-5">

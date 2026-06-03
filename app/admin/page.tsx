@@ -3,11 +3,13 @@
 import { ArrowDownToLine, ArrowUpFromLine } from 'lucide-react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { CapCounterWidget } from '@/components/admin/widgets/CapCounterWidget';
 import { OccupancyWidget } from '@/components/admin/widgets/OccupancyWidget';
+import { PeriodFilter } from '@/components/admin/widgets/PeriodFilter';
 import { SalesSummaryWidget } from '@/components/admin/widgets/SalesSummaryWidget';
+import { resolvePeriod, type PeriodPreset } from '@/lib/services/metrics';
 import { useAppStore } from '@/lib/store';
 import { toIsoDate } from '@/lib/utils/dates';
 
@@ -18,6 +20,8 @@ export default function AdminDashboardPage() {
   const t = useTranslations('Admin');
 
   const today = toIsoDate(new Date());
+  const [period, setPeriod] = useState<PeriodPreset>('thisMonth');
+  const range = useMemo(() => resolvePeriod(period, today), [period, today]);
 
   const checkingIn = useMemo(
     () => reservations.filter((r) => r.status === 'approved' && r.checkIn === today),
@@ -30,14 +34,17 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="font-serif text-2xl text-ink">{t('navDashboard')}</h1>
-        <p className="text-sm text-ink/60">{t('dashboardSubtitle')}</p>
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="font-serif text-2xl text-ink">{t('navDashboard')}</h1>
+          <p className="text-sm text-ink/60">{t('dashboardSubtitle')}</p>
+        </div>
+        <PeriodFilter value={period} onChange={setPeriod} />
       </header>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <OccupancyWidget />
-        <SalesSummaryWidget />
+        <OccupancyWidget range={range} />
+        <SalesSummaryWidget range={range} />
         <CapCounterWidget />
       </div>
 

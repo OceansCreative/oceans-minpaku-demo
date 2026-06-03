@@ -53,4 +53,23 @@ describe('joinPropertyDateTime', () => {
     expect(new Date(checkOut).getUTCDate()).toBe(14);
     expect(new Date(checkOut).getUTCHours()).toBe(1);
   });
+
+  it('keeps the property calendar date for a cross-midnight JST passcode (00:30)', () => {
+    // 00:30 JST on 2026-06-12 is the prior UTC day (2026-06-11 15:30 UTC).
+    // The serialized string must still carry the *property* date 2026-06-12.
+    const window = joinPropertyDateTime('2026-06-12', '00:30');
+    expect(window).toBe(`2026-06-12T00:30:00${PROPERTY_TZ_OFFSET}`);
+
+    const instant = new Date(window);
+    expect(instant.getUTCDate()).toBe(11);
+    expect(instant.getUTCHours()).toBe(15);
+    expect(instant.getUTCMinutes()).toBe(30);
+  });
+
+  it('throws on a time that is not HH:mm', () => {
+    expect(() => joinPropertyDateTime('2026-06-12', '9:00')).toThrow(/HH:mm/);
+    expect(() => joinPropertyDateTime('2026-06-12', '15:0')).toThrow(/HH:mm/);
+    expect(() => joinPropertyDateTime('2026-06-12', '1500')).toThrow(/HH:mm/);
+    expect(() => joinPropertyDateTime('2026-06-12', '')).toThrow(/HH:mm/);
+  });
 });

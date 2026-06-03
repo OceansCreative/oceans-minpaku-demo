@@ -43,5 +43,8 @@ export function nightsBetween(checkIn: IsoDate, checkOut: IsoDate): number {
  * to UTC 15:00 = JST 24:00 — the passcode would have come alive 9 hours late.
  */
 export function joinPropertyDateTime(date: IsoDate, time: HHmm): IsoDateTime {
+  if (!/^\d{2}:\d{2}$/.test(time)) {
+    throw new Error(`joinPropertyDateTime: time must be HH:mm, got "${time}"`);
+  }
   return `${date}T${time}:00${PROPERTY_TZ_OFFSET}`;
 }

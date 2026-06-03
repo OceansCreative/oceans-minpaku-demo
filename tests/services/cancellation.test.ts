@@ -111,4 +111,31 @@ describe('calculateCancellationFee', () => {
       }),
     ).toThrow(/non-negative/);
   });
+
+  it('reports negative daysRemaining and the strictest step when cancelled after check-in', () => {
+    const result = calculateCancellationFee({
+      amount: 24_000,
+      checkInDate: '2026-06-20',
+      cancelledAt: new Date('2026-06-23T08:00:00.000Z'), // 3 days into the stay
+      policy: SEED_POLICY,
+    });
+    expect(result.daysRemaining).toBe(-3);
+    expect(result.appliedStep?.id).toBe('cxl-1d'); // no step matches → strictest
+    expect(result.feeAmount).toBe(24_000);
+    expect(result.refundAmount).toBe(0);
+  });
+
+  it('floors cancelledAt to its UTC day so a time component cannot shift daysRemaining', () => {
+    // 2026-06-15 23:30 UTC is still 5 days before a 2026-06-20 check-in once
+    // floored to the UTC day; a raw diff would round down to 4 and mis-step.
+    const result = calculateCancellationFee({
+      amount: 24_000,
+      checkInDate: '2026-06-20',
+      cancelledAt: new Date('2026-06-15T23:30:00.000Z'),
+      policy: SEED_POLICY,
+    });
+    expect(result.daysRemaining).toBe(5);
+    expect(result.appliedStep?.id).toBe('cxl-3d');
+    expect(result.feeAmount).toBe(12_000);
+  });
 });

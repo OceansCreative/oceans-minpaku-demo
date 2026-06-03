@@ -2,7 +2,7 @@
 
 import { BookOpenCheck, Mail, MessageSquare, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { useAppStore } from '@/lib/store';
@@ -165,14 +165,21 @@ function TemplateEditor({
   const [draft, setDraft] = useState<ReminderTemplate>(template);
   const tr = useTranslations('Admin');
   const tc = useTranslations('Common');
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') onCancel();
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onCancel]);
+
   return (
     <div
       role="dialog"
       aria-modal
+      aria-labelledby="reminder-editor-title"
       onClick={onCancel}
-      onKeyDown={(e) => {
-        if (e.key === 'Escape') onCancel();
-      }}
       className="fixed inset-0 z-[55] flex items-center justify-center bg-ink/40 px-4 backdrop-blur-sm"
     >
       <div
@@ -180,7 +187,9 @@ function TemplateEditor({
         className="max-h-[90vh] w-full max-w-xl space-y-4 overflow-y-auto rounded-2xl bg-sand p-6 shadow-2xl"
       >
         <header>
-          <h2 className="font-serif text-lg text-ink">{tr('editReminder')}</h2>
+          <h2 id="reminder-editor-title" className="font-serif text-lg text-ink">
+            {tr('editReminder')}
+          </h2>
           <p className="text-xs text-ink/50">
             {tr('idLabel')} <code>{draft.id}</code>
           </p>

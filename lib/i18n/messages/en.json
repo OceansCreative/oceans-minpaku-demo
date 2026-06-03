@@ -372,5 +372,31 @@
     "conflictsPanelTitle": "Conflicting pending reservations: {count}",
     "conflictsDuplicate": "Overlaps: {ids}",
     "conflictsResolve": "Resolve"
+  },
+  "Receipt": {
+    "title": "Receipt",
+    "documentNo": "Receipt No.",
+    "issuedOn": "Issued",
+    "issuedTo": "Billed to",
+    "issuer": "Issued by",
+    "stayPeriod": "Stay",
+    "room": "Room",
+    "nights": "{nights, plural, one {# night} other {# nights}}",
+    "description": "Accommodation",
+    "unitNote": "¥{amount} per night",
+    "subtotalNet": "Subtotal (excl. tax)",
+    "tax": "Consumption tax ({rate}%)",
+    "total": "Total (incl. tax)",
+    "deposit": "Security deposit (held separately, refundable)",
+    "paymentMethod": "Payment method",
+    "paymentCard": "Credit card (Stripe)",
+    "print": "Print / Save as PDF",
+    "back": "Back to reservation",
+    "view": "Get receipt",
+    "notCapturedTitle": "Receipt not available yet",
+    "notCapturedBody": "Once payment is captured, you can issue the receipt for this reservation.",
+    "notFound": "Reservation not found.",
+    "demoNote": "* This is an OceansBase sample build — not a real receipt.",
+    "thanks": "Thank you for your stay."
   }
 }

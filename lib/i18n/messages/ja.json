@@ -372,5 +372,31 @@
     "conflictsPanelTitle": "競合中の承認待ち予約: {count} 件",
     "conflictsDuplicate": "重複: {ids}",
     "conflictsResolve": "対応する"
+  },
+  "Receipt": {
+    "title": "領収書",
+    "documentNo": "領収書番号",
+    "issuedOn": "発行日",
+    "issuedTo": "宛名",
+    "issuer": "発行者",
+    "stayPeriod": "宿泊期間",
+    "room": "お部屋",
+    "nights": "{nights}泊",
+    "description": "宿泊料",
+    "unitNote": "1泊あたり ¥{amount}",
+    "subtotalNet": "小計（税抜）",
+    "tax": "消費税（{rate}%）",
+    "total": "合計（税込）",
+    "deposit": "保証金（別途・退去後返金）",
+    "paymentMethod": "お支払い方法",
+    "paymentCard": "クレジットカード（Stripe）",
+    "print": "印刷 / PDF保存",
+    "back": "予約詳細へ戻る",
+    "view": "領収書を発行",
+    "notCapturedTitle": "領収書はまだ発行できません",
+    "notCapturedBody": "決済が完了すると、この予約の領収書を発行できます。",
+    "notFound": "予約が見つかりませんでした。",
+    "demoNote": "※ これは OceansBase の制作サンプルです。実際の領収書ではありません。",
+    "thanks": "ご利用ありがとうございました。"
   }
 }

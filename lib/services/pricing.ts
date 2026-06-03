@@ -150,6 +150,39 @@ function daysBetween(a: Date, b: Date): number {
   return Math.round((floorToUtcDay(b).getTime() - floorToUtcDay(a).getTime()) / MS_PER_DAY);
 }
 
+// ---------- Rate heatmap ----------
+
+/**
+ * Map a nightly `rate` onto an integer heat bucket `0..levels-1` for a calendar
+ * heatmap, where `0` is the coldest (cheapest) and `levels-1` the hottest
+ * (most expensive). The bucket is derived from where `rate` falls in the
+ * `[min, max]` band; values outside the band clamp to the nearest edge.
+ *
+ * Pure and deterministic — no `Date`, no DOM, no I/O. Safe edge handling:
+ * - `min === max` (a flat month, or a single day) → the middle bucket, so the
+ *   tint reads as "neutral" rather than implying a high/low extreme.
+ * - non-finite `rate`/`min`/`max`, or `levels < 1`, or `max < min` → `0`.
+ */
+export function rateHeatLevel(rate: number, min: number, max: number, levels = 5): number {
+  if (
+    !Number.isFinite(rate) ||
+    !Number.isFinite(min) ||
+    !Number.isFinite(max) ||
+    !Number.isFinite(levels) ||
+    levels < 1 ||
+    max < min
+  ) {
+    return 0;
+  }
+  const maxLevel = Math.floor(levels) - 1;
+  if (max === min) {
+    return Math.floor(maxLevel / 2);
+  }
+  const fraction = (rate - min) / (max - min);
+  const bucket = Math.floor(fraction * levels);
+  return Math.min(maxLevel, Math.max(0, bucket));
+}
+
 // ---------- Cancellation fee ----------
 
 export interface CancellationFeeResult {

@@ -7,10 +7,28 @@ import { useMemo, useState } from 'react';
 
 import { ConflictsPanel } from '@/components/admin/ConflictsPanel';
 import { AIRBNB_ICAL_LAG_HOURS } from '@/lib/mock/airbnb-ical';
+import { calculateNightlyRates, rateHeatLevel } from '@/lib/services/pricing';
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils/cn';
 
-import type { Reservation } from '@/types';
+import type { PricingRule, Reservation } from '@/types';
+
+/** Number of heat buckets; matches HEAT_TINTS length. */
+const HEAT_LEVELS = 5;
+
+/**
+ * Graduated tint per heat level, coldest (cheapest) → hottest (most expensive).
+ * Listed as full class strings so Tailwind can statically detect them. The moss
+ * accent keeps the palette on-brand; opacity stays low so cell content (reserva-
+ * tion chips, today marker, the crimson double-booking ring) stays legible.
+ */
+const HEAT_TINTS = [
+  'bg-moss/[0.04]',
+  'bg-moss/[0.10]',
+  'bg-moss/[0.18]',
+  'bg-moss/[0.28]',
+  'bg-moss/[0.40]',
+] as const;
 
 function startOfMonth(d: Date): Date {
   return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1));
@@ -25,6 +43,7 @@ function isoDay(d: Date): string {
 export default function AdminCalendarPage() {
   const reservations = useAppStore((s) => s.reservations);
   const rooms = useAppStore((s) => s.rooms);
+  const pricingRules = useAppStore((s) => s.pricingRules);
   const t = useTranslations('Admin');
   const [cursor, setCursor] = useState(() => startOfMonth(new Date()));
 
@@ -36,6 +55,41 @@ export default function AdminCalendarPage() {
       return d;
     });
   }, [cursor]);
+
+  // Heatmap: per-room nightly rate for every visible day, via the shared pricing
+  // service (no inline pricing math). Only date-intrinsic rules apply on the
+  // calendar — leadtime/occupancy need a booking context that doesn't exist for
+  // an empty grid cell, and leadtime would otherwise throw without `bookedAt`.
+  const { ratesByRoom, monthMin, monthMax } = useMemo(() => {
+    const dateRules: PricingRule[] = pricingRules.filter(
+      (r) => r.condition.type === 'weekend' || r.condition.type === 'season',
+    );
+    const checkIn = isoDay(days[0] ?? cursor);
+    const lastDay = days[days.length - 1] ?? cursor;
+    const checkOutDate = new Date(lastDay);
+    checkOutDate.setUTCDate(checkOutDate.getUTCDate() + 1);
+    const checkOut = isoDay(checkOutDate);
+
+    const byRoom = new Map<string, Map<string, number>>();
+    let min = Number.POSITIVE_INFINITY;
+    let max = Number.NEGATIVE_INFINITY;
+    for (const room of rooms) {
+      const dayMap = new Map<string, number>();
+      const rates = calculateNightlyRates({
+        basePrice: room.basePrice,
+        checkIn,
+        checkOut,
+        rules: dateRules,
+      });
+      for (const rate of rates) {
+        dayMap.set(rate.date, rate.price);
+        if (rate.price < min) min = rate.price;
+        if (rate.price > max) max = rate.price;
+      }
+      byRoom.set(room.id, dayMap);
+    }
+    return { ratesByRoom: byRoom, monthMin: min, monthMax: max };
+  }, [cursor, days, rooms, pricingRules]);
 
   return (
     <div className="space-y-5">
@@ -89,7 +143,10 @@ export default function AdminCalendarPage() {
           {t('icalLagAfter')} <strong>{t('icalLagSafeguard')}</strong> {t('icalLagFinal')}
         </p>
       </div>
-      <Legend />
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+        <Legend />
+        <HeatLegend />
+      </div>
 
       <div className="overflow-x-auto rounded-2xl border border-ink/10 bg-sand">
         <table className="min-w-full border-collapse text-xs">
@@ -129,18 +186,30 @@ export default function AdminCalendarPage() {
                   );
                   const conflict = occupants.length > 1;
                   const first = occupants[0];
+                  const rate = ratesByRoom.get(room.id)?.get(cellIso);
+                  // Heat tint only on cells without a double-booking, so the
+                  // crimson conflict highlight is never diluted.
+                  const heatTint =
+                    !conflict && rate !== undefined
+                      ? HEAT_TINTS[rateHeatLevel(rate, monthMin, monthMax, HEAT_LEVELS)]
+                      : undefined;
+                  const rateLabel =
+                    rate !== undefined
+                      ? t('cellNightlyRate', { rate: rate.toLocaleString() })
+                      : undefined;
+                  const occupantTitle =
+                    occupants.length === 0
+                      ? t('cellVacant')
+                      : occupants.map((o) => `${o.id} (${o.source}, ${o.status})`).join('\n');
                   return (
                     <td
                       key={cellIso}
                       className={cn(
                         'h-9 border-l border-ink/5 align-middle',
+                        heatTint,
                         conflict && 'bg-crimson/20 ring-2 ring-inset ring-crimson',
                       )}
-                      title={
-                        occupants.length === 0
-                          ? t('cellVacant')
-                          : occupants.map((o) => `${o.id} (${o.source}, ${o.status})`).join('\n')
-                      }
+                      title={rateLabel ? `${occupantTitle}\n${rateLabel}` : occupantTitle}
                     >
                       {first && (
                         <Link
@@ -195,5 +264,21 @@ function Legend() {
         </li>
       ))}
     </ul>
+  );
+}
+
+function HeatLegend() {
+  const t = useTranslations('Admin');
+  return (
+    <div className="inline-flex items-center gap-2 text-[11px] text-ink/60">
+      <span className="uppercase tracking-wider text-ink/45">{t('heatLegendTitle')}</span>
+      <span>{t('heatLegendLow')}</span>
+      <span className="inline-flex overflow-hidden rounded-sm ring-1 ring-inset ring-ink/10">
+        {HEAT_TINTS.map((tone, i) => (
+          <span key={i} className={cn('inline-block h-3 w-5', tone)} aria-hidden />
+        ))}
+      </span>
+      <span>{t('heatLegendHigh')}</span>
+    </div>
   );
 }

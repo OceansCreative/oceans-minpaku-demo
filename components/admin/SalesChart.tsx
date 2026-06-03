@@ -11,11 +11,7 @@ import {
   YAxis,
 } from 'recharts';
 
-export interface SalesBucket {
-  key: string;
-  direct: number;
-  airbnb: number;
-}
+import type { SalesBucket } from '@/lib/services/sales';
 
 /**
  * Stacked bar chart for the sales aggregation page. Pulled out of the page so

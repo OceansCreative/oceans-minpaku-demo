@@ -225,6 +225,7 @@
     "enableNow": "Enable (becomes eligible for auto-send immediately after saving)",
     "chartLoading": "Loading chart…",
     "salesSubtitle": "Review revenue by source and period in a chart.",
+    "exportSalesCsv": "Export sales CSV",
     "granDay": "Daily",
     "granMonth": "Monthly",
     "granYear": "Yearly",

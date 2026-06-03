@@ -1,12 +1,19 @@
 'use client';
 
-import { BarChart3, Filter } from 'lucide-react';
+import { BarChart3, Download, Filter } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 
+import {
+  bucketSales,
+  salesBucketsToCsv,
+  salesTotals,
+  type SalesGranularity,
+} from '@/lib/services/sales';
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils/cn';
+import { toIsoDate } from '@/lib/utils/dates';
 
 function SalesChartLoading() {
   const t = useTranslations('Admin');
@@ -25,56 +32,52 @@ const SalesChart = dynamic(() => import('@/components/admin/SalesChart'), {
   loading: () => <SalesChartLoading />,
 });
 
-type Granularity = 'day' | 'month' | 'year';
-
-interface Bucket {
-  key: string;
-  direct: number;
-  airbnb: number;
-}
-
-function bucketKey(iso: string, gran: Granularity): string {
-  if (gran === 'day') return iso;
-  if (gran === 'month') return iso.slice(0, 7);
-  return iso.slice(0, 4);
-}
-
 export default function AdminSalesPage() {
   const reservations = useAppStore((s) => s.reservations);
   const t = useTranslations('Admin');
-  const [gran, setGran] = useState<Granularity>('month');
+  const [gran, setGran] = useState<SalesGranularity>('month');
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
 
-  const buckets: Bucket[] = useMemo(() => {
-    const map = new Map<string, Bucket>();
-    for (const r of reservations) {
-      if (r.status === 'cancelled' || r.status === 'rejected') continue;
-      if (from && r.checkIn < from) continue;
-      if (to && r.checkIn > to) continue;
-      const key = bucketKey(r.checkIn, gran);
-      const existing = map.get(key) ?? { key, direct: 0, airbnb: 0 };
-      if (r.source === 'direct') existing.direct += r.amount;
-      else existing.airbnb += r.amount;
-      map.set(key, existing);
-    }
-    return [...map.values()].sort((a, b) => (a.key < b.key ? -1 : 1));
-  }, [reservations, gran, from, to]);
+  const buckets = useMemo(
+    () => bucketSales(reservations, { granularity: gran, from, to }),
+    [reservations, gran, from, to],
+  );
 
-  const total = buckets.reduce((acc, m) => acc + m.direct + m.airbnb, 0);
-  const totalDirect = buckets.reduce((acc, m) => acc + m.direct, 0);
-  const totalAirbnb = buckets.reduce((acc, m) => acc + m.airbnb, 0);
+  const { total, direct: totalDirect, airbnb: totalAirbnb } = salesTotals(buckets);
+
+  function exportCsv() {
+    const csv = salesBucketsToCsv(buckets);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `sales-${gran}-${toIsoDate(new Date())}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="font-serif text-2xl text-ink">{t('navSales')}</h1>
-        <p className="text-sm text-ink/60">{t('salesSubtitle')}</p>
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="font-serif text-2xl text-ink">{t('navSales')}</h1>
+          <p className="text-sm text-ink/60">{t('salesSubtitle')}</p>
+        </div>
+        <button
+          type="button"
+          onClick={exportCsv}
+          disabled={buckets.length === 0}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-ink/15 bg-sand px-3 py-2 text-xs text-ink/70 transition-colors hover:bg-ink/[0.04] hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          <Download className="h-3.5 w-3.5" />
+          {t('exportSalesCsv')}
+        </button>
       </header>
 
       <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-ink/10 bg-sand p-3 text-sm">
         <Filter className="h-3.5 w-3.5 text-ink/40" />
-        {(['day', 'month', 'year'] as Granularity[]).map((g) => (
+        {(['day', 'month', 'year'] as SalesGranularity[]).map((g) => (
           <button
             key={g}
             type="button"

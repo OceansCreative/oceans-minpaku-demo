@@ -225,6 +225,7 @@
     "enableNow": "有効にする（保存後すぐに自動送信の対象になります）",
     "chartLoading": "グラフを読み込み中…",
     "salesSubtitle": "経路別 / 期間別の売上をグラフで確認できます。",
+    "exportSalesCsv": "売上CSVをエクスポート",
     "granDay": "日別",
     "granMonth": "月別",
     "granYear": "年別",

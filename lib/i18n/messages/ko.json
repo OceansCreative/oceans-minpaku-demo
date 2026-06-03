@@ -97,6 +97,7 @@
     "loginSubmit": "로그인",
     "loginMockNote": "※ 데모용 모의 인증입니다. 실제 환경에서는 Auth0 / NextAuth / 자체 ID 등으로 교체합니다.",
     "reservationsSubtitle": "예약의 상태와 경로를 확인하고 승인 / 거절을 판단합니다.",
+    "exportCsv": "CSV 내보내기",
     "statusPending": "승인 대기",
     "statusApproved": "확정",
     "statusRejected": "거절",

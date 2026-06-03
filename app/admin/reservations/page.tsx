@@ -1,12 +1,14 @@
 'use client';
 
-import { ChevronRight, Filter } from 'lucide-react';
+import { ChevronRight, Download, Filter } from 'lucide-react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 
+import { reservationsToCsv } from '@/lib/services/export';
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils/cn';
+import { toIsoDate } from '@/lib/utils/dates';
 
 import type { ReservationStatus } from '@/types';
 
@@ -46,13 +48,34 @@ export default function AdminReservationsPage() {
       .sort((a, b) => (a.checkIn < b.checkIn ? -1 : 1));
   }, [reservations, filter, source]);
 
+  function exportCsv() {
+    const csv = reservationsToCsv(filtered, { rooms, guests });
+    // Prefix a UTF-8 BOM so Excel reads non-ASCII guest/room names correctly.
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `reservations-${toIsoDate(new Date())}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <div className="space-y-6">
-      <header className="flex items-end justify-between">
+      <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-serif text-2xl text-ink">{t('navReservations')}</h1>
           <p className="text-sm text-ink/60">{t('reservationsSubtitle')}</p>
         </div>
+        <button
+          type="button"
+          onClick={exportCsv}
+          disabled={filtered.length === 0}
+          className="inline-flex items-center gap-1.5 rounded-md border border-ink/15 bg-sand px-3 py-1.5 text-xs text-ink/80 hover:bg-ink/[0.04] disabled:opacity-40"
+        >
+          <Download className="h-3.5 w-3.5" />
+          {t('exportCsv')}
+        </button>
       </header>
 
       <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-ink/10 bg-sand p-3">

@@ -11,6 +11,27 @@ import { useAppStore } from '@/lib/store';
 
 import type { LanguageCode } from '@/types';
 
+type MessageTree = { [key: string]: string | MessageTree };
+
+/**
+ * Recursively overlay `overrides` onto `base`, key by key. Used so a partially
+ * translated locale (zh/ko) falls back to the `ja` reference for any key it
+ * omits — at every nesting level, not just the top. A shallow `{...ja, ...zh}`
+ * would let a present namespace (e.g. `Admin`) shadow ja's entire namespace,
+ * dropping fallback for every sibling key the locale hasn't translated yet.
+ */
+function deepMergeMessages(base: MessageTree, overrides: MessageTree): MessageTree {
+  const out: MessageTree = { ...base };
+  for (const [key, value] of Object.entries(overrides)) {
+    const baseValue = out[key];
+    out[key] =
+      typeof value === 'object' && typeof baseValue === 'object'
+        ? deepMergeMessages(baseValue, value)
+        : value;
+  }
+  return out;
+}
+
 /**
  * Bundle of compile-time-bundled translations. Loaded synchronously so the demo
  * works offline; a production deploy would lazy-load via `next-intl` static imports.
@@ -18,10 +39,10 @@ import type { LanguageCode } from '@/types';
 const MESSAGES: Record<LanguageCode, AbstractIntlMessages> = {
   ja: ja as AbstractIntlMessages,
   en: en as AbstractIntlMessages,
-  // zh / ko are partial; missing keys fall back to ja through next-intl's
-  // `getMessageFallback` (configured in NextIntlClientProvider below).
-  zh: { ...(ja as object), ...(zh as object) } as AbstractIntlMessages,
-  ko: { ...(ja as object), ...(ko as object) } as AbstractIntlMessages,
+  // zh / ko are partially translated; deep-merge over ja so any untranslated
+  // key (at any depth) gracefully falls back to the ja reference string.
+  zh: deepMergeMessages(ja as MessageTree, zh as MessageTree) as AbstractIntlMessages,
+  ko: deepMergeMessages(ja as MessageTree, ko as MessageTree) as AbstractIntlMessages,
 };
 
 interface IntlProviderProps {

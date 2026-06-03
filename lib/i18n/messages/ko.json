@@ -23,5 +23,49 @@
     "description": "4개의 객실은 각각 다른 풍경과 분위기를 가지고 있습니다.",
     "capacity": "최대 {count}명",
     "viewDetails": "상세 보기"
+  },
+  "RoomDetail": {
+    "basePrice": "기본 요금",
+    "perNight": "/ 박",
+    "bookThisRoom": "이 객실 예약하기",
+    "approvalNote": "예약은 신청 후 호스트의 승인으로 확정됩니다."
+  },
+  "Booking": {
+    "stepDates": "일정",
+    "stepTime": "시각",
+    "stepParking": "주차장",
+    "stepReview": "요금 확인",
+    "stepInfo": "투숙객 정보",
+    "stepPayment": "결제",
+    "next": "다음",
+    "prev": "이전",
+    "submit": "예약 신청하기",
+    "submitting": "전송 중..."
+  },
+  "Admin": {
+    "navDashboard": "대시보드",
+    "navReservations": "예약 관리",
+    "navCalendar": "캘린더",
+    "navMessages": "투숙객 메시지",
+    "navReminders": "리마인더",
+    "navSales": "매출 집계",
+    "navPasscodes": "비밀번호 관리",
+    "navPricing": "요금 설정",
+    "navCancellation": "취소 정책 설정",
+    "navOta": "OTA 연동",
+    "navGuestRegister": "투숙객 명부",
+    "navSettings": "샘플 데이터",
+    "signOut": "로그아웃",
+    "loginTitle": "관리자 로그인",
+    "loginInvalid": "자격 증명이 올바르지 않습니다 (demo / demo)",
+    "approve": "승인하기 (Stripe capture)",
+    "reject": "거절 (Stripe cancel)",
+    "cancel": "이 예약 취소",
+    "doubleBookingWarning": "더블 부킹 위험이 있습니다 — 승인이 비활성화되었습니다",
+    "todayCheckIn": "오늘 체크인",
+    "todayCheckOut": "오늘 체크아웃",
+    "occupancy": "가동률 (지난 30일)",
+    "monthlySales": "이번 달 매출",
+    "capCounter": "연간 180일 가동 카운터"
   }
 }

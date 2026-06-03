@@ -23,5 +23,49 @@
     "description": "四间客房各具景观与风格。",
     "capacity": "最多 {count} 位入住",
     "viewDetails": "查看详情"
+  },
+  "RoomDetail": {
+    "basePrice": "基础房费",
+    "perNight": "/ 晚",
+    "bookThisRoom": "预订此客房",
+    "approvalNote": "预订申请提交后，需经房东确认方可成立。"
+  },
+  "Booking": {
+    "stepDates": "日期",
+    "stepTime": "时间",
+    "stepParking": "停车",
+    "stepReview": "费用确认",
+    "stepInfo": "入住人信息",
+    "stepPayment": "支付",
+    "next": "下一步",
+    "prev": "上一步",
+    "submit": "提交预订申请",
+    "submitting": "提交中..."
+  },
+  "Admin": {
+    "navDashboard": "仪表盘",
+    "navReservations": "预订管理",
+    "navCalendar": "日历",
+    "navMessages": "住客消息",
+    "navReminders": "提醒事项",
+    "navSales": "销售汇总",
+    "navPasscodes": "门锁密码管理",
+    "navPricing": "价格设置",
+    "navCancellation": "取消政策设置",
+    "navOta": "OTA 联动",
+    "navGuestRegister": "住客登记簿",
+    "navSettings": "示例数据",
+    "signOut": "退出登录",
+    "loginTitle": "后台登录",
+    "loginInvalid": "凭据不正确（demo / demo）",
+    "approve": "批准（Stripe capture）",
+    "reject": "拒绝（Stripe cancel）",
+    "cancel": "取消此预订",
+    "doubleBookingWarning": "存在重复预订的风险 — 批准已被禁用",
+    "todayCheckIn": "今日入住",
+    "todayCheckOut": "今日退房",
+    "occupancy": "入住率（过去 30 天）",
+    "monthlySales": "本月销售额",
+    "capCounter": "年度 180 天 运营计数器"
   }
 }

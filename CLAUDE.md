@@ -71,10 +71,13 @@ TZ=UTC pnpm test && TZ=Asia/Tokyo pnpm test && TZ=America/New_York pnpm test
 ## i18n (next-intl)
 
 Catalogs: `lib/i18n/messages/{ja,en,zh,ko}.json`, wired via
-`lib/i18n/IntlProvider.tsx`. **`ja` is the source/reference locale.** `ja`/`en`
-are full; `zh`/`ko` are intentionally partial. User-facing copy belongs in the
-catalog (`t()` keys), not hardcoded in components. Keep ICU placeholders
-(`{name}`, plurals, rich tags) identical across every locale or formatting throws.
+`lib/i18n/IntlProvider.tsx`. **`ja` is the source/reference locale.** All four
+locales are kept at full parity with `ja` (0 missing / 0 orphan keys).
+`IntlProvider` deep-merges each locale over `ja`, so a newly-added key falls back
+to the `ja` reference until it's translated rather than throwing — keep parity by
+adding new keys to every locale. User-facing copy belongs in the catalog (`t()`
+keys), not hardcoded in components. Keep ICU placeholders (`{name}`, plurals,
+rich tags) identical across every locale or formatting throws.
 
 ## Commit hygiene
 

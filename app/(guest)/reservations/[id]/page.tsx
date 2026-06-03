@@ -69,6 +69,14 @@ export default function ReservationStatusPage({ params }: PageProps) {
           <Row label="Intent">
             <code className="text-xs">{reservation.payment.intentId}</code>
           </Row>
+          {reservation.payment.status === 'captured' && (
+            <Link
+              href={`/reservations/${reservation.id}/receipt`}
+              className="mt-1 inline-flex items-center gap-1 text-xs text-moss hover:text-ink"
+            >
+              領収書を発行 →
+            </Link>
+          )}
         </Card>
         <Card title="スマートロック">
           {reservation.passcode ? (

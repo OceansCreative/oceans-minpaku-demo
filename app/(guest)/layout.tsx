@@ -8,7 +8,7 @@ import type { ReactNode } from 'react';
 export default function GuestLayout({ children }: { children: ReactNode }) {
   return (
     <>
-      <header className="sticky top-0 z-30 border-b border-ink/10 bg-sand/85 backdrop-blur supports-[backdrop-filter]:bg-sand/65">
+      <header className="sticky top-0 z-30 border-b border-ink/10 bg-sand/85 backdrop-blur supports-[backdrop-filter]:bg-sand/65 print:hidden">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4">
           <Link href="/" className="flex shrink-0 flex-col leading-tight">
             <span className="font-serif text-base text-ink sm:text-lg">和庵 山陰</span>

@@ -372,5 +372,31 @@
     "conflictsPanelTitle": "存在冲突的待批准预订: {count} 条",
     "conflictsDuplicate": "重复: {ids}",
     "conflictsResolve": "处理"
+  },
+  "Receipt": {
+    "title": "收据",
+    "documentNo": "收据编号",
+    "issuedOn": "开具日期",
+    "issuedTo": "抬头",
+    "issuer": "开具方",
+    "stayPeriod": "入住期间",
+    "room": "房间",
+    "nights": "{nights}晚",
+    "description": "住宿费",
+    "unitNote": "每晚 ¥{amount}",
+    "subtotalNet": "小计（不含税）",
+    "tax": "消费税（{rate}%）",
+    "total": "合计（含税）",
+    "deposit": "押金（另计・退房后退还）",
+    "paymentMethod": "支付方式",
+    "paymentCard": "信用卡（Stripe）",
+    "print": "打印 / 保存为 PDF",
+    "back": "返回预订详情",
+    "view": "开具收据",
+    "notCapturedTitle": "尚无法开具收据",
+    "notCapturedBody": "付款完成后，即可为此预订开具收据。",
+    "notFound": "未找到该预订。",
+    "demoNote": "※ 这是 OceansBase 的制作样例，并非真实收据。",
+    "thanks": "感谢您的入住。"
   }
 }

@@ -10,6 +10,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { use, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -42,13 +43,14 @@ export default function AdminReservationDetailPage({ params }: PageProps) {
   const allReservations = useAppStore((s) => s.reservations);
   const upsertReservation = useAppStore((s) => s.upsertReservation);
   const cancellationPolicy = useAppStore((s) => s.cancellationPolicy);
+  const t = useTranslations('Admin');
 
   const [busy, setBusy] = useState<'approve' | 'reject' | 'cancel' | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   if (!reservation || !room) {
-    return <p className="text-sm text-ink/60">予約が見つかりませんでした。</p>;
+    return <p className="text-sm text-ink/60">{t('reservationNotFound')}</p>;
   }
 
   const conflicts = detectOverlap(allReservations, {
@@ -73,13 +75,16 @@ export default function AdminReservationDetailPage({ params }: PageProps) {
       };
       const result = await approveReservation(reservation, allReservations, intent);
       upsertReservation(result.reservation);
-      toast.success('予約を承認しました', {
-        description: `Stripe で ¥${reservation.amount.toLocaleString()} を確定、RemoteLOCK パスコード ${result.passcode.code} を発行しました。`,
+      toast.success(t('approveSuccess'), {
+        description: t('approveSuccessDesc', {
+          amount: reservation.amount.toLocaleString(),
+          code: result.passcode.code,
+        }),
       });
     } catch (e) {
-      const message = e instanceof Error ? e.message : '承認に失敗しました';
+      const message = e instanceof Error ? e.message : t('approveError');
       setError(message);
-      toast.error('承認に失敗しました', { description: message });
+      toast.error(t('approveError'), { description: message });
     } finally {
       setBusy(null);
     }
@@ -111,13 +116,16 @@ export default function AdminReservationDetailPage({ params }: PageProps) {
         cancellationFee: fee.feeAmount,
       });
       upsertReservation(result.reservation);
-      toast.success('予約をキャンセルしました', {
-        description: `¥${result.refund.amount.toLocaleString()} を返金（差引キャンセル料: ¥${fee.feeAmount.toLocaleString()}）。スマートロックのパスコードも失効しました。`,
+      toast.success(t('cancelSuccess'), {
+        description: t('cancelSuccessDesc', {
+          refund: result.refund.amount.toLocaleString(),
+          fee: fee.feeAmount.toLocaleString(),
+        }),
       });
     } catch (e) {
-      const message = e instanceof Error ? e.message : 'キャンセルに失敗しました';
+      const message = e instanceof Error ? e.message : t('cancelError');
       setError(message);
-      toast.error('キャンセルに失敗しました', { description: message });
+      toast.error(t('cancelError'), { description: message });
     } finally {
       setBusy(null);
     }
@@ -138,13 +146,13 @@ export default function AdminReservationDetailPage({ params }: PageProps) {
       };
       const result = await rejectReservation(reservation, intent);
       upsertReservation(result.reservation);
-      toast.success('予約を却下しました', {
-        description: 'Stripe の与信を解除しました。ゲスト側にも結果が反映されます。',
+      toast.success(t('rejectSuccess'), {
+        description: t('rejectSuccessDesc'),
       });
     } catch (e) {
-      const message = e instanceof Error ? e.message : '却下に失敗しました';
+      const message = e instanceof Error ? e.message : t('rejectError');
       setError(message);
-      toast.error('却下に失敗しました', { description: message });
+      toast.error(t('rejectError'), { description: message });
     } finally {
       setBusy(null);
     }
@@ -157,13 +165,15 @@ export default function AdminReservationDetailPage({ params }: PageProps) {
         className="inline-flex items-center gap-1.5 text-xs text-ink/50 hover:text-ink"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
-        予約一覧へ戻る
+        {t('backToReservations')}
       </Link>
 
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-serif text-2xl text-ink">{room.name} のご予約</h1>
-          <p className="text-sm text-ink/50">{guest?.name ?? '— ゲスト不明 —'}</p>
+          <h1 className="font-serif text-2xl text-ink">
+            {t('reservationOf', { room: room.name })}
+          </h1>
+          <p className="text-sm text-ink/50">{guest?.name ?? t('guestUnknown')}</p>
         </div>
         <span className="rounded-full bg-ink/[0.04] px-3 py-1 text-xs text-ink/70">
           {reservation.id}
@@ -175,49 +185,49 @@ export default function AdminReservationDetailPage({ params }: PageProps) {
       )}
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Card title="日程">
-          <Row label="チェックイン">
+        <Card title={t('cardSchedule')}>
+          <Row label={t('rowCheckIn')}>
             {reservation.checkIn} {reservation.checkInTime}
           </Row>
-          <Row label="チェックアウト">
+          <Row label={t('rowCheckOut')}>
             {reservation.checkOut} {reservation.checkOutTime}
           </Row>
-          <Row label="経路">{reservation.source}</Row>
+          <Row label={t('rowSource')}>{reservation.source}</Row>
         </Card>
-        <Card title="決済">
-          <Row label="金額">¥{reservation.amount.toLocaleString()}</Row>
-          <Row label="状態">{reservation.payment.status}</Row>
-          <Row label="Intent">
+        <Card title={t('cardPayment')}>
+          <Row label={t('rowAmount')}>¥{reservation.amount.toLocaleString()}</Row>
+          <Row label={t('rowPaymentStatus')}>{reservation.payment.status}</Row>
+          <Row label={t('rowIntent')}>
             <code className="text-[11px]">{reservation.payment.intentId}</code>
           </Row>
         </Card>
-        <Card title="ゲスト">
-          <Row label="お名前">{guest?.name ?? '—'}</Row>
-          <Row label="メール">{guest?.email ?? '—'}</Row>
-          <Row label="電話">{guest?.phone ?? '—'}</Row>
+        <Card title={t('cardGuest')}>
+          <Row label={t('rowName')}>{guest?.name ?? '—'}</Row>
+          <Row label={t('rowEmail')}>{guest?.email ?? '—'}</Row>
+          <Row label={t('rowPhone')}>{guest?.phone ?? '—'}</Row>
         </Card>
-        <Card title="ステータス">
-          <Row label="現在">{reservation.status}</Row>
+        <Card title={t('cardStatus')}>
+          <Row label={t('rowCurrent')}>{reservation.status}</Row>
         </Card>
-        <Card title="スマートロック">
+        <Card title={t('cardSmartLock')}>
           {reservation.passcode ? (
             <div className="space-y-2">
               <p className="flex items-center gap-1.5 text-xs text-moss">
                 <KeyRound className="h-3.5 w-3.5" />
-                RemoteLOCK パスコード発行済み
+                {t('passcodeIssued')}
               </p>
               <p className="rounded-md bg-ink px-3 py-2 text-center font-mono text-xl tracking-[0.3em] text-sand">
                 {reservation.passcode.code}
               </p>
               <p className="text-[10px] text-ink/50">
-                有効期間: {reservation.passcode.validFrom.slice(0, 16).replace('T', ' ')} 〜{' '}
-                {reservation.passcode.validUntil.slice(0, 16).replace('T', ' ')}
+                {t('passcodeValidRange', {
+                  from: reservation.passcode.validFrom.slice(0, 16).replace('T', ' '),
+                  until: reservation.passcode.validUntil.slice(0, 16).replace('T', ' '),
+                })}
               </p>
             </div>
           ) : (
-            <p className="text-sm text-ink/50">
-              承認時に RemoteLOCK へパスコード発行リクエストを送ります。
-            </p>
+            <p className="text-sm text-ink/50">{t('passcodeIssueOnApproval')}</p>
           )}
         </Card>
       </div>
@@ -254,7 +264,7 @@ export default function AdminReservationDetailPage({ params }: PageProps) {
             ) : (
               <CheckCircle2 className="h-4 w-4" />
             )}
-            承認する（Stripe capture）
+            {t('approve')}
           </button>
           <button
             type="button"
@@ -270,11 +280,9 @@ export default function AdminReservationDetailPage({ params }: PageProps) {
             ) : (
               <XCircle className="h-4 w-4" />
             )}
-            却下（Stripe cancel）
+            {t('reject')}
           </button>
-          <p className="ml-auto self-center text-[11px] text-ink/50">
-            承認で与信を捕捉、却下で与信を解除します。
-          </p>
+          <p className="ml-auto self-center text-[11px] text-ink/50">{t('approveCaptureHint')}</p>
         </div>
       )}
 

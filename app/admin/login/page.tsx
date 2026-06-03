@@ -2,19 +2,23 @@
 
 import { Lock, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Suspense, useState } from 'react';
 
 import { useAppStore } from '@/lib/store';
 
 export default function AdminLoginPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="grid min-h-[40vh] place-items-center text-sm text-ink/50">読み込み中…</div>
-      }
-    >
+    <Suspense fallback={<LoginFallback />}>
       <LoginForm />
     </Suspense>
+  );
+}
+
+function LoginFallback() {
+  const t = useTranslations('Common');
+  return (
+    <div className="grid min-h-[40vh] place-items-center text-sm text-ink/50">{t('loading')}</div>
   );
 }
 
@@ -22,6 +26,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const signInAdmin = useAppStore((s) => s.signInAdmin);
+  const t = useTranslations('Admin');
   const [username, setUsername] = useState('demo');
   const [password, setPassword] = useState('demo');
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +38,7 @@ function LoginForm() {
       const next = searchParams.get('next') ?? '/admin';
       router.push(next);
     } else {
-      setError('資格情報が正しくありません（demo / demo）');
+      setError(t('loginInvalid'));
     }
   }
 
@@ -43,10 +48,10 @@ function LoginForm() {
         <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-ink text-sand">
           <Lock className="h-5 w-5" />
         </div>
-        <h1 className="font-serif text-2xl text-ink">管理画面ログイン</h1>
+        <h1 className="font-serif text-2xl text-ink">{t('loginTitle')}</h1>
         <p className="text-xs text-ink/50">
-          このサンプルは <code className="rounded bg-ink/5 px-1.5 py-0.5">demo</code> /{' '}
-          <code className="rounded bg-ink/5 px-1.5 py-0.5">demo</code> でログインできます。
+          {t('loginHintBefore')} <code className="rounded bg-ink/5 px-1.5 py-0.5">demo</code> /{' '}
+          <code className="rounded bg-ink/5 px-1.5 py-0.5">demo</code> {t('loginHintAfter')}
         </p>
       </div>
 
@@ -55,7 +60,7 @@ function LoginForm() {
         className="mt-8 space-y-4 rounded-2xl border border-ink/10 bg-sand p-6"
       >
         <label className="block space-y-1.5">
-          <span className="text-xs text-ink/60">ユーザー名</span>
+          <span className="text-xs text-ink/60">{t('loginUsername')}</span>
           <input
             type="text"
             value={username}
@@ -65,7 +70,7 @@ function LoginForm() {
           />
         </label>
         <label className="block space-y-1.5">
-          <span className="text-xs text-ink/60">パスワード</span>
+          <span className="text-xs text-ink/60">{t('loginPassword')}</span>
           <input
             type="password"
             value={password}
@@ -85,11 +90,9 @@ function LoginForm() {
           className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-ink px-4 py-2.5 text-sm font-medium text-sand transition-colors hover:bg-ink/90"
         >
           <ShieldCheck className="h-4 w-4" />
-          ログイン
+          {t('loginSubmit')}
         </button>
-        <p className="border-t border-ink/10 pt-3 text-[11px] text-ink/40">
-          ※ デモ用のモック認証です。本番では Auth0 / NextAuth / 自社IDなどに差し替えます。
-        </p>
+        <p className="border-t border-ink/10 pt-3 text-[11px] text-ink/40">{t('loginMockNote')}</p>
       </form>
     </div>
   );

@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 
 import { useAppStore } from '@/lib/store';
@@ -26,28 +27,30 @@ import { cn } from '@/lib/utils/cn';
 
 interface NavItem {
   href: string;
-  label: string;
+  labelKey: string;
   icon: typeof LayoutDashboard;
 }
 
 const NAV: NavItem[] = [
-  { href: '/admin', label: 'ダッシュボード', icon: LayoutDashboard },
-  { href: '/admin/reservations', label: '予約管理', icon: ClipboardList },
-  { href: '/admin/calendar', label: 'カレンダー', icon: Calendar },
-  { href: '/admin/messages', label: 'ゲストメッセージ', icon: MessageSquare },
-  { href: '/admin/reminders', label: 'リマインダー', icon: BookOpenCheck },
-  { href: '/admin/sales', label: '売上集計', icon: BarChart3 },
-  { href: '/admin/passcodes', label: 'パスコード管理', icon: KeyRound },
-  { href: '/admin/pricing', label: '料金設定', icon: Tag },
-  { href: '/admin/cancellation', label: 'キャンセル設定', icon: CreditCard },
-  { href: '/admin/ota', label: 'OTA連携', icon: Network },
-  { href: '/admin/guest-register', label: '宿泊者名簿', icon: Users },
-  { href: '/admin/settings', label: 'サンプルデータ', icon: Settings },
+  { href: '/admin', labelKey: 'navDashboard', icon: LayoutDashboard },
+  { href: '/admin/reservations', labelKey: 'navReservations', icon: ClipboardList },
+  { href: '/admin/calendar', labelKey: 'navCalendar', icon: Calendar },
+  { href: '/admin/messages', labelKey: 'navMessages', icon: MessageSquare },
+  { href: '/admin/reminders', labelKey: 'navReminders', icon: BookOpenCheck },
+  { href: '/admin/sales', labelKey: 'navSales', icon: BarChart3 },
+  { href: '/admin/passcodes', labelKey: 'navPasscodes', icon: KeyRound },
+  { href: '/admin/pricing', labelKey: 'navPricing', icon: Tag },
+  { href: '/admin/cancellation', labelKey: 'navCancellation', icon: CreditCard },
+  { href: '/admin/ota', labelKey: 'navOta', icon: Network },
+  { href: '/admin/guest-register', labelKey: 'navGuestRegister', icon: Users },
+  { href: '/admin/settings', labelKey: 'navSettings', icon: Settings },
 ];
 
 export function AdminShell({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const t = useTranslations('Admin');
+  const tNav = useTranslations('Nav');
   const authed = useAppStore((s) => s.isAdminAuthenticated);
   const signOut = useAppStore((s) => s.signOutAdmin);
   const reservations = useAppStore((s) => s.reservations);
@@ -73,7 +76,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
   if (!authed) {
     return (
       <div className="grid min-h-[60vh] place-items-center text-sm text-ink/50">
-        ログイン画面へ移動中…
+        {t('redirectingToLogin')}
       </div>
     );
   }
@@ -81,8 +84,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const sidebar = (
     <div className="sticky top-4 space-y-1 rounded-2xl border border-ink/10 bg-sand p-3">
       <div className="px-3 py-3">
-        <p className="font-serif text-base text-ink">管理画面</p>
-        <p className="text-[10px] uppercase tracking-widest text-ink/40">和庵 山陰 / Admin</p>
+        <p className="font-serif text-base text-ink">{tNav('admin')}</p>
+        <p className="text-[10px] uppercase tracking-widest text-ink/40">{t('brandSubtitle')}</p>
       </div>
       <nav className="space-y-0.5 text-sm">
         {NAV.map((item) => {
@@ -99,14 +102,14 @@ export function AdminShell({ children }: { children: ReactNode }) {
               )}
             >
               <Icon className="h-4 w-4" />
-              <span className="flex-1 truncate">{item.label}</span>
+              <span className="flex-1 truncate">{t(item.labelKey)}</span>
               {item.href === '/admin/reservations' && pendingCount > 0 && (
                 <span
                   className={cn(
                     'rounded-full px-1.5 py-0.5 text-[10px] font-medium',
                     active ? 'bg-sand text-ink' : 'bg-crimson text-sand',
                   )}
-                  aria-label={`${pendingCount} 件の新規予約`}
+                  aria-label={t('pendingBadgeLabel', { count: pendingCount })}
                 >
                   {pendingCount}
                 </span>
@@ -116,14 +119,14 @@ export function AdminShell({ children }: { children: ReactNode }) {
         })}
       </nav>
       <div className="border-t border-ink/10 px-3 py-3 text-[11px] text-ink/50">
-        <p>OceansBase 制作サンプル</p>
+        <p>{t('credit')}</p>
         <Link
           href="https://oceans-base.com/contact"
           target="_blank"
           rel="noopener noreferrer"
           className="text-moss underline"
         >
-          開発のご相談はこちら
+          {t('creditLink')}
         </Link>
       </div>
       <button
@@ -135,7 +138,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         className="mx-3 mb-2 inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs text-ink/60 hover:bg-ink/5 hover:text-ink"
       >
         <LogOut className="h-3.5 w-3.5" />
-        ログアウト
+        {t('signOut')}
       </button>
     </div>
   );
@@ -149,7 +152,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         <button
           type="button"
           onClick={() => setMobileOpen(true)}
-          aria-label="メニューを開く"
+          aria-label={t('openMenu')}
           /* Below the DemoBanner (~30px) + 16px gap; z-25 so the demo banner /
              welcome modal still sit above. */
           className="fixed left-3 top-[68px] z-[25] rounded-full bg-ink p-2.5 text-sand shadow-lg ring-1 ring-sand/20"
@@ -168,7 +171,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
               <button
                 type="button"
                 onClick={() => setMobileOpen(false)}
-                aria-label="メニューを閉じる"
+                aria-label={t('closeMenu')}
                 className="mb-2 ml-auto block rounded-full p-1.5 text-ink/40 hover:bg-ink/5"
               >
                 <X className="h-4 w-4" />

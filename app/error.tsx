@@ -2,6 +2,7 @@
 
 import { AlertTriangle, Home, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 
 import { useAppStore } from '@/lib/store';
@@ -19,6 +20,7 @@ export default function GlobalError({
   reset: () => void;
 }) {
   const resetSampleData = useAppStore((s) => s.resetToSeed);
+  const t = useTranslations('Error');
 
   useEffect(() => {
     // eslint-disable-next-line no-console
@@ -30,11 +32,11 @@ export default function GlobalError({
       <div className="grid h-14 w-14 place-items-center rounded-full bg-crimson/10 text-crimson">
         <AlertTriangle className="h-6 w-6" />
       </div>
-      <h1 className="font-serif text-2xl text-ink">予期しないエラーが発生しました</h1>
-      <p className="text-sm text-ink/60">申し訳ありません。再試行で多くの場合は復帰します。</p>
+      <h1 className="font-serif text-2xl text-ink">{t('title')}</h1>
+      <p className="text-sm text-ink/60">{t('description')}</p>
       {error.digest && (
         <p className="text-[11px] text-ink/40">
-          digest: <code>{error.digest}</code>
+          {t('digestLabel')} <code>{error.digest}</code>
         </p>
       )}
       <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
@@ -44,7 +46,7 @@ export default function GlobalError({
           className="inline-flex items-center gap-1.5 rounded-md bg-ink px-4 py-2 text-sm font-medium text-sand hover:bg-ink/90"
         >
           <RotateCcw className="h-4 w-4" />
-          再試行
+          {t('retry')}
         </button>
         <button
           type="button"
@@ -54,14 +56,14 @@ export default function GlobalError({
           }}
           className="inline-flex items-center gap-1.5 rounded-md border border-ink/15 px-4 py-2 text-sm text-ink/70 hover:bg-ink/5"
         >
-          サンプルデータをリセットして再試行
+          {t('resetAndRetry')}
         </button>
         <Link
           href="/"
           className="inline-flex items-center gap-1.5 rounded-md border border-ink/15 px-4 py-2 text-sm text-ink/70 hover:bg-ink/5"
         >
           <Home className="h-4 w-4" />
-          トップへ
+          {t('home')}
         </Link>
       </div>
     </div>

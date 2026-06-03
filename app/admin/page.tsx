@@ -2,6 +2,7 @@
 
 import { ArrowDownToLine, ArrowUpFromLine } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 
 import { CapCounterWidget } from '@/components/admin/widgets/CapCounterWidget';
@@ -14,6 +15,7 @@ export default function AdminDashboardPage() {
   const reservations = useAppStore((s) => s.reservations);
   const rooms = useAppStore((s) => s.rooms);
   const guests = useAppStore((s) => s.guests);
+  const t = useTranslations('Admin');
 
   const today = toIsoDate(new Date());
 
@@ -29,8 +31,8 @@ export default function AdminDashboardPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-serif text-2xl text-ink">ダッシュボード</h1>
-        <p className="text-sm text-ink/60">本日のオペレーションを一目で把握できます。</p>
+        <h1 className="font-serif text-2xl text-ink">{t('navDashboard')}</h1>
+        <p className="text-sm text-ink/60">{t('dashboardSubtitle')}</p>
       </header>
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -41,22 +43,22 @@ export default function AdminDashboardPage() {
 
       <div className="grid gap-4 md:grid-cols-2">
         <TodaySection
-          title="本日チェックイン"
+          title={t('todayCheckIn')}
           tone="text-emerald-700"
           Icon={ArrowDownToLine}
           reservations={checkingIn}
           rooms={rooms}
           guests={guests}
-          emptyHint="本日チェックインの予約はありません。"
+          emptyHint={t('todayCheckInEmpty')}
         />
         <TodaySection
-          title="本日チェックアウト"
+          title={t('todayCheckOut')}
           tone="text-amber-700"
           Icon={ArrowUpFromLine}
           reservations={checkingOut}
           rooms={rooms}
           guests={guests}
-          emptyHint="本日チェックアウトの予約はありません。"
+          emptyHint={t('todayCheckOutEmpty')}
         />
       </div>
     </div>
@@ -84,6 +86,7 @@ function TodaySection({
   guests: Guest[];
   emptyHint: string;
 }) {
+  const t = useTranslations('Admin');
   return (
     <section className="space-y-3 rounded-2xl border border-ink/10 bg-sand p-5">
       <header className="flex items-center justify-between">
@@ -91,7 +94,9 @@ function TodaySection({
           <Icon className="h-4 w-4" />
           {title}
         </h2>
-        <span className="text-xs text-ink/50">{reservations.length} 件</span>
+        <span className="text-xs text-ink/50">
+          {t('countSuffix', { count: reservations.length })}
+        </span>
       </header>
       {reservations.length === 0 ? (
         <p className="text-xs text-ink/40">{emptyHint}</p>
@@ -112,7 +117,7 @@ function TodaySection({
                   href={`/admin/reservations/${r.id}`}
                   className="text-[11px] text-moss hover:text-ink"
                 >
-                  詳細 →
+                  {t('detailArrow')}
                 </Link>
               </li>
             );

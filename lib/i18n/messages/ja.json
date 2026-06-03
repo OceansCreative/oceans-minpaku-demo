@@ -97,6 +97,7 @@
     "loginSubmit": "ログイン",
     "loginMockNote": "※ デモ用のモック認証です。本番では Auth0 / NextAuth / 自社IDなどに差し替えます。",
     "reservationsSubtitle": "予約のステータスと経路を確認し、承認 / 却下を判断します。",
+    "exportCsv": "CSVをエクスポート",
     "statusPending": "承認待ち",
     "statusApproved": "確定",
     "statusRejected": "却下",

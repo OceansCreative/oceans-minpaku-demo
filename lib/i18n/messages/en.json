@@ -97,6 +97,7 @@
     "loginSubmit": "Sign in",
     "loginMockNote": "* Mock auth for the demo. In production this is swapped for Auth0 / NextAuth / your own identity provider.",
     "reservationsSubtitle": "Review reservation status and source, then decide whether to approve or reject.",
+    "exportCsv": "Export CSV",
     "statusPending": "Pending",
     "statusApproved": "Confirmed",
     "statusRejected": "Rejected",

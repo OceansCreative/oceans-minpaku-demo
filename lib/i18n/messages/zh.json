@@ -97,6 +97,7 @@
     "loginSubmit": "登录",
     "loginMockNote": "※ 这是演示用的模拟认证。正式环境将替换为 Auth0 / NextAuth / 自有 ID 等。",
     "reservationsSubtitle": "查看预订的状态与来源，判断是否批准 / 拒绝。",
+    "exportCsv": "导出 CSV",
     "statusPending": "待批准",
     "statusApproved": "已确认",
     "statusRejected": "已拒绝",

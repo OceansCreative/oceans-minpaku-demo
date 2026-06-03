@@ -9,6 +9,7 @@
  * spreadsheet or downstream tool regardless of the UI locale.
  */
 
+import { toCsv } from '@/lib/services/csv';
 import { nightsBetween } from '@/lib/utils/dates';
 
 import type { Guest, Reservation, Room } from '@/types';
@@ -32,23 +33,6 @@ export const RESERVATION_CSV_HEADER = [
 ] as const;
 
 /**
- * Escape a single CSV field per RFC 4180: wrap in double quotes only when the
- * value contains a comma, double quote, or newline, and double any interior
- * quotes. Leaves plain values untouched.
- */
-function escapeCsvField(value: string): string {
-  if (/[",\r\n]/.test(value)) {
-    return `"${value.replaceAll('"', '""')}"`;
-  }
-  return value;
-}
-
-/** Join one row of already-stringified cells into an escaped CSV line. */
-function toCsvRow(cells: readonly string[]): string {
-  return cells.map(escapeCsvField).join(',');
-}
-
-/**
  * Render the given reservations as a CSV string.
  *
  * Columns: Reservation ID, Room, Guest, Check-in, Check-out, Nights, Status,
@@ -65,24 +49,22 @@ export function reservationsToCsv(
   const roomById = new Map(lookups.rooms.map((r) => [r.id, r]));
   const guestById = new Map(lookups.guests.map((g) => [g.id, g]));
 
-  const lines = [toCsvRow(RESERVATION_CSV_HEADER)];
+  const rows: string[][] = [[...RESERVATION_CSV_HEADER]];
 
   for (const r of reservations) {
     const roomName = roomById.get(r.roomId)?.name ?? '';
     const guestName = guestById.get(r.guestId)?.name ?? '';
-    lines.push(
-      toCsvRow([
-        r.id,
-        roomName,
-        guestName,
-        r.checkIn,
-        r.checkOut,
-        String(nightsBetween(r.checkIn, r.checkOut)),
-        r.status,
-        String(r.amount),
-      ]),
-    );
+    rows.push([
+      r.id,
+      roomName,
+      guestName,
+      r.checkIn,
+      r.checkOut,
+      String(nightsBetween(r.checkIn, r.checkOut)),
+      r.status,
+      String(r.amount),
+    ]);
   }
 
-  return lines.join('\n');
+  return toCsv(rows);
 }

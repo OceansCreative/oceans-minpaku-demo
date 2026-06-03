@@ -225,6 +225,7 @@
     "enableNow": "启用（保存后将立即纳入自动发送对象）",
     "chartLoading": "正在加载图表…",
     "salesSubtitle": "可通过图表按来源 / 期间查看销售额。",
+    "exportSalesCsv": "导出销售 CSV",
     "granDay": "按日",
     "granMonth": "按月",
     "granYear": "按年",

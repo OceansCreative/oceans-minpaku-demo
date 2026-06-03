@@ -2,6 +2,7 @@
 
 import { AlertTriangle, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 
 import { detectOverlap } from '@/lib/services/reservation';
@@ -22,6 +23,7 @@ interface ConflictRow {
 export function ConflictsPanel() {
   const reservations = useAppStore((s) => s.reservations);
   const rooms = useAppStore((s) => s.rooms);
+  const t = useTranslations('Admin');
 
   const conflicts: ConflictRow[] = useMemo(() => {
     return reservations
@@ -44,7 +46,7 @@ export function ConflictsPanel() {
     <section className="space-y-3 rounded-2xl border-2 border-crimson/40 bg-crimson/5 p-5">
       <header className="flex items-center gap-2 text-sm text-crimson">
         <AlertTriangle className="h-4 w-4" />
-        <span className="font-medium">競合中の承認待ち予約: {conflicts.length} 件</span>
+        <span className="font-medium">{t('conflictsPanelTitle', { count: conflicts.length })}</span>
       </header>
       <ul className="space-y-2 text-xs">
         {conflicts.map(({ pending, blockers }) => {
@@ -63,14 +65,16 @@ export function ConflictsPanel() {
                   </span>
                 </p>
                 <p className="text-ink/50">
-                  重複: {blockers.map((b) => `${b.id} (${b.source})`).join(', ')}
+                  {t('conflictsDuplicate', {
+                    ids: blockers.map((b) => `${b.id} (${b.source})`).join(', '),
+                  })}
                 </p>
               </div>
               <Link
                 href={`/admin/reservations/${pending.id}`}
                 className="inline-flex items-center gap-1 text-crimson hover:text-crimson/80"
               >
-                対応する
+                {t('conflictsResolve')}
                 <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </li>

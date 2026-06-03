@@ -1,6 +1,7 @@
 'use client';
 
 import { TrendingUp } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 
 import { useAppStore } from '@/lib/store';
@@ -9,6 +10,7 @@ import { toIsoDate } from '@/lib/utils/dates';
 /** Captured revenue this month + projected revenue from remaining approved stays. */
 export function SalesSummaryWidget() {
   const reservations = useAppStore((s) => s.reservations);
+  const t = useTranslations('Admin');
 
   const { captured, upcoming } = useMemo(() => {
     const today = new Date();
@@ -35,17 +37,17 @@ export function SalesSummaryWidget() {
       <header className="flex items-center justify-between">
         <h2 className="flex items-center gap-2 font-serif text-base text-ink/80">
           <TrendingUp className="h-4 w-4 text-moss" />
-          今月の売上
+          {t('monthlySales')}
         </h2>
       </header>
       <div className="space-y-2">
         <div>
           <p className="text-2xl font-medium text-ink">¥{captured.toLocaleString()}</p>
-          <p className="text-[11px] text-ink/50">確定済み（Stripe captured）</p>
+          <p className="text-[11px] text-ink/50">{t('salesCaptured')}</p>
         </div>
         <div className="border-t border-ink/10 pt-2">
           <p className="text-lg text-ink/70">+¥{upcoming.toLocaleString()}</p>
-          <p className="text-[11px] text-ink/50">承認済み・未確定見込み</p>
+          <p className="text-[11px] text-ink/50">{t('salesUpcoming')}</p>
         </div>
       </div>
     </section>

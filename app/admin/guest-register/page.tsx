@@ -9,6 +9,7 @@ import {
   Upload,
   Users,
 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 
 import { useAppStore } from '@/lib/store';
@@ -20,6 +21,7 @@ export default function AdminGuestRegisterPage() {
   const guests = useAppStore((s) => s.guests);
   const register = useAppStore((s) => s.guestRegister);
   const upsert = useAppStore((s) => s.upsertGuestRegister);
+  const t = useTranslations('Admin');
 
   const eligible = useMemo(
     () =>
@@ -61,14 +63,14 @@ export default function AdminGuestRegisterPage() {
 
   function exportCsv() {
     const header = [
-      '予約ID',
-      '氏名',
-      '国籍',
-      '職業',
-      '旅券番号',
-      'チェックイン',
-      'チェックアウト',
-      '身分証',
+      t('csvReservationId'),
+      t('csvName'),
+      t('csvNationality'),
+      t('csvProfession'),
+      t('csvPassportNumber'),
+      t('csvCheckIn'),
+      t('csvCheckOut'),
+      t('csvIdDocument'),
     ];
     const rows = register.map((entry) => {
       const reservation = reservations.find((r) => r.id === entry.reservationId);
@@ -80,7 +82,7 @@ export default function AdminGuestRegisterPage() {
         entry.passportNumber ?? '',
         reservation?.checkIn ?? '',
         reservation?.checkOut ?? '',
-        entry.idImageUrl ? '取得済み' : '未取得',
+        entry.idImageUrl ? t('csvIdObtained') : t('csvIdNotObtained'),
       ];
     });
     const csv = [header, ...rows]
@@ -100,11 +102,8 @@ export default function AdminGuestRegisterPage() {
       <ComplianceNotes />
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-serif text-2xl text-ink">宿泊者名簿</h1>
-          <p className="text-sm text-ink/60">
-            住宅宿泊事業法 §8 に基づく宿泊者の記録。氏名・国籍・連絡先・職業を記載し、3
-            年間保存します。
-          </p>
+          <h1 className="font-serif text-2xl text-ink">{t('guestRegisterTitle')}</h1>
+          <p className="text-sm text-ink/60">{t('guestRegisterSubtitle')}</p>
         </div>
         <button
           type="button"
@@ -113,7 +112,7 @@ export default function AdminGuestRegisterPage() {
           className="inline-flex items-center gap-1.5 rounded-md border border-ink/15 bg-sand px-3 py-1.5 text-xs text-ink/80 hover:bg-ink/[0.04] disabled:opacity-40"
         >
           <Download className="h-3.5 w-3.5" />
-          CSV エクスポート
+          {t('csvExport')}
         </button>
       </header>
 
@@ -121,11 +120,11 @@ export default function AdminGuestRegisterPage() {
         <table className="w-full text-sm">
           <thead className="bg-ink/[0.03] text-xs uppercase tracking-wider text-ink/50">
             <tr>
-              <th className="px-3 py-2.5 text-left">予約</th>
-              <th className="px-3 py-2.5 text-left">氏名</th>
-              <th className="px-3 py-2.5 text-left">国籍</th>
-              <th className="px-3 py-2.5 text-left">職業</th>
-              <th className="px-3 py-2.5 text-left">旅券番号</th>
+              <th className="px-3 py-2.5 text-left">{t('colReservation')}</th>
+              <th className="px-3 py-2.5 text-left">{t('colName')}</th>
+              <th className="px-3 py-2.5 text-left">{t('colNationality')}</th>
+              <th className="px-3 py-2.5 text-left">{t('colProfession')}</th>
+              <th className="px-3 py-2.5 text-left">{t('colPassportNumber')}</th>
               <th className="px-3 py-2.5"></th>
             </tr>
           </thead>
@@ -160,7 +159,7 @@ export default function AdminGuestRegisterPage() {
                       value={merged.profession ?? ''}
                       onChange={(e) => updateDraft(r.id, { profession: e.target.value })}
                       className={inputClass}
-                      placeholder="例: 会社員"
+                      placeholder={t('professionPlaceholder')}
                     />
                   </td>
                   <td className="px-3 py-2">
@@ -169,7 +168,7 @@ export default function AdminGuestRegisterPage() {
                       value={merged.passportNumber ?? ''}
                       onChange={(e) => updateDraft(r.id, { passportNumber: e.target.value })}
                       className={`${inputClass} w-28 font-mono text-xs`}
-                      placeholder="（外国籍のみ）"
+                      placeholder={t('passportForeignOnly')}
                     />
                   </td>
                   <td className="px-3 py-2 text-right">
@@ -188,7 +187,7 @@ export default function AdminGuestRegisterPage() {
                         className="inline-flex items-center gap-1 rounded-md bg-ink px-2.5 py-1 text-[11px] text-sand hover:bg-ink/90"
                       >
                         <ClipboardCheck className="h-3 w-3" />
-                        記録
+                        {t('record')}
                       </button>
                     </div>
                   </td>
@@ -199,7 +198,7 @@ export default function AdminGuestRegisterPage() {
               <tr>
                 <td colSpan={6} className="px-4 py-8 text-center text-xs text-ink/40">
                   <Users className="mx-auto mb-1 h-5 w-5 opacity-50" />
-                  記録対象の予約はまだありません。
+                  {t('guestRegisterEmpty')}
                 </td>
               </tr>
             )}
@@ -211,47 +210,42 @@ export default function AdminGuestRegisterPage() {
 }
 
 function ComplianceNotes() {
+  const t = useTranslations('Admin');
   return (
     <section className="rounded-2xl border border-moss/30 bg-moss/[0.06] p-5 text-xs leading-relaxed text-ink/70">
       <h2 className="mb-2 flex items-center gap-2 text-sm font-medium text-moss">
         <BookOpen className="h-4 w-4" />
-        住宅宿泊事業法 (民泊新法) 対応メモ
+        {t('complianceTitle')}
       </h2>
       <ul className="list-disc space-y-1 pl-5">
         <li>
-          <strong>§8 宿泊者名簿の備付義務</strong>: 氏名・住所・職業・宿泊日を記録し、3
-          年間保存。外国籍の宿泊者は旅券番号も必須。
+          <strong>{t('complianceItem8Title')}</strong>: {t('complianceItem8Body')}
         </li>
         <li>
-          <strong>§6 本人確認義務</strong>:
-          対面または「ICTを用いた方法」で本人確認を行う。ICT方式の場合、宿泊者が映像で旅券を提示する／顔写真を撮影するなどの方法が認められている。
+          <strong>{t('complianceItem6Title')}</strong>: {t('complianceItem6Body')}
         </li>
         <li>
-          <strong>§2-3 年間180日上限</strong>:
-          1年間（4月〜翌3月）で180日まで。ダッシュボードの稼働カウンタを参照。
+          <strong>{t('complianceItem23Title')}</strong>: {t('complianceItem23Body')}
         </li>
         <li>
-          <strong>都道府県への定期報告</strong>:
-          2ヶ月に1回、宿泊日数・宿泊者数・国籍別内訳を報告。本サンプルではCSVエクスポート機能で代替。
+          <strong>{t('complianceReportTitle')}</strong>: {t('complianceReportBody')}
         </li>
       </ul>
-      <p className="mt-3 text-[11px] text-ink/40">
-        ※
-        本番運用前に管轄保健所への届出・標識掲示・苦情対応窓口の整備など、追加の運用要件があります。詳細は専門家にご相談ください。
-      </p>
+      <p className="mt-3 text-[11px] text-ink/40">{t('complianceFooter')}</p>
     </section>
   );
 }
 
 function IdUploadButton({ uploaded, onUpload }: { uploaded: boolean; onUpload: () => void }) {
+  const t = useTranslations('Admin');
   if (uploaded) {
     return (
       <span
         className="inline-flex items-center gap-1 rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 text-[10px] text-emerald-700"
-        title="ICT本人確認: 身分証画像 + 顔写真 を取得済み"
+        title={t('idCheckOkTitle')}
       >
         <CheckCircle2 className="h-3 w-3" />
-        ICT本人確認 OK
+        {t('idCheckOk')}
       </span>
     );
   }
@@ -259,12 +253,12 @@ function IdUploadButton({ uploaded, onUpload }: { uploaded: boolean; onUpload: (
     <button
       type="button"
       onClick={onUpload}
-      title="ICT本人確認のための身分証画像をアップロード（モック）"
+      title={t('idUploadTitle')}
       className="inline-flex items-center gap-1 rounded-md border border-ink/15 px-2 py-1 text-[10px] text-ink/60 hover:bg-ink/[0.04]"
     >
       <Upload className="h-3 w-3" />
       <ScanLine className="h-3 w-3" />
-      身分証 UP
+      {t('idUpload')}
     </button>
   );
 }

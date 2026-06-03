@@ -1,6 +1,7 @@
 'use client';
 
 import { KeyRound, Loader2, RefreshCw, ShieldOff } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -12,6 +13,7 @@ export default function AdminPasscodesPage() {
   const rooms = useAppStore((s) => s.rooms);
   const guests = useAppStore((s) => s.guests);
   const setReservationPasscode = useAppStore((s) => s.setReservationPasscode);
+  const t = useTranslations('Admin');
   const [busyId, setBusyId] = useState<string | null>(null);
 
   const issued = useMemo(
@@ -32,9 +34,11 @@ export default function AdminPasscodesPage() {
         validUntil: `${r.checkOut}T${r.checkOutTime}:00+09:00`,
       });
       setReservationPasscode(reservationId, fresh);
-      toast.success('パスコードを再発行しました', { description: `新しいコード: ${fresh.code}` });
+      toast.success(t('reissueSuccess'), {
+        description: t('reissueSuccessDesc', { code: fresh.code }),
+      });
     } catch (e) {
-      toast.error('再発行に失敗しました', {
+      toast.error(t('reissueError'), {
         description: e instanceof Error ? e.message : undefined,
       });
     } finally {
@@ -45,14 +49,14 @@ export default function AdminPasscodesPage() {
   async function revoke(reservationId: string) {
     const r = reservations.find((x) => x.id === reservationId);
     if (!r?.passcode) return;
-    if (!confirm('このパスコードを失効させますか？')) return;
+    if (!confirm(t('confirmRevoke'))) return;
     setBusyId(reservationId);
     try {
       await revokeCode({ passcode: r.passcode });
       setReservationPasscode(reservationId, undefined);
-      toast.success('パスコードを失効させました');
+      toast.success(t('revokeSuccess'));
     } catch (e) {
-      toast.error('失効に失敗しました', {
+      toast.error(t('revokeError'), {
         description: e instanceof Error ? e.message : undefined,
       });
     } finally {
@@ -63,21 +67,19 @@ export default function AdminPasscodesPage() {
   return (
     <div className="space-y-5">
       <header>
-        <h1 className="font-serif text-2xl text-ink">パスコード管理</h1>
-        <p className="text-sm text-ink/60">
-          発行済みパスコードの一覧。再発行・失効の操作ログは本番環境で監査ログに保存します。
-        </p>
+        <h1 className="font-serif text-2xl text-ink">{t('navPasscodes')}</h1>
+        <p className="text-sm text-ink/60">{t('passcodesSubtitle')}</p>
       </header>
 
       <div className="overflow-hidden rounded-2xl border border-ink/10 bg-sand">
         <table className="w-full text-sm">
           <thead className="bg-ink/[0.03] text-xs uppercase tracking-wider text-ink/50">
             <tr>
-              <th className="px-4 py-2.5 text-left">予約</th>
-              <th className="px-4 py-2.5 text-left">ゲスト</th>
-              <th className="px-4 py-2.5 text-left">部屋</th>
-              <th className="px-4 py-2.5 text-left">コード</th>
-              <th className="px-4 py-2.5 text-left">有効期間</th>
+              <th className="px-4 py-2.5 text-left">{t('colReservation')}</th>
+              <th className="px-4 py-2.5 text-left">{t('colGuest')}</th>
+              <th className="px-4 py-2.5 text-left">{t('colRoom')}</th>
+              <th className="px-4 py-2.5 text-left">{t('colCode')}</th>
+              <th className="px-4 py-2.5 text-left">{t('colValidRange')}</th>
               <th className="px-4 py-2.5"></th>
             </tr>
           </thead>
@@ -106,7 +108,7 @@ export default function AdminPasscodesPage() {
                         type="button"
                         onClick={() => reissue(r.id)}
                         disabled={busyId === r.id}
-                        title="再発行"
+                        title={t('reissue')}
                         className="rounded-md p-1.5 text-ink/60 hover:bg-ink/5 hover:text-ink disabled:opacity-50"
                       >
                         {busyId === r.id ? (
@@ -119,7 +121,7 @@ export default function AdminPasscodesPage() {
                         type="button"
                         onClick={() => revoke(r.id)}
                         disabled={busyId === r.id}
-                        title="失効"
+                        title={t('revoke')}
                         className="rounded-md p-1.5 text-crimson/60 hover:bg-crimson/10 hover:text-crimson disabled:opacity-50"
                       >
                         <ShieldOff className="h-3.5 w-3.5" />
@@ -132,7 +134,7 @@ export default function AdminPasscodesPage() {
             {issued.length === 0 && (
               <tr>
                 <td colSpan={6} className="px-4 py-8 text-center text-sm text-ink/40">
-                  発行済みのパスコードはありません。
+                  {t('passcodesEmpty')}
                 </td>
               </tr>
             )}

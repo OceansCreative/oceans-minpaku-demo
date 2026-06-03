@@ -2,6 +2,7 @@
 
 import { ChevronRight, Filter } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 
 import { useAppStore } from '@/lib/store';
@@ -11,17 +12,18 @@ import type { ReservationStatus } from '@/types';
 
 type StatusFilter = ReservationStatus | 'all';
 
-const STATUS_LABEL: Record<ReservationStatus, { label: string; tone: string }> = {
-  pending: { label: '承認待ち', tone: 'bg-moss/15 text-moss' },
-  approved: { label: '確定', tone: 'bg-emerald-100 text-emerald-700' },
-  rejected: { label: '却下', tone: 'bg-crimson/10 text-crimson' },
-  cancelled: { label: 'キャンセル', tone: 'bg-ink/10 text-ink/60' },
+const STATUS_META: Record<ReservationStatus, { labelKey: string; tone: string }> = {
+  pending: { labelKey: 'statusPending', tone: 'bg-moss/15 text-moss' },
+  approved: { labelKey: 'statusApproved', tone: 'bg-emerald-100 text-emerald-700' },
+  rejected: { labelKey: 'statusRejected', tone: 'bg-crimson/10 text-crimson' },
+  cancelled: { labelKey: 'statusCancelled', tone: 'bg-ink/10 text-ink/60' },
 };
 
 export default function AdminReservationsPage() {
   const reservations = useAppStore((s) => s.reservations);
   const rooms = useAppStore((s) => s.rooms);
   const guests = useAppStore((s) => s.guests);
+  const t = useTranslations('Admin');
   const [filter, setFilter] = useState<StatusFilter>('all');
   const [source, setSource] = useState<'all' | 'direct' | 'airbnb'>('all');
 
@@ -48,30 +50,27 @@ export default function AdminReservationsPage() {
     <div className="space-y-6">
       <header className="flex items-end justify-between">
         <div>
-          <h1 className="font-serif text-2xl text-ink">予約管理</h1>
-          <p className="text-sm text-ink/60">
-            予約のステータスと経路を確認し、承認 / 却下を判断します。
-          </p>
+          <h1 className="font-serif text-2xl text-ink">{t('navReservations')}</h1>
+          <p className="text-sm text-ink/60">{t('reservationsSubtitle')}</p>
         </div>
       </header>
 
       <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-ink/10 bg-sand p-3">
         <Filter className="h-3.5 w-3.5 text-ink/40" />
-        {(Object.keys(STATUS_LABEL) as ReservationStatus[]).concat(['all'] as never).length > 0 &&
-          (['all', 'pending', 'approved', 'rejected', 'cancelled'] as StatusFilter[]).map((s) => (
-            <button
-              key={s}
-              type="button"
-              onClick={() => setFilter(s)}
-              className={cn(
-                'rounded-full px-3 py-1 text-xs',
-                filter === s ? 'bg-ink text-sand' : 'bg-ink/[0.04] text-ink/70 hover:bg-ink/10',
-              )}
-            >
-              {s === 'all' ? 'すべて' : STATUS_LABEL[s].label}
-              <span className="ml-1.5 text-[10px] opacity-60">{counts[s]}</span>
-            </button>
-          ))}
+        {(['all', 'pending', 'approved', 'rejected', 'cancelled'] as StatusFilter[]).map((s) => (
+          <button
+            key={s}
+            type="button"
+            onClick={() => setFilter(s)}
+            className={cn(
+              'rounded-full px-3 py-1 text-xs',
+              filter === s ? 'bg-ink text-sand' : 'bg-ink/[0.04] text-ink/70 hover:bg-ink/10',
+            )}
+          >
+            {s === 'all' ? t('filterAll') : t(STATUS_META[s].labelKey)}
+            <span className="ml-1.5 text-[10px] opacity-60">{counts[s]}</span>
+          </button>
+        ))}
         <span className="mx-2 h-4 w-px bg-ink/15" />
         {(['all', 'direct', 'airbnb'] as const).map((s) => (
           <button
@@ -83,7 +82,7 @@ export default function AdminReservationsPage() {
               source === s ? 'bg-moss text-sand' : 'bg-ink/[0.04] text-ink/70 hover:bg-ink/10',
             )}
           >
-            {s === 'all' ? '全経路' : s}
+            {s === 'all' ? t('filterAllSources') : s}
           </button>
         ))}
       </div>
@@ -92,13 +91,13 @@ export default function AdminReservationsPage() {
         <table className="w-full text-sm">
           <thead className="bg-ink/[0.03] text-xs uppercase tracking-wider text-ink/50">
             <tr>
-              <th className="px-4 py-2.5 text-left">予約ID</th>
-              <th className="px-4 py-2.5 text-left">ゲスト</th>
-              <th className="px-4 py-2.5 text-left">部屋</th>
-              <th className="px-4 py-2.5 text-left">日程</th>
-              <th className="px-4 py-2.5 text-right">金額</th>
-              <th className="px-4 py-2.5 text-center">経路</th>
-              <th className="px-4 py-2.5 text-center">ステータス</th>
+              <th className="px-4 py-2.5 text-left">{t('colReservationId')}</th>
+              <th className="px-4 py-2.5 text-left">{t('colGuest')}</th>
+              <th className="px-4 py-2.5 text-left">{t('colRoom')}</th>
+              <th className="px-4 py-2.5 text-left">{t('colDates')}</th>
+              <th className="px-4 py-2.5 text-right">{t('colAmount')}</th>
+              <th className="px-4 py-2.5 text-center">{t('colSource')}</th>
+              <th className="px-4 py-2.5 text-center">{t('colStatus')}</th>
               <th className="px-4 py-2.5"></th>
             </tr>
           </thead>
@@ -133,10 +132,10 @@ export default function AdminReservationsPage() {
                     <span
                       className={cn(
                         'rounded-full px-2 py-0.5 text-[11px] font-medium',
-                        STATUS_LABEL[r.status].tone,
+                        STATUS_META[r.status].tone,
                       )}
                     >
-                      {STATUS_LABEL[r.status].label}
+                      {t(STATUS_META[r.status].labelKey)}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
@@ -144,7 +143,7 @@ export default function AdminReservationsPage() {
                       href={`/admin/reservations/${r.id}`}
                       className="inline-flex items-center gap-1 text-xs text-moss hover:text-ink"
                     >
-                      詳細
+                      {t('detail')}
                       <ChevronRight className="h-3.5 w-3.5" />
                     </Link>
                   </td>
@@ -155,10 +154,8 @@ export default function AdminReservationsPage() {
               <tr>
                 <td colSpan={8} className="px-4 py-12 text-center">
                   <Filter className="mx-auto h-6 w-6 text-ink/30" />
-                  <p className="mt-2 text-sm text-ink/50">条件に一致する予約はありません</p>
-                  <p className="mt-1 text-[11px] text-ink/40">
-                    上のフィルタを「すべて」「全経路」に戻すと再表示されます。
-                  </p>
+                  <p className="mt-2 text-sm text-ink/50">{t('reservationsEmpty')}</p>
+                  <p className="mt-1 text-[11px] text-ink/40">{t('reservationsEmptyHint')}</p>
                 </td>
               </tr>
             )}

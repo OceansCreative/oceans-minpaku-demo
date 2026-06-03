@@ -119,6 +119,7 @@ export default function AdminMessagesPage() {
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   placeholder={tr('messagePlaceholder')}
+                  aria-label={tr('messagePlaceholder')}
                   className="flex-1 rounded-md border border-ink/15 bg-sand px-3 py-2 text-sm focus:border-moss focus:outline-none focus:ring-1 focus:ring-moss"
                 />
                 <button

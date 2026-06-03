@@ -2,7 +2,7 @@
 
 import { CreditCard, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { useAppStore } from '@/lib/store';
@@ -138,14 +138,21 @@ function StepEditor({
   const [draft, setDraft] = useState<CancellationPolicy>(step);
   const t = useTranslations('Admin');
   const tc = useTranslations('Common');
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') onCancel();
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onCancel]);
+
   return (
     <div
       role="dialog"
       aria-modal
+      aria-labelledby="cxl-step-editor-title"
       onClick={onCancel}
-      onKeyDown={(e) => {
-        if (e.key === 'Escape') onCancel();
-      }}
       className="fixed inset-0 z-[55] flex items-center justify-center bg-ink/40 px-4 backdrop-blur-sm"
     >
       <div
@@ -153,7 +160,9 @@ function StepEditor({
         className="w-full max-w-md space-y-5 rounded-2xl bg-sand p-6 shadow-2xl"
       >
         <header>
-          <h2 className="font-serif text-lg text-ink">{t('editCancellationStep')}</h2>
+          <h2 id="cxl-step-editor-title" className="font-serif text-lg text-ink">
+            {t('editCancellationStep')}
+          </h2>
           <p className="text-xs text-ink/50">
             {t('idLabel')} <code>{draft.id}</code>
           </p>

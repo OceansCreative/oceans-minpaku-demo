@@ -110,6 +110,7 @@ export default function AdminPasscodesPage() {
                         onClick={() => reissue(r.id)}
                         disabled={busyId === r.id}
                         title={t('reissue')}
+                        aria-label={t('reissue')}
                         className="rounded-md p-1.5 text-ink/60 hover:bg-ink/5 hover:text-ink disabled:opacity-50"
                       >
                         {busyId === r.id ? (
@@ -123,6 +124,7 @@ export default function AdminPasscodesPage() {
                         onClick={() => revoke(r.id)}
                         disabled={busyId === r.id}
                         title={t('revoke')}
+                        aria-label={t('revoke')}
                         className="rounded-md p-1.5 text-crimson/60 hover:bg-crimson/10 hover:text-crimson disabled:opacity-50"
                       >
                         <ShieldOff className="h-3.5 w-3.5" />

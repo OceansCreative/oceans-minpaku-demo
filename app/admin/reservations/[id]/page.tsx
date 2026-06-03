@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { use, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { calculateCancellationFee } from '@/lib/services/pricing';
@@ -396,15 +396,21 @@ function CancelConfirmDialog({
     cancelledAt: new Date(),
     policy,
   });
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') onDismiss();
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onDismiss]);
+
   return (
     <div
       role="dialog"
       aria-modal
       aria-labelledby="cancel-dialog-title"
       onClick={onDismiss}
-      onKeyDown={(e) => {
-        if (e.key === 'Escape') onDismiss();
-      }}
       className="fixed inset-0 z-[55] flex items-center justify-center bg-ink/40 px-4 backdrop-blur-sm"
     >
       <div

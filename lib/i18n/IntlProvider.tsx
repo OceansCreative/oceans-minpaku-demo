@@ -1,7 +1,7 @@
 'use client';
 
 import { NextIntlClientProvider, type AbstractIntlMessages } from 'next-intl';
-import { useMemo, type ReactNode } from 'react';
+import { useEffect, useMemo, type ReactNode } from 'react';
 
 import en from '@/lib/i18n/messages/en.json';
 import ja from '@/lib/i18n/messages/ja.json';
@@ -52,6 +52,13 @@ interface IntlProviderProps {
 export function IntlProvider({ children }: IntlProviderProps) {
   const language = useAppStore((s) => s.language);
   const messages = useMemo(() => MESSAGES[language] ?? MESSAGES.ja, [language]);
+
+  // Keep the document language in sync with the active locale so assistive tech
+  // announces content in the right language. The server renders `lang="ja"`
+  // (the reference locale); this updates it once the persisted choice rehydrates.
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
 
   return (
     <NextIntlClientProvider

@@ -142,6 +142,7 @@ export default function AdminGuestRegisterPage() {
                       type="text"
                       value={merged.name ?? guest?.name ?? ''}
                       onChange={(e) => updateDraft(r.id, { name: e.target.value })}
+                      aria-label={t('colName')}
                       className={inputClass}
                     />
                   </td>
@@ -150,6 +151,7 @@ export default function AdminGuestRegisterPage() {
                       type="text"
                       value={merged.nationality ?? guest?.nationality ?? ''}
                       onChange={(e) => updateDraft(r.id, { nationality: e.target.value })}
+                      aria-label={t('colNationality')}
                       className={`${inputClass} w-20`}
                     />
                   </td>
@@ -158,6 +160,7 @@ export default function AdminGuestRegisterPage() {
                       type="text"
                       value={merged.profession ?? ''}
                       onChange={(e) => updateDraft(r.id, { profession: e.target.value })}
+                      aria-label={t('colProfession')}
                       className={inputClass}
                       placeholder={t('professionPlaceholder')}
                     />
@@ -167,6 +170,7 @@ export default function AdminGuestRegisterPage() {
                       type="text"
                       value={merged.passportNumber ?? ''}
                       onChange={(e) => updateDraft(r.id, { passportNumber: e.target.value })}
+                      aria-label={t('colPassportNumber')}
                       className={`${inputClass} w-28 font-mono text-xs`}
                       placeholder={t('passportForeignOnly')}
                     />

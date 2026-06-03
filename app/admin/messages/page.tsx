@@ -1,6 +1,7 @@
 'use client';
 
 import { MessageSquare, Send } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 
 import { useAppStore } from '@/lib/store';
@@ -14,6 +15,7 @@ export default function AdminMessagesPage() {
   const rooms = useAppStore((s) => s.rooms);
   const messages = useAppStore((s) => s.messages);
   const appendMessage = useAppStore((s) => s.appendMessage);
+  const tr = useTranslations('Admin');
 
   const threads = useMemo(
     () =>
@@ -43,10 +45,8 @@ export default function AdminMessagesPage() {
   return (
     <div className="space-y-5">
       <header>
-        <h1 className="font-serif text-2xl text-ink">ゲストメッセージ</h1>
-        <p className="text-sm text-ink/60">
-          予約ごとのチャットスレッド。本番では Twilio / SendGrid 経由で多言語通知に接続します。
-        </p>
+        <h1 className="font-serif text-2xl text-ink">{tr('navMessages')}</h1>
+        <p className="text-sm text-ink/60">{tr('messagesSubtitle')}</p>
       </header>
 
       <div className="grid h-[60vh] gap-4 md:grid-cols-[16rem,1fr]">
@@ -55,10 +55,8 @@ export default function AdminMessagesPage() {
             <div className="grid h-full place-items-center p-6 text-center">
               <div>
                 <MessageSquare className="mx-auto h-6 w-6 text-ink/30" />
-                <p className="mt-2 text-xs text-ink/50">スレッドがありません</p>
-                <p className="mt-1 text-[10px] text-ink/40">
-                  予約が発生するとここにスレッドが並びます。
-                </p>
+                <p className="mt-2 text-xs text-ink/50">{tr('threadsEmpty')}</p>
+                <p className="mt-1 text-[10px] text-ink/40">{tr('threadsEmptyHint')}</p>
               </div>
             </div>
           ) : (
@@ -76,7 +74,7 @@ export default function AdminMessagesPage() {
                         activeId === t.id && 'bg-ink/[0.06]',
                       )}
                     >
-                      <p className="text-ink">{guest?.name ?? '— 名なし —'}</p>
+                      <p className="text-ink">{guest?.name ?? tr('guestNameless')}</p>
                       <p className="text-[10px] text-ink/50">
                         {room?.name} · {t.checkIn} → {t.checkOut}
                       </p>
@@ -94,9 +92,7 @@ export default function AdminMessagesPage() {
               <ThreadHeader active={active} />
               <div className="flex-1 space-y-2 overflow-y-auto px-4 py-3">
                 {activeMessages.length === 0 ? (
-                  <p className="text-center text-xs text-ink/40">
-                    まだメッセージがありません。下のフォームから送信できます。
-                  </p>
+                  <p className="text-center text-xs text-ink/40">{tr('noMessagesYet')}</p>
                 ) : (
                   activeMessages.map((m) => (
                     <div
@@ -122,7 +118,7 @@ export default function AdminMessagesPage() {
                   type="text"
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
-                  placeholder="メッセージを入力..."
+                  placeholder={tr('messagePlaceholder')}
                   className="flex-1 rounded-md border border-ink/15 bg-sand px-3 py-2 text-sm focus:border-moss focus:outline-none focus:ring-1 focus:ring-moss"
                 />
                 <button
@@ -130,12 +126,12 @@ export default function AdminMessagesPage() {
                   className="inline-flex items-center gap-1 rounded-md bg-ink px-3 py-2 text-xs text-sand hover:bg-ink/90"
                 >
                   <Send className="h-3.5 w-3.5" />
-                  送信
+                  {tr('sendMessage')}
                 </button>
               </form>
             </>
           ) : (
-            <p className="m-auto text-sm text-ink/40">スレッドを選択してください。</p>
+            <p className="m-auto text-sm text-ink/40">{tr('selectThread')}</p>
           )}
         </section>
       </div>

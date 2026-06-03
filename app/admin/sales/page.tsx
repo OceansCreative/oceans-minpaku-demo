@@ -2,21 +2,27 @@
 
 import { BarChart3, Filter } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils/cn';
+
+function SalesChartLoading() {
+  const t = useTranslations('Admin');
+  return (
+    <div className="grid h-72 w-full place-items-center text-xs text-ink/40">
+      {t('chartLoading')}
+    </div>
+  );
+}
 
 // Lazy-load recharts so the rest of the admin shell stays close to the ~110kB
 // First Load JS budget that the other admin pages occupy. SSR is disabled
 // because ResponsiveContainer measures the DOM on mount.
 const SalesChart = dynamic(() => import('@/components/admin/SalesChart'), {
   ssr: false,
-  loading: () => (
-    <div className="grid h-72 w-full place-items-center text-xs text-ink/40">
-      グラフを読み込み中…
-    </div>
-  ),
+  loading: () => <SalesChartLoading />,
 });
 
 type Granularity = 'day' | 'month' | 'year';
@@ -35,6 +41,7 @@ function bucketKey(iso: string, gran: Granularity): string {
 
 export default function AdminSalesPage() {
   const reservations = useAppStore((s) => s.reservations);
+  const t = useTranslations('Admin');
   const [gran, setGran] = useState<Granularity>('month');
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
@@ -61,8 +68,8 @@ export default function AdminSalesPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-serif text-2xl text-ink">売上集計</h1>
-        <p className="text-sm text-ink/60">経路別 / 期間別の売上をグラフで確認できます。</p>
+        <h1 className="font-serif text-2xl text-ink">{t('navSales')}</h1>
+        <p className="text-sm text-ink/60">{t('salesSubtitle')}</p>
       </header>
 
       <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-ink/10 bg-sand p-3 text-sm">
@@ -77,12 +84,12 @@ export default function AdminSalesPage() {
               gran === g ? 'bg-ink text-sand' : 'bg-ink/[0.04] text-ink/70 hover:bg-ink/10',
             )}
           >
-            {g === 'day' ? '日別' : g === 'month' ? '月別' : '年別'}
+            {g === 'day' ? t('granDay') : g === 'month' ? t('granMonth') : t('granYear')}
           </button>
         ))}
         <span className="mx-2 h-4 w-px bg-ink/15" />
         <label className="flex items-center gap-1.5 text-xs text-ink/60">
-          開始
+          {t('rangeStart')}
           <input
             type="date"
             value={from}
@@ -91,7 +98,7 @@ export default function AdminSalesPage() {
           />
         </label>
         <label className="flex items-center gap-1.5 text-xs text-ink/60">
-          終了
+          {t('rangeEnd')}
           <input
             type="date"
             value={to}
@@ -108,26 +115,26 @@ export default function AdminSalesPage() {
             }}
             className="text-[11px] text-ink/40 underline-offset-2 hover:underline"
           >
-            期間をクリア
+            {t('clearRange')}
           </button>
         )}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <SummaryCard label="期間合計" value={total} />
-        <SummaryCard label="Direct 経路" value={totalDirect} tone="text-blue-700" />
-        <SummaryCard label="Airbnb 経路" value={totalAirbnb} tone="text-pink-700" />
+        <SummaryCard label={t('totalForRange')} value={total} />
+        <SummaryCard label={t('directRevenue')} value={totalDirect} tone="text-blue-700" />
+        <SummaryCard label={t('airbnbRevenue')} value={totalAirbnb} tone="text-pink-700" />
       </div>
 
       <section className="space-y-3 rounded-2xl border border-ink/10 bg-sand p-5">
         <h2 className="flex items-center gap-2 font-serif text-base text-ink/80">
           <BarChart3 className="h-4 w-4 text-moss" />
-          売上推移（経路別積み上げ）
+          {t('salesTrend')}
         </h2>
         <SalesChart data={buckets} />
       </section>
 
-      <p className="text-[11px] text-ink/40">※ キャンセル / 却下された予約は集計対象外です。</p>
+      <p className="text-[11px] text-ink/40">{t('salesExcludeNote')}</p>
     </div>
   );
 }

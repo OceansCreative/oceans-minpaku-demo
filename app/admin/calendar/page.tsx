@@ -2,6 +2,7 @@
 
 import { ChevronLeft, ChevronRight, Info } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 
 import { ConflictsPanel } from '@/components/admin/ConflictsPanel';
@@ -9,7 +10,7 @@ import { AIRBNB_ICAL_LAG_HOURS } from '@/lib/mock/airbnb-ical';
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils/cn';
 
-import type { Reservation, ReservationStatus } from '@/types';
+import type { Reservation } from '@/types';
 
 function startOfMonth(d: Date): Date {
   return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1));
@@ -24,6 +25,7 @@ function isoDay(d: Date): string {
 export default function AdminCalendarPage() {
   const reservations = useAppStore((s) => s.reservations);
   const rooms = useAppStore((s) => s.rooms);
+  const t = useTranslations('Admin');
   const [cursor, setCursor] = useState(() => startOfMonth(new Date()));
 
   const days = useMemo(() => {
@@ -39,10 +41,8 @@ export default function AdminCalendarPage() {
     <div className="space-y-5">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-serif text-2xl text-ink">カレンダー</h1>
-          <p className="text-sm text-ink/60">
-            部屋ごとの予約を1ヶ月単位で確認できます。経路により色分けされ、ダブルブッキングは赤で警告されます。
-          </p>
+          <h1 className="font-serif text-2xl text-ink">{t('navCalendar')}</h1>
+          <p className="text-sm text-ink/60">{t('calendarSubtitle')}</p>
         </div>
         <div className="flex items-center gap-2 rounded-2xl border border-ink/10 bg-sand px-2 py-1">
           <button
@@ -53,12 +53,12 @@ export default function AdminCalendarPage() {
               setCursor(d);
             }}
             className="rounded-md p-1.5 text-ink/60 hover:bg-ink/5"
-            aria-label="前月"
+            aria-label={t('prevMonth')}
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
           <span className="px-2 text-sm tabular-nums text-ink">
-            {cursor.getUTCFullYear()} 年 {cursor.getUTCMonth() + 1} 月
+            {t('yearMonth', { year: cursor.getUTCFullYear(), month: cursor.getUTCMonth() + 1 })}
           </span>
           <button
             type="button"
@@ -68,7 +68,7 @@ export default function AdminCalendarPage() {
               setCursor(d);
             }}
             className="rounded-md p-1.5 text-ink/60 hover:bg-ink/5"
-            aria-label="翌月"
+            aria-label={t('nextMonth')}
           >
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -79,13 +79,14 @@ export default function AdminCalendarPage() {
       <div className="flex items-start gap-2 rounded-md border border-ink/10 bg-ink/[0.02] px-4 py-2.5 text-[11px] text-ink/60">
         <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-moss" />
         <p>
-          Airbnb iCal は上流側で{' '}
+          {t('icalLagBefore')}{' '}
           <strong>
-            {AIRBNB_ICAL_LAG_HOURS.min}〜{AIRBNB_ICAL_LAG_HOURS.max} 時間の遅延
+            {t('icalLagHours', {
+              min: AIRBNB_ICAL_LAG_HOURS.min,
+              max: AIRBNB_ICAL_LAG_HOURS.max,
+            })}
           </strong>{' '}
-          があるため、同期直後でも他チャネルの新規予約が反映されていない可能性があります。
-          そのため当システムでは <strong>承認制 + 承認時の在庫再チェック</strong>{' '}
-          を最終防波堤としています。
+          {t('icalLagAfter')} <strong>{t('icalLagSafeguard')}</strong> {t('icalLagFinal')}
         </p>
       </div>
       <Legend />
@@ -95,7 +96,7 @@ export default function AdminCalendarPage() {
           <thead className="sticky top-0 z-10 bg-ink/[0.03] text-[10px] uppercase tracking-wider text-ink/50">
             <tr>
               <th className="sticky left-0 z-20 min-w-[7rem] border-b border-ink/10 bg-ink/[0.03] px-3 py-2 text-left">
-                部屋
+                {t('colRoomHeader')}
               </th>
               {days.map((d) => (
                 <th
@@ -137,7 +138,7 @@ export default function AdminCalendarPage() {
                       )}
                       title={
                         occupants.length === 0
-                          ? '空室'
+                          ? t('cellVacant')
                           : occupants.map((o) => `${o.id} (${o.source}, ${o.status})`).join('\n')
                       }
                     >
@@ -175,21 +176,22 @@ function abbrevId(id: string): string {
 }
 
 function Legend() {
-  const items: { label: string; tone: string; status?: ReservationStatus }[] = [
-    { label: 'Direct（確定）', tone: 'bg-blue-200 text-blue-900' },
-    { label: 'Airbnb（確定）', tone: 'bg-pink-200 text-pink-900' },
-    { label: 'Pending（承認待ち）', tone: 'bg-moss/20 text-moss' },
+  const t = useTranslations('Admin');
+  const items: { labelKey: string; tone: string }[] = [
+    { labelKey: 'legendDirect', tone: 'bg-blue-200 text-blue-900' },
+    { labelKey: 'legendAirbnb', tone: 'bg-pink-200 text-pink-900' },
+    { labelKey: 'legendPending', tone: 'bg-moss/20 text-moss' },
     {
-      label: 'ダブルブッキング',
+      labelKey: 'legendDoubleBooking',
       tone: 'bg-crimson/20 ring-2 ring-inset ring-crimson text-crimson',
     },
   ];
   return (
     <ul className="flex flex-wrap gap-2 text-[11px] text-ink/60">
       {items.map((it) => (
-        <li key={it.label} className="inline-flex items-center gap-1.5">
+        <li key={it.labelKey} className="inline-flex items-center gap-1.5">
           <span className={cn('inline-block h-3 w-5 rounded-sm', it.tone)} />
-          {it.label}
+          {t(it.labelKey)}
         </li>
       ))}
     </ul>

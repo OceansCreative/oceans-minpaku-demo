@@ -1,6 +1,7 @@
 'use client';
 
 import { ShieldCheck } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 
 import { useAppStore } from '@/lib/store';
@@ -15,6 +16,7 @@ const CAP_DAYS = 180;
  */
 export function CapCounterWidget() {
   const reservations = useAppStore((s) => s.reservations);
+  const t = useTranslations('Admin');
 
   const used = useMemo(() => {
     const now = new Date();
@@ -48,10 +50,10 @@ export function CapCounterWidget() {
       <header className="flex items-center justify-between">
         <h2 className="flex items-center gap-2 font-serif text-base text-ink/80">
           <ShieldCheck className="h-4 w-4 text-moss" />
-          年間 180 日 稼働カウンタ
+          {t('capCounter')}
         </h2>
         <span className={cn('text-xs tabular-nums', danger ? 'text-crimson' : 'text-ink/50')}>
-          {used} / {CAP_DAYS} 泊
+          {t('capCounterValue', { used, cap: CAP_DAYS })}
         </span>
       </header>
       <div className="h-2 overflow-hidden rounded-full bg-ink/[0.06]">
@@ -61,9 +63,7 @@ export function CapCounterWidget() {
           aria-hidden
         />
       </div>
-      <p className="text-[11px] text-ink/40">
-        住宅宿泊事業法 §2-3: 年間営業日数 180 日上限。会計年度 (4月〜翌3月) で集計。
-      </p>
+      <p className="text-[11px] text-ink/40">{t('capCounterNote')}</p>
     </section>
   );
 }

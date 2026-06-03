@@ -1,6 +1,7 @@
 'use client';
 
 import { BookOpenCheck, Mail, MessageSquare, Pencil, Plus, Trash2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -9,18 +10,18 @@ import { cn } from '@/lib/utils/cn';
 
 import type { ReminderChannel, ReminderTemplate } from '@/types';
 
-const OFFSET_PRESETS: { label: string; value: string }[] = [
-  { label: 'チェックイン時', value: 'PT0S' },
-  { label: '前日', value: '-P1D' },
-  { label: '3日前', value: '-P3D' },
-  { label: '1週間前', value: '-P7D' },
-  { label: 'チェックイン2時間後', value: 'PT2H' },
+const OFFSET_PRESETS: { labelKey: string; value: string }[] = [
+  { labelKey: 'offsetAtCheckIn', value: 'PT0S' },
+  { labelKey: 'offsetDayBefore', value: '-P1D' },
+  { labelKey: 'offset3DaysBefore', value: '-P3D' },
+  { labelKey: 'offset1WeekBefore', value: '-P7D' },
+  { labelKey: 'offset2HoursAfter', value: 'PT2H' },
 ];
 
-function blankTemplate(): ReminderTemplate {
+function blankTemplate(name: string): ReminderTemplate {
   return {
     id: `rem-${Math.random().toString(36).slice(2, 6)}`,
-    name: '新規テンプレート',
+    name,
     offset: '-P1D',
     channel: 'message',
     subject: '',
@@ -34,37 +35,36 @@ export default function AdminRemindersPage() {
   const toggle = useAppStore((s) => s.toggleReminderTemplate);
   const remove = useAppStore((s) => s.removeReminderTemplate);
   const upsert = useAppStore((s) => s.upsertReminderTemplate);
+  const tr = useTranslations('Admin');
 
   const [editing, setEditing] = useState<ReminderTemplate | null>(null);
 
   function handleSave(t: ReminderTemplate) {
     upsert(t);
-    toast.success('テンプレートを保存しました', { description: t.name });
+    toast.success(tr('templateSaved'), { description: t.name });
     setEditing(null);
   }
 
   function handleRemove(t: ReminderTemplate) {
-    if (!confirm(`「${t.name}」を削除しますか？`)) return;
+    if (!confirm(tr('confirmRemoveTemplate', { name: t.name }))) return;
     remove(t.id);
-    toast.success('テンプレートを削除しました', { description: t.name });
+    toast.success(tr('templateRemoved'), { description: t.name });
   }
 
   return (
     <div className="space-y-5">
       <header className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h1 className="font-serif text-2xl text-ink">リマインダー</h1>
-          <p className="text-sm text-ink/60">
-            自動送信メッセージのテンプレート。`offset` は ISO 8601 duration（チェックイン基準）。
-          </p>
+          <h1 className="font-serif text-2xl text-ink">{tr('navReminders')}</h1>
+          <p className="text-sm text-ink/60">{tr('remindersSubtitle')}</p>
         </div>
         <button
           type="button"
-          onClick={() => setEditing(blankTemplate())}
+          onClick={() => setEditing(blankTemplate(tr('newTemplate')))}
           className="inline-flex items-center gap-1.5 rounded-md bg-ink px-3 py-1.5 text-xs text-sand hover:bg-ink/90"
         >
           <Plus className="h-3.5 w-3.5" />
-          テンプレート追加
+          {tr('addTemplate')}
         </button>
       </header>
 
@@ -84,7 +84,7 @@ export default function AdminRemindersPage() {
                   {t.name}
                 </p>
                 <p className="text-[11px] text-ink/50">
-                  offset: <code>{t.offset}</code> · {channelLabel(t)}
+                  {tr('offsetLabel')} <code>{t.offset}</code> · {channelLabel(t, tr)}
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -94,12 +94,12 @@ export default function AdminRemindersPage() {
                     checked={t.enabled}
                     onChange={(e) => toggle(t.id, e.target.checked)}
                   />
-                  有効
+                  {tr('enabled')}
                 </label>
                 <button
                   type="button"
                   onClick={() => setEditing(t)}
-                  aria-label={`${t.name} を編集`}
+                  aria-label={tr('editAria', { name: t.name })}
                   className="rounded-md p-1.5 text-ink/60 hover:bg-ink/5 hover:text-ink"
                 >
                   <Pencil className="h-3.5 w-3.5" />
@@ -107,7 +107,7 @@ export default function AdminRemindersPage() {
                 <button
                   type="button"
                   onClick={() => handleRemove(t)}
-                  aria-label={`${t.name} を削除`}
+                  aria-label={tr('removeAria', { name: t.name })}
                   className="rounded-md p-1.5 text-crimson/60 hover:bg-crimson/10 hover:text-crimson"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
@@ -121,10 +121,8 @@ export default function AdminRemindersPage() {
         {templates.length === 0 && (
           <div className="rounded-2xl border border-dashed border-ink/15 bg-sand/40 px-6 py-10 text-center">
             <BookOpenCheck className="mx-auto h-6 w-6 text-ink/30" />
-            <p className="mt-2 text-sm text-ink/50">テンプレートがありません。</p>
-            <p className="text-[11px] text-ink/40">
-              右上の「テンプレート追加」から作成してください。
-            </p>
+            <p className="mt-2 text-sm text-ink/50">{tr('remindersEmpty')}</p>
+            <p className="text-[11px] text-ink/40">{tr('remindersEmptyHint')}</p>
           </div>
         )}
       </div>
@@ -136,18 +134,21 @@ export default function AdminRemindersPage() {
   );
 }
 
-function channelLabel(t: ReminderTemplate): React.ReactNode {
+function channelLabel(
+  t: ReminderTemplate,
+  tr: ReturnType<typeof useTranslations>,
+): React.ReactNode {
   if (t.channel === 'email')
     return (
       <span className="inline-flex items-center gap-1">
         <Mail className="h-3 w-3" />
-        メール
+        {tr('channelEmail')}
       </span>
     );
   return (
     <span className="inline-flex items-center gap-1">
       <MessageSquare className="h-3 w-3" />
-      アプリ内メッセージ
+      {tr('channelMessage')}
     </span>
   );
 }
@@ -162,6 +163,8 @@ function TemplateEditor({
   onCancel: () => void;
 }) {
   const [draft, setDraft] = useState<ReminderTemplate>(template);
+  const tr = useTranslations('Admin');
+  const tc = useTranslations('Common');
   return (
     <div
       role="dialog"
@@ -177,14 +180,14 @@ function TemplateEditor({
         className="max-h-[90vh] w-full max-w-xl space-y-4 overflow-y-auto rounded-2xl bg-sand p-6 shadow-2xl"
       >
         <header>
-          <h2 className="font-serif text-lg text-ink">リマインダーを編集</h2>
+          <h2 className="font-serif text-lg text-ink">{tr('editReminder')}</h2>
           <p className="text-xs text-ink/50">
-            ID: <code>{draft.id}</code>
+            {tr('idLabel')} <code>{draft.id}</code>
           </p>
         </header>
 
         <label className="block space-y-1.5">
-          <span className="text-xs text-ink/60">テンプレート名</span>
+          <span className="text-xs text-ink/60">{tr('templateName')}</span>
           <input
             type="text"
             value={draft.name}
@@ -195,7 +198,7 @@ function TemplateEditor({
 
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="space-y-1.5">
-            <span className="text-xs text-ink/60">送信タイミング (ISO 8601 duration)</span>
+            <span className="text-xs text-ink/60">{tr('sendTiming')}</span>
             <input
               type="text"
               value={draft.offset}
@@ -215,26 +218,26 @@ function TemplateEditor({
                       : 'border-ink/15 text-ink/60 hover:bg-ink/5'
                   }`}
                 >
-                  {p.label}
+                  {tr(p.labelKey)}
                 </button>
               ))}
             </div>
           </label>
           <label className="space-y-1.5">
-            <span className="text-xs text-ink/60">チャネル</span>
+            <span className="text-xs text-ink/60">{tr('channel')}</span>
             <select
               value={draft.channel}
               onChange={(e) => setDraft({ ...draft, channel: e.target.value as ReminderChannel })}
               className="w-full rounded-md border border-ink/20 bg-sand px-3 py-2 text-sm"
             >
-              <option value="email">メール</option>
-              <option value="message">アプリ内メッセージ</option>
+              <option value="email">{tr('channelEmail')}</option>
+              <option value="message">{tr('channelMessage')}</option>
             </select>
           </label>
         </div>
 
         <label className="block space-y-1.5">
-          <span className="text-xs text-ink/60">件名</span>
+          <span className="text-xs text-ink/60">{tr('subject')}</span>
           <input
             type="text"
             value={draft.subject}
@@ -244,7 +247,7 @@ function TemplateEditor({
         </label>
 
         <label className="block space-y-1.5">
-          <span className="text-xs text-ink/60">本文</span>
+          <span className="text-xs text-ink/60">{tr('body')}</span>
           <textarea
             value={draft.body}
             rows={5}
@@ -259,7 +262,7 @@ function TemplateEditor({
             checked={draft.enabled}
             onChange={(e) => setDraft({ ...draft, enabled: e.target.checked })}
           />
-          有効にする（保存後すぐに自動送信の対象になります）
+          {tr('enableNow')}
         </label>
 
         <div className="flex justify-end gap-2 pt-2">
@@ -268,14 +271,14 @@ function TemplateEditor({
             onClick={onCancel}
             className="rounded-md px-4 py-2 text-sm text-ink/70 hover:bg-ink/5"
           >
-            キャンセル
+            {tc('cancel')}
           </button>
           <button
             type="button"
             onClick={() => onSave(draft)}
             className="rounded-md bg-ink px-4 py-2 text-sm font-medium text-sand hover:bg-ink/90"
           >
-            保存
+            {tc('save')}
           </button>
         </div>
       </div>

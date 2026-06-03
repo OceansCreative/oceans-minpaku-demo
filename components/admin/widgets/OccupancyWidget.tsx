@@ -1,6 +1,7 @@
 'use client';
 
 import { Activity } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 
 import { useAppStore } from '@/lib/store';
@@ -13,6 +14,7 @@ import { toIsoDate } from '@/lib/utils/dates';
 export function OccupancyWidget() {
   const reservations = useAppStore((s) => s.reservations);
   const rooms = useAppStore((s) => s.rooms);
+  const t = useTranslations('Admin');
 
   const rate = useMemo(() => {
     const today = new Date();
@@ -45,7 +47,7 @@ export function OccupancyWidget() {
       <header className="flex items-center justify-between">
         <h2 className="flex items-center gap-2 font-serif text-base text-ink/80">
           <Activity className="h-4 w-4 text-moss" />
-          稼働率（過去30日）
+          {t('occupancy')}
         </h2>
         <span className="text-xs text-ink/40">{pct}%</span>
       </header>
@@ -58,7 +60,7 @@ export function OccupancyWidget() {
           />
         </div>
         <p className="text-[11px] text-ink/40">
-          全 {rooms.length} 室 × 30 日 = {rooms.length * 30} 室泊 を分母として算出。
+          {t('occupancyDenominator', { rooms: rooms.length, roomNights: rooms.length * 30 })}
         </p>
       </div>
     </section>

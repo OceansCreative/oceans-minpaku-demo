@@ -399,5 +399,15 @@
     "notFound": "予約が見つかりませんでした。",
     "demoNote": "※ これは OceansBase の制作サンプルです。実際の領収書ではありません。",
     "thanks": "ご利用ありがとうございました。"
+  },
+  "Availability": {
+    "title": "空室・料金カレンダー",
+    "vacant": "空室",
+    "booked": "満室",
+    "prevMonth": "前の月",
+    "nextMonth": "次の月",
+    "monthLabel": "{year}年{month}月",
+    "weekdayNarrow": "日,月,火,水,木,金,土",
+    "note": "料金は目安です。ご予約画面で最終確定します。"
   }
 }

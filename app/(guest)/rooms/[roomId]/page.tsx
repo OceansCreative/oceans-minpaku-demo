@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import { AvailabilityCalendar } from '@/components/guest/AvailabilityCalendar';
 import { seedProperty, seedRooms } from '@/lib/seed';
 
 interface RoomDetailPageProps {
@@ -82,6 +83,8 @@ export default async function RoomDetailPage({ params }: RoomDetailPageProps) {
               ))}
             </ul>
           </div>
+
+          <AvailabilityCalendar roomId={room.id} basePrice={room.basePrice} />
         </div>
 
         <aside className="h-fit space-y-4 rounded-2xl border border-ink/10 bg-sand/60 p-6">

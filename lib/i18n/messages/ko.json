@@ -399,5 +399,15 @@
     "notFound": "예약을 찾을 수 없습니다.",
     "demoNote": "※ 이것은 OceansBase의 제작 샘플이며 실제 영수증이 아닙니다.",
     "thanks": "이용해 주셔서 감사합니다."
+  },
+  "Availability": {
+    "title": "공실・요금 캘린더",
+    "vacant": "예약 가능",
+    "booked": "예약 완료",
+    "prevMonth": "이전 달",
+    "nextMonth": "다음 달",
+    "monthLabel": "{year}년 {month}월",
+    "weekdayNarrow": "일,월,화,수,목,금,토",
+    "note": "요금은 참고용이며 예약 시 최종 확정됩니다."
   }
 }

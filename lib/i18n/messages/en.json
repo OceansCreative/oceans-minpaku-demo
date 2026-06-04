@@ -399,5 +399,15 @@
     "notFound": "Reservation not found.",
     "demoNote": "* This is an OceansBase sample build — not a real receipt.",
     "thanks": "Thank you for your stay."
+  },
+  "Availability": {
+    "title": "Availability & rates",
+    "vacant": "Open",
+    "booked": "Booked",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month",
+    "monthLabel": "{month}/{year}",
+    "weekdayNarrow": "S,M,T,W,T,F,S",
+    "note": "Rates are indicative and finalized at checkout."
   }
 }

@@ -399,5 +399,15 @@
     "notFound": "未找到该预订。",
     "demoNote": "※ 这是 OceansBase 的制作样例，并非真实收据。",
     "thanks": "感谢您的入住。"
+  },
+  "Availability": {
+    "title": "空房・价格日历",
+    "vacant": "可订",
+    "booked": "已订",
+    "prevMonth": "上个月",
+    "nextMonth": "下个月",
+    "monthLabel": "{year}年{month}月",
+    "weekdayNarrow": "日,一,二,三,四,五,六",
+    "note": "价格仅供参考，下单时最终确定。"
   }
 }

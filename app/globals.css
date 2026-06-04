@@ -33,4 +33,87 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+
+  /* Vertical writing-mode accent (縦書き) for 和モダン section labels / brand. */
+  .vertical-rl {
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+  }
+
+  /* Scroll-reveal: fade + lift into view (toggled by the Reveal component). */
+  .reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
+  }
+  .reveal-in {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Page-transition entrance (app/template.tsx). */
+.page-enter {
+  animation: page-enter 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Hero content rise on load + slow cinematic zoom (Ken Burns). */
+.hero-rise {
+  animation: hero-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.hero-kenburns {
+  animation: hero-kenburns 18s ease-out forwards;
+  transform-origin: center;
+}
+
+@keyframes hero-kenburns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+
+/* Respect reduced-motion: neutralize every entrance/ambient animation. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .page-enter,
+  .hero-rise,
+  .hero-kenburns {
+    animation: none;
+  }
 }

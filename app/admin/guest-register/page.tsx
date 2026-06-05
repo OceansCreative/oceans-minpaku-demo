@@ -12,6 +12,7 @@ import {
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 
+import { PeriodicReportCard } from '@/components/admin/PeriodicReportCard';
 import { useAppStore } from '@/lib/store';
 
 import type { GuestRegister } from '@/types';
@@ -100,6 +101,7 @@ export default function AdminGuestRegisterPage() {
   return (
     <div className="space-y-5">
       <ComplianceNotes />
+      <PeriodicReportCard />
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-serif text-2xl text-ink">{t('guestRegisterTitle')}</h1>

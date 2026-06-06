@@ -7,6 +7,8 @@ import { IntlProvider } from '@/lib/i18n/IntlProvider';
 import { hydrateAppStore } from '@/lib/store';
 import { TourProvider } from '@/lib/tour/TourProvider';
 
+import { ThemeProvider } from './ThemeProvider';
+
 interface AppProvidersProps {
   children: ReactNode;
 }
@@ -30,6 +32,7 @@ export function AppProviders({ children }: AppProvidersProps) {
 
   return (
     <IntlProvider>
+      <ThemeProvider />
       <TourProvider>{children}</TourProvider>
       <Toaster
         position="bottom-center"

@@ -473,5 +473,11 @@
     "col_date": "日付",
     "col_rating": "評価",
     "col_comment": "コメント"
+  },
+  "theme": {
+    "light": "ライトモード",
+    "dark": "ダークモード",
+    "system": "システム設定",
+    "toggle_aria": "テーマを切り替える"
   }
 }

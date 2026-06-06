@@ -23,6 +23,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 
+import { ThemeToggle } from '@/components/guest/ThemeToggle';
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils/cn';
 
@@ -84,10 +85,15 @@ export function AdminShell({ children }: { children: ReactNode }) {
   }
 
   const sidebar = (
-    <div className="sticky top-4 space-y-1 rounded-2xl border border-ink/10 bg-sand p-3">
-      <div className="px-3 py-3">
-        <p className="font-serif text-base text-ink">{tNav('admin')}</p>
-        <p className="text-[10px] uppercase tracking-widest text-ink/40">{t('brandSubtitle')}</p>
+    <div className="sticky top-4 space-y-1 rounded-2xl border border-ink/10 bg-sand p-3 dark:border-gray-700 dark:bg-gray-800">
+      <div className="flex items-start justify-between px-3 py-3">
+        <div>
+          <p className="font-serif text-base text-ink dark:text-gray-100">{tNav('admin')}</p>
+          <p className="text-[10px] uppercase tracking-widest text-ink/40 dark:text-gray-500">
+            {t('brandSubtitle')}
+          </p>
+        </div>
+        <ThemeToggle />
       </div>
       <nav className="space-y-0.5 text-sm">
         {NAV.map((item) => {
@@ -100,7 +106,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
               href={item.href}
               className={cn(
                 'flex items-center gap-2 rounded-md px-3 py-2 transition-colors',
-                active ? 'bg-ink text-sand' : 'text-ink/70 hover:bg-ink/5 hover:text-ink',
+                active
+                  ? 'bg-ink text-sand dark:bg-gray-700 dark:text-gray-100'
+                  : 'text-ink/70 hover:bg-ink/5 hover:text-ink dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-100',
               )}
             >
               <Icon className="h-4 w-4" />
@@ -109,7 +117,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
                 <span
                   className={cn(
                     'rounded-full px-1.5 py-0.5 text-[10px] font-medium',
-                    active ? 'bg-sand text-ink' : 'bg-crimson text-sand',
+                    active
+                      ? 'bg-sand text-ink dark:bg-gray-800 dark:text-gray-100'
+                      : 'bg-crimson text-sand',
                   )}
                   aria-label={t('pendingBadgeLabel', { count: pendingCount })}
                 >
@@ -120,7 +130,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           );
         })}
       </nav>
-      <div className="border-t border-ink/10 px-3 py-3 text-[11px] text-ink/50">
+      <div className="border-t border-ink/10 px-3 py-3 text-[11px] text-ink/50 dark:border-gray-700 dark:text-gray-500">
         <p>{t('credit')}</p>
         <Link
           href="https://oceans-base.com/contact"
@@ -137,7 +147,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           signOut();
           router.push('/admin/login');
         }}
-        className="mx-3 mb-2 inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs text-ink/60 hover:bg-ink/5 hover:text-ink"
+        className="mx-3 mb-2 inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs text-ink/60 hover:bg-ink/5 hover:text-ink dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-100"
       >
         <LogOut className="h-3.5 w-3.5" />
         {t('signOut')}
@@ -157,7 +167,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           aria-label={t('openMenu')}
           /* Below the DemoBanner (~30px) + 16px gap; z-25 so the demo banner /
              welcome modal still sit above. */
-          className="fixed left-3 top-[68px] z-[25] rounded-full bg-ink p-2.5 text-sand shadow-lg ring-1 ring-sand/20"
+          className="fixed left-3 top-[68px] z-[25] rounded-full bg-ink p-2.5 text-sand shadow-lg ring-1 ring-sand/20 dark:bg-gray-700 dark:ring-gray-600"
         >
           <Menu className="h-4 w-4" />
         </button>
@@ -167,14 +177,14 @@ export function AdminShell({ children }: { children: ReactNode }) {
             onClick={() => setMobileOpen(false)}
           >
             <div
-              className="absolute left-0 top-0 h-full w-72 overflow-y-auto bg-sand p-3"
+              className="absolute left-0 top-0 h-full w-72 overflow-y-auto bg-sand p-3 dark:bg-gray-900"
               onClick={(e) => e.stopPropagation()}
             >
               <button
                 type="button"
                 onClick={() => setMobileOpen(false)}
                 aria-label={t('closeMenu')}
-                className="mb-2 ml-auto block rounded-full p-1.5 text-ink/40 hover:bg-ink/5"
+                className="mb-2 ml-auto block rounded-full p-1.5 text-ink/40 hover:bg-ink/5 dark:text-gray-500 dark:hover:bg-white/10"
               >
                 <X className="h-4 w-4" />
               </button>

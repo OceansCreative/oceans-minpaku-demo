@@ -16,7 +16,7 @@ export function DemoBanner({ className }: DemoBannerProps) {
       role="note"
       className={cn(
         'flex items-center justify-center gap-2 border-b border-ink/10 bg-ink/[0.03] px-4 py-1.5',
-        'text-[11px] text-ink/60 sm:text-xs',
+        'text-[11px] text-ink/60 dark:border-gray-700/60 dark:bg-gray-800/30 dark:text-gray-400 sm:text-xs',
         className,
       )}
     >

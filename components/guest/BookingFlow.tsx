@@ -199,7 +199,7 @@ export function BookingFlow({ room }: BookingFlowProps) {
               <CalendarIcon className="h-4 w-4 text-moss" />
               <span>チェックイン / アウトを選択してください</span>
             </header>
-            <div className="overflow-x-auto rounded-2xl border border-ink/10 bg-sand p-4">
+            <div className="overflow-x-auto rounded-2xl border border-ink/10 bg-sand p-4 dark:border-gray-700 dark:bg-gray-800">
               <DayPicker
                 mode="range"
                 numberOfMonths={2}
@@ -217,15 +217,16 @@ export function BookingFlow({ room }: BookingFlowProps) {
                 }}
               />
             </div>
-            <ul className="flex flex-wrap gap-3 text-[11px] text-ink/60">
+            <ul className="flex flex-wrap gap-3 text-[11px] text-ink/60 dark:text-gray-400">
               <li className="inline-flex items-center gap-1.5">
-                <span className="inline-block h-3 w-3 rounded-sm bg-ink" /> 選択中
+                <span className="inline-block h-3 w-3 rounded-sm bg-ink dark:bg-gray-300" /> 選択中
               </li>
               <li className="inline-flex items-center gap-1.5">
-                <span className="inline-block h-3 w-3 rounded-sm bg-ink/10" /> 滞在期間
+                <span className="inline-block h-3 w-3 rounded-sm bg-ink/10 dark:bg-gray-600" />{' '}
+                滞在期間
               </li>
               <li className="inline-flex items-center gap-1.5">
-                <span className="inline-block h-3 w-3 rounded-sm border border-ink/30 bg-sand line-through" />
+                <span className="inline-block h-3 w-3 rounded-sm border border-ink/30 bg-sand line-through dark:border-gray-600 dark:bg-gray-700" />
                 予約済み
               </li>
             </ul>
@@ -330,8 +331,8 @@ export function BookingFlow({ room }: BookingFlowProps) {
               <CreditCard className="h-4 w-4 text-moss" />
               <span>お支払い方法（モック）</span>
             </header>
-            <div className="rounded-2xl border border-ink/10 bg-sand p-5">
-              <div className="mb-4 flex items-center gap-2 rounded-md bg-moss/10 px-3 py-2 text-[11px] text-moss">
+            <div className="rounded-2xl border border-ink/10 bg-sand p-5 dark:border-gray-700 dark:bg-gray-800">
+              <div className="mb-4 flex items-center gap-2 rounded-md bg-moss/10 px-3 py-2 text-[11px] text-moss dark:bg-moss/20">
                 <Lock className="h-3.5 w-3.5" />
                 これはデモ用のフォームです。実際のカード情報は送信されません。
               </div>
@@ -371,7 +372,7 @@ export function BookingFlow({ room }: BookingFlowProps) {
                   </Field>
                 </div>
               </div>
-              <p className="mt-4 border-t border-ink/10 pt-3 text-[11px] text-ink/50">
+              <p className="mt-4 border-t border-ink/10 pt-3 text-[11px] text-ink/50 dark:border-gray-700 dark:text-gray-400">
                 ご予約のリクエスト時点では <strong className="text-ink">与信のみ</strong>{' '}
                 を確保します（authorized）。ホストが承認した時点で正式に決済（captured）
                 となります。承認されなかった場合は決済されません。
@@ -386,8 +387,8 @@ export function BookingFlow({ room }: BookingFlowProps) {
               <Receipt className="h-4 w-4 text-moss" />
               <span>料金の内訳をご確認ください</span>
             </header>
-            <div className="overflow-hidden rounded-2xl border border-ink/10 bg-sand">
-              <ul className="divide-y divide-ink/5 text-sm">
+            <div className="overflow-hidden rounded-2xl border border-ink/10 bg-sand dark:border-gray-700 dark:bg-gray-800">
+              <ul className="divide-y divide-ink/5 text-sm dark:divide-gray-700">
                 {quote.rates.map((rate) => {
                   const isPremium = rate.price !== room.basePrice;
                   return (
@@ -429,8 +430,10 @@ export function BookingFlow({ room }: BookingFlowProps) {
                     <span className="font-medium text-ink">+¥{subtotal.toLocaleString()}</span>
                   </div>
                 ))}
-              <div className="flex items-center justify-between border-t border-ink/10 bg-ink/[0.02] px-4 py-3">
-                <span className="text-sm text-ink/70">合計（{quote.nights} 泊）</span>
+              <div className="flex items-center justify-between border-t border-ink/10 bg-ink/[0.02] px-4 py-3 dark:border-gray-700 dark:bg-gray-700/30">
+                <span className="text-sm text-ink/70 dark:text-gray-400">
+                  合計（{quote.nights} 泊）
+                </span>
                 <div className="text-right">
                   {(appliedPromo || addonTotal > 0) && (
                     <p className="text-xs text-ink/40 line-through">
@@ -535,8 +538,8 @@ export function BookingFlow({ room }: BookingFlowProps) {
                 className={cn(
                   'col-span-5 rounded-md border px-3 py-2 text-xs sm:col-span-10',
                   parkingId === undefined
-                    ? 'border-ink bg-ink text-sand'
-                    : 'border-ink/15 bg-sand text-ink/70 hover:border-ink/30',
+                    ? 'border-ink bg-ink text-sand dark:border-gray-600 dark:bg-gray-600 dark:text-gray-100'
+                    : 'border-ink/15 bg-sand text-ink/70 hover:border-ink/30 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-gray-400',
                 )}
               >
                 利用しない
@@ -549,8 +552,8 @@ export function BookingFlow({ room }: BookingFlowProps) {
                   className={cn(
                     'rounded-md border py-2 text-xs',
                     parkingId === slot.id
-                      ? 'border-ink bg-ink text-sand'
-                      : 'border-ink/15 bg-sand text-ink/70 hover:border-ink/30',
+                      ? 'border-ink bg-ink text-sand dark:border-gray-600 dark:bg-gray-600 dark:text-gray-100'
+                      : 'border-ink/15 bg-sand text-ink/70 hover:border-ink/30 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-gray-400',
                   )}
                   aria-label={`駐車場区画 ${slot.label}`}
                 >
@@ -580,8 +583,8 @@ export function BookingFlow({ room }: BookingFlowProps) {
                       className={cn(
                         'flex items-start gap-3 rounded-xl border p-4 text-left transition-colors',
                         isSelected
-                          ? 'border-moss bg-moss/5 ring-1 ring-moss/30'
-                          : 'border-ink/15 bg-sand hover:border-ink/30',
+                          ? 'border-moss bg-moss/5 ring-1 ring-moss/30 dark:bg-moss/10'
+                          : 'border-ink/15 bg-sand hover:border-ink/30 dark:border-gray-600 dark:bg-gray-800 dark:hover:border-gray-400',
                       )}
                     >
                       <span className="mt-0.5 text-2xl leading-none" aria-hidden>
@@ -665,9 +668,9 @@ export function BookingFlow({ room }: BookingFlowProps) {
         />
       </section>
 
-      <aside className="h-fit space-y-3 rounded-2xl border border-ink/10 bg-sand/60 p-5 text-sm">
-        <p className="font-serif text-base text-ink">{room.name}</p>
-        <dl className="space-y-2 text-xs text-ink/70">
+      <aside className="h-fit space-y-3 rounded-2xl border border-ink/10 bg-sand/60 p-5 text-sm dark:border-gray-700 dark:bg-gray-800/60">
+        <p className="font-serif text-base text-ink dark:text-gray-100">{room.name}</p>
+        <dl className="space-y-2 text-xs text-ink/70 dark:text-gray-400">
           <Row label="チェックイン">
             {range?.from ? `${toIsoDate(range.from)} ${checkInTime}` : '— 未選択 —'}
           </Row>
@@ -686,11 +689,13 @@ export function BookingFlow({ room }: BookingFlowProps) {
             ))}
           {quote && (
             <Row label="合計">
-              <span className="font-serif text-base text-ink">¥{finalAmount.toLocaleString()}</span>
+              <span className="font-serif text-base text-ink dark:text-gray-100">
+                ¥{finalAmount.toLocaleString()}
+              </span>
             </Row>
           )}
         </dl>
-        <p className="text-[11px] text-ink/40">
+        <p className="text-[11px] text-ink/40 dark:text-gray-500">
           駐車場・料金・ゲスト情報・決済は後続のステップで選択します。
         </p>
       </aside>
@@ -707,7 +712,7 @@ function StepIndicator({
 }) {
   const currentIdx = STEPS.findIndex((s) => s.id === current);
   return (
-    <ol className="flex flex-wrap items-center gap-2 text-[11px] text-ink/50">
+    <ol className="flex flex-wrap items-center gap-2 text-[11px] text-ink/50 dark:text-gray-500">
       {STEPS.map((s, i) => {
         const reached = i <= currentIdx;
         const active = s.id === current;
@@ -732,7 +737,9 @@ function StepIndicator({
               <span
                 className={cn(
                   'inline-flex h-5 w-5 items-center justify-center rounded-full border text-[10px]',
-                  reached ? 'border-ink bg-ink text-sand' : 'border-ink/30 text-ink/40',
+                  reached
+                    ? 'border-ink bg-ink text-sand dark:border-gray-500 dark:bg-gray-600 dark:text-gray-100'
+                    : 'border-ink/30 text-ink/40 dark:border-gray-600 dark:text-gray-500',
                   active && 'ring-2 ring-moss/40',
                 )}
               >
@@ -762,7 +769,7 @@ function StepNav({
   submitButton?: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center justify-between border-t border-ink/10 pt-4">
+    <div className="flex items-center justify-between border-t border-ink/10 pt-4 dark:border-gray-700">
       {onPrev ? (
         <button
           type="button"
@@ -816,8 +823,8 @@ function TimeChoice({
             className={cn(
               'rounded-md border px-3 py-1.5 text-sm transition-colors',
               value === opt
-                ? 'border-ink bg-ink text-sand'
-                : 'border-ink/15 bg-sand text-ink/70 hover:border-ink/30',
+                ? 'border-ink bg-ink text-sand dark:border-gray-600 dark:bg-gray-600 dark:text-gray-100'
+                : 'border-ink/15 bg-sand text-ink/70 hover:border-ink/30 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-gray-400',
             )}
           >
             {opt}
@@ -829,7 +836,7 @@ function TimeChoice({
 }
 
 const inputClass =
-  'w-full rounded-md border border-ink/20 bg-sand px-3 py-2 text-sm text-ink placeholder:text-ink/30 focus:border-moss focus:outline-none focus:ring-1 focus:ring-moss';
+  'w-full rounded-md border border-ink/20 bg-sand px-3 py-2 text-sm text-ink placeholder:text-ink/30 focus:border-moss focus:outline-none focus:ring-1 focus:ring-moss dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500 dark:focus:border-moss';
 
 function Field({
   label,

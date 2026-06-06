@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { seedPricingRules } from '@/lib/seed/pricing';
 import { calculateNightlyRates, calculateStayTotal } from '@/lib/services/pricing';
 
 import type { PricingRule } from '@/types';
@@ -294,5 +295,66 @@ describe('calculateStayTotal', () => {
     expect(quote.nights).toBe(3);
     // Fri (×1.2) + Sat (×1.2) + Sun (×1.0)
     expect(quote.total).toBe(Math.round(BASE * 1.2) + Math.round(BASE * 1.2) + BASE);
+  });
+});
+
+const longStayRule: PricingRule = {
+  id: 'rule-long-stay',
+  condition: { type: 'lengthOfStay', value: { minNights: 5 } },
+  multiplier: 0.9,
+};
+
+describe('lengthOfStay rule', () => {
+  it('discounts every night once the stay reaches the minimum nights', () => {
+    const rates = calculateNightlyRates({
+      basePrice: BASE,
+      checkIn: '2026-06-08', // Mon → 5 nights, all weekdays (no weekend overlap)
+      checkOut: '2026-06-13',
+      rules: [longStayRule],
+    });
+    expect(rates).toHaveLength(5);
+    expect(rates.every((r) => r.price === Math.round(BASE * 0.9))).toBe(true);
+    expect(rates.every((r) => r.appliedRules.includes('rule-long-stay'))).toBe(true);
+  });
+
+  it('does not apply below the minimum nights', () => {
+    const rates = calculateNightlyRates({
+      basePrice: BASE,
+      checkIn: '2026-06-08', // 4 nights
+      checkOut: '2026-06-12',
+      rules: [longStayRule],
+    });
+    expect(rates).toHaveLength(4);
+    expect(rates.every((r) => r.price === BASE)).toBe(true);
+    expect(rates.every((r) => r.appliedRules.length === 0)).toBe(true);
+  });
+
+  it('compounds with a weekend rule', () => {
+    const rates = calculateNightlyRates({
+      basePrice: BASE,
+      checkIn: '2026-06-05', // Fri → 5 nights incl. Fri+Sat
+      checkOut: '2026-06-10',
+      rules: [weekendRule, longStayRule],
+    });
+    const byDate = new Map(rates.map((r) => [r.date, r.price]));
+    // Fri: weekend ×1.2 × long-stay ×0.9
+    expect(byDate.get('2026-06-05')).toBe(Math.round(BASE * 1.2 * 0.9));
+    // Sun: long-stay only ×0.9
+    expect(byDate.get('2026-06-07')).toBe(Math.round(BASE * 0.9));
+  });
+});
+
+describe('calculateStayTotal with the seed rule set (booking path)', () => {
+  it('quotes without throwing when a leadtime rule is present and bookedAt is supplied', () => {
+    // Mirrors the guest BookingFlow call: full seed rules + a bookedAt anchor.
+    const quote = calculateStayTotal({
+      basePrice: 20_000,
+      checkIn: '2026-09-10',
+      checkOut: '2026-09-13',
+      rules: seedPricingRules,
+      context: { bookedAt: new Date('2026-09-01T00:00:00.000Z') },
+    });
+    expect(quote.nights).toBe(3);
+    expect(quote.total).toBeGreaterThan(0);
   });
 });

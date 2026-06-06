@@ -1,3 +1,4 @@
+export * from './addon';
 export * from './common';
 export * from './property';
 export * from './guest';

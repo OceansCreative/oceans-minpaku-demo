@@ -3,6 +3,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+import { createAddonSlice } from './addon-slice';
 import { createAppSlice } from './app-slice';
 import { createGuestRegisterSlice } from './guest-register-slice';
 import { createMessagesSlice } from './messages-slice';
@@ -37,6 +38,7 @@ export const useAppStore = create<AppStore>()(
         ...createGuestRegisterSlice(...a),
         ...createPromoSlice(...a),
         ...createReviewSlice(...a),
+        ...createAddonSlice(...a),
         // Override resetToSeed so it rebuilds every slice atomically.
         resetToSeed: () => {
           const state = get();
@@ -47,6 +49,7 @@ export const useAppStore = create<AppStore>()(
           state.resetGuestRegisterSlice();
           state.clearPromo();
           state.resetReviewSlice();
+          state.clearAddons();
         },
       };
     },

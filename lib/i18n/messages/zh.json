@@ -416,7 +416,9 @@
     "notFound": "未找到该预订。",
     "demoNote": "※ 这是 OceansBase 的制作样例，并非真实收据。",
     "thanks": "感谢您的入住。",
-    "promoDiscount": "优惠折扣"
+    "promoDiscount": "优惠折扣",
+    "addonLine": "附加服务",
+    "addonTotal": "附加服务合计"
   },
   "promo": {
     "title": "优惠码",
@@ -438,6 +440,18 @@
     "monthLabel": "{year}年{month}月",
     "weekdayNarrow": "日,一,二,三,四,五,六",
     "note": "价格仅供参考，下单时最终确定。"
+  },
+  "addons": {
+    "title": "附加服务",
+    "subtitle": "可添加您希望的附加服务",
+    "bbq": "BBQ 套餐",
+    "breakfast": "早餐服务",
+    "sauna": "桑拿包场",
+    "bicycle": "自行车租赁",
+    "lateCheckout": "晚退房",
+    "perStay": "每次入住",
+    "total": "附加服务合计",
+    "none": "无附加服务"
   },
   "review": {
     "title": "房客评价",

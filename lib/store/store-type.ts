@@ -5,6 +5,7 @@
  *
  * Add new slice intersections here as they land.
  */
+import type { AddonSlice } from './addon-slice';
 import type { AppSlice } from './app-slice';
 import type { GuestRegisterSlice } from './guest-register-slice';
 import type { MessagesSlice } from './messages-slice';
@@ -21,4 +22,5 @@ export type AppStore = AppSlice &
   MessagesSlice &
   GuestRegisterSlice &
   PromoSlice &
-  ReviewSlice;
+  ReviewSlice &
+  AddonSlice;

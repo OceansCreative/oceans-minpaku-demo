@@ -414,7 +414,19 @@
     "notCapturedBody": "付款完成后，即可为此预订开具收据。",
     "notFound": "未找到该预订。",
     "demoNote": "※ 这是 OceansBase 的制作样例，并非真实收据。",
-    "thanks": "感谢您的入住。"
+    "thanks": "感谢您的入住。",
+    "promoDiscount": "优惠折扣"
+  },
+  "promo": {
+    "title": "优惠码",
+    "placeholder": "输入优惠码",
+    "apply": "应用",
+    "remove": "删除",
+    "applied": "已应用",
+    "discount": "折扣",
+    "error_NOT_FOUND": "无效的优惠码",
+    "error_INACTIVE": "此优惠码已失效",
+    "error_MIN_NIGHTS": "此优惠码需要住满{minNights}晚"
   },
   "Availability": {
     "title": "空房・价格日历",

@@ -414,7 +414,19 @@
     "notCapturedBody": "Once payment is captured, you can issue the receipt for this reservation.",
     "notFound": "Reservation not found.",
     "demoNote": "* This is an OceansBase sample build — not a real receipt.",
-    "thanks": "Thank you for your stay."
+    "thanks": "Thank you for your stay.",
+    "promoDiscount": "Promo discount"
+  },
+  "promo": {
+    "title": "Promo Code",
+    "placeholder": "Enter code",
+    "apply": "Apply",
+    "remove": "Remove",
+    "applied": "Applied",
+    "discount": "Discount",
+    "error_NOT_FOUND": "Invalid code",
+    "error_INACTIVE": "This code is no longer active",
+    "error_MIN_NIGHTS": "This code requires {minNights} or more nights"
   },
   "Availability": {
     "title": "Availability & rates",

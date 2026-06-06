@@ -126,6 +126,21 @@ export default function ReceiptPage({ params }: PageProps) {
                 ¥{receipt.net.toLocaleString()}
               </td>
             </tr>
+            {reservation.promoDiscount !== undefined && reservation.promoDiscount > 0 && (
+              <tr className="border-b border-ink/10">
+                <td className="py-2.5 text-moss">
+                  {t('promoDiscount')}
+                  {reservation.promoCode && (
+                    <span className="ml-2 font-mono text-xs text-moss/70">
+                      {reservation.promoCode}
+                    </span>
+                  )}
+                </td>
+                <td className="py-2.5 text-right tabular-nums text-moss">
+                  -¥{reservation.promoDiscount.toLocaleString()}
+                </td>
+              </tr>
+            )}
             <tr className="border-b border-ink/10">
               <td className="py-2.5 text-ink/70">{t('tax', { rate: taxRatePct })}</td>
               <td className="py-2.5 text-right tabular-nums text-ink">

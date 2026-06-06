@@ -8,6 +8,7 @@ import { createGuestRegisterSlice } from './guest-register-slice';
 import { createMessagesSlice } from './messages-slice';
 import { createPolicySlice } from './policy-slice';
 import { createPricingSlice } from './pricing-slice';
+import { createPromoSlice } from './promo-slice';
 import { createReservationSlice } from './reservation-slice';
 
 import type { AppStore } from './store-type';
@@ -33,6 +34,7 @@ export const useAppStore = create<AppStore>()(
         ...createPolicySlice(...a),
         ...createMessagesSlice(...a),
         ...createGuestRegisterSlice(...a),
+        ...createPromoSlice(...a),
         // Override resetToSeed so it rebuilds every slice atomically.
         resetToSeed: () => {
           const state = get();
@@ -41,6 +43,7 @@ export const useAppStore = create<AppStore>()(
           state.resetPolicySlice();
           state.resetMessagesSlice();
           state.resetGuestRegisterSlice();
+          state.clearPromo();
         },
       };
     },

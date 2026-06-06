@@ -132,6 +132,9 @@ export function BookingFlow({ room }: BookingFlowProps) {
       checkIn: toIsoDate(range.from),
       checkOut: toIsoDate(range.to),
       rules: pricingRules,
+      // Live booking → "now" is the lead-time anchor. Without this the seed's
+      // leadtime rule throws (the service has no implicit "now" fallback).
+      context: { bookedAt: new Date() },
     });
   }, [range?.from, range?.to, room.basePrice, pricingRules]);
 

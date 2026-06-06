@@ -16,6 +16,7 @@ const TYPE_LABEL_KEY: Record<PricingRuleType, string> = {
   season: 'ruleTypeSeason',
   leadtime: 'ruleTypeLeadtime',
   occupancy: 'ruleTypeOccupancy',
+  lengthOfStay: 'ruleTypeLengthOfStay',
 };
 
 const WEEKDAY_LABEL_KEYS = [
@@ -39,6 +40,8 @@ function blankRule(type: PricingRuleType): PricingRule {
       return { id, condition: { type, value: { maxDaysBefore: 3 } }, multiplier: 0.9 };
     case 'occupancy':
       return { id, condition: { type, value: { minOccupancyRate: 0.8 } }, multiplier: 1.15 };
+    case 'lengthOfStay':
+      return { id, condition: { type, value: { minNights: 5 } }, multiplier: 0.9 };
   }
 }
 
@@ -173,6 +176,8 @@ function summarizeCondition(rule: PricingRule, t: Translator): string {
       return t('leadtimeSummary', { days: c.value.maxDaysBefore });
     case 'occupancy':
       return t('occupancySummary', { pct: Math.round(c.value.minOccupancyRate * 100) });
+    case 'lengthOfStay':
+      return t('lengthOfStaySummary', { nights: c.value.minNights });
   }
 }
 
@@ -354,6 +359,29 @@ function ConditionFields({
         />
         <span className="ml-2 text-[11px] text-ink/40">
           {t('leadtimeApplyHint', { days: c.value.maxDaysBefore })}
+        </span>
+      </label>
+    );
+  }
+  if (c.type === 'lengthOfStay') {
+    return (
+      <label className="block space-y-1.5">
+        <span className="text-xs text-ink/60">{t('lengthOfStayMin')}</span>
+        <input
+          type="number"
+          value={c.value.minNights}
+          min="2"
+          max="30"
+          onChange={(e) =>
+            setDraft({
+              ...draft,
+              condition: { type: 'lengthOfStay', value: { minNights: Number(e.target.value) } },
+            })
+          }
+          className="w-32 rounded-md border border-ink/20 bg-sand px-3 py-2 text-sm"
+        />
+        <span className="ml-2 text-[11px] text-ink/40">
+          {t('lengthOfStayApplyHint', { nights: c.value.minNights })}
         </span>
       </label>
     );

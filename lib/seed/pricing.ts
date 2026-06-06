@@ -37,6 +37,11 @@ export const seedPricingRules: PricingRule[] = [
     condition: { type: 'occupancy', value: { minOccupancyRate: 0.8 } },
     multiplier: 1.15,
   },
+  {
+    id: 'rule-long-stay',
+    condition: { type: 'lengthOfStay', value: { minNights: 5 } }, // 5+ nights = 連泊割
+    multiplier: 0.9,
+  },
 ];
 
 /**

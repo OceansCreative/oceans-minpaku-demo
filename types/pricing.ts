@@ -31,11 +31,17 @@ export interface OccupancyCondition {
   minOccupancyRate: number;
 }
 
+export interface LengthOfStayCondition {
+  /** Rule applies when the stay is at least this many nights (連泊割). */
+  minNights: number;
+}
+
 export type PricingRuleCondition =
   | { type: 'weekend'; value: WeekendCondition }
   | { type: 'season'; value: SeasonCondition }
   | { type: 'leadtime'; value: LeadTimeCondition }
-  | { type: 'occupancy'; value: OccupancyCondition };
+  | { type: 'occupancy'; value: OccupancyCondition }
+  | { type: 'lengthOfStay'; value: LengthOfStayCondition };
 
 /**
  * Convenience alias matching the discriminator literal types. UI code can switch

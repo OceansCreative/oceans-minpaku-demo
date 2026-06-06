@@ -4,3 +4,4 @@ export * from './pricing';
 export * from './property';
 export * from './reminders';
 export * from './reservations';
+export * from './reviews';

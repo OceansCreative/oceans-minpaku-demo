@@ -65,6 +65,7 @@
     "navCancellation": "Cancellation",
     "navOta": "OTA",
     "navGuestRegister": "Guest register",
+    "navReviews": "Reviews",
     "navSettings": "Sample data",
     "signOut": "Sign out",
     "loginTitle": "Admin sign in",
@@ -437,5 +438,26 @@
     "monthLabel": "{month}/{year}",
     "weekdayNarrow": "S,M,T,W,T,F,S",
     "note": "Rates are indicative and finalized at checkout."
+  },
+  "review": {
+    "title": "Guest Reviews",
+    "average": "Average rating",
+    "count": "{count} reviews",
+    "write": "Write a review",
+    "submitted": "Thank you for your review",
+    "rating_label": "Rating",
+    "comment_label": "Comment",
+    "comment_placeholder": "How was your stay?",
+    "submit": "Submit",
+    "no_reviews": "No reviews yet",
+    "show_more": "Show more",
+    "validation_rating": "Please select a rating",
+    "validation_comment": "Please enter at least 10 characters",
+    "admin_title": "Review Management",
+    "col_room": "Room",
+    "col_guest": "Guest",
+    "col_date": "Date",
+    "col_rating": "Rating",
+    "col_comment": "Comment"
   }
 }

@@ -65,6 +65,7 @@
     "navCancellation": "キャンセル設定",
     "navOta": "OTA連携",
     "navGuestRegister": "宿泊者名簿",
+    "navReviews": "レビュー管理",
     "navSettings": "サンプルデータ",
     "signOut": "ログアウト",
     "loginTitle": "管理画面ログイン",
@@ -437,5 +438,26 @@
     "monthLabel": "{year}年{month}月",
     "weekdayNarrow": "日,月,火,水,木,金,土",
     "note": "料金は目安です。ご予約画面で最終確定します。"
+  },
+  "review": {
+    "title": "ゲストレビュー",
+    "average": "平均評価",
+    "count": "{count}件",
+    "write": "レビューを書く",
+    "submitted": "レビューありがとうございます",
+    "rating_label": "評価",
+    "comment_label": "コメント",
+    "comment_placeholder": "ご滞在はいかがでしたか？",
+    "submit": "送信する",
+    "no_reviews": "まだレビューがありません",
+    "show_more": "もっと見る",
+    "validation_rating": "評価を選択してください",
+    "validation_comment": "コメントを10文字以上入力してください",
+    "admin_title": "レビュー管理",
+    "col_room": "お部屋",
+    "col_guest": "ゲスト",
+    "col_date": "日付",
+    "col_rating": "評価",
+    "col_comment": "コメント"
   }
 }

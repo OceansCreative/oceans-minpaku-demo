@@ -65,6 +65,7 @@
     "navCancellation": "取消政策设置",
     "navOta": "OTA 联动",
     "navGuestRegister": "住客登记簿",
+    "navReviews": "评价管理",
     "navSettings": "示例数据",
     "signOut": "退出登录",
     "loginTitle": "后台登录",
@@ -437,5 +438,26 @@
     "monthLabel": "{year}年{month}月",
     "weekdayNarrow": "日,一,二,三,四,五,六",
     "note": "价格仅供参考，下单时最终确定。"
+  },
+  "review": {
+    "title": "房客评价",
+    "average": "平均评分",
+    "count": "{count}条",
+    "write": "撰写评价",
+    "submitted": "感谢您的评价",
+    "rating_label": "评分",
+    "comment_label": "评论",
+    "comment_placeholder": "请分享您的入住体验",
+    "submit": "提交",
+    "no_reviews": "暂无评价",
+    "show_more": "查看更多",
+    "validation_rating": "请选择评分",
+    "validation_comment": "请输入至少10个字符",
+    "admin_title": "评价管理",
+    "col_room": "房间",
+    "col_guest": "房客",
+    "col_date": "日期",
+    "col_rating": "评分",
+    "col_comment": "评论"
   }
 }

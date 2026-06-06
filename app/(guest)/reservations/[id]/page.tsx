@@ -2,10 +2,13 @@
 
 import { ArrowLeft, CheckCircle2, Clock3, KeyRound, ShieldCheck, XCircle } from 'lucide-react';
 import Link from 'next/link';
-import { use } from 'react';
+import { useTranslations } from 'next-intl';
+import { use, useState } from 'react';
 
+import { ReviewForm } from '@/components/guest/ReviewForm';
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils/cn';
+import { toIsoDate } from '@/lib/utils/dates';
 
 import type { Reservation, ReservationStatus } from '@/types';
 
@@ -15,6 +18,7 @@ interface PageProps {
 
 export default function ReservationStatusPage({ params }: PageProps) {
   const { id } = use(params);
+  const t = useTranslations('review');
   const reservation = useAppStore((s) => s.reservations.find((r) => r.id === id));
   const room = useAppStore((s) =>
     reservation ? s.rooms.find((r) => r.id === reservation.roomId) : undefined,
@@ -22,6 +26,15 @@ export default function ReservationStatusPage({ params }: PageProps) {
   const guest = useAppStore((s) =>
     reservation ? s.guests.find((g) => g.id === reservation.guestId) : undefined,
   );
+  const existingReview = useAppStore((s) => s.reviews.find((r) => r.reservationId === id));
+
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
+
+  const today = toIsoDate(new Date());
+  const checkoutPassed = reservation != null && reservation.checkOut <= today;
+  const showReviewPrompt =
+    reservation?.status === 'approved' && checkoutPassed && !existingReview && !reviewSubmitted;
 
   if (!reservation || !room) {
     return (
@@ -88,6 +101,39 @@ export default function ReservationStatusPage({ params }: PageProps) {
       </section>
 
       <NextStepsForStatus reservation={reservation} />
+
+      {showReviewPrompt && (
+        <div className="mt-8 rounded-2xl border border-ink/10 bg-sand p-5">
+          {reviewOpen ? (
+            <div className="space-y-4">
+              <h2 className="font-serif text-lg text-ink">{t('title')}</h2>
+              <ReviewForm
+                reservationId={reservation.id}
+                roomId={reservation.roomId}
+                guestName={guest?.name ?? ''}
+                onSubmitted={() => {
+                  setReviewOpen(false);
+                  setReviewSubmitted(true);
+                }}
+              />
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setReviewOpen(true)}
+              className="rounded-md bg-ink px-5 py-2.5 text-sm font-medium text-sand transition-colors hover:bg-ink/90"
+            >
+              {t('write')}
+            </button>
+          )}
+        </div>
+      )}
+
+      {reviewSubmitted && (
+        <div className="mt-8 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-900">
+          {t('submitted')}
+        </div>
+      )}
 
       <div className="mt-12 rounded-lg border border-ink/10 bg-ink/[0.02] px-5 py-4 text-xs text-ink/60">
         ※ これは OceansBase の制作サンプルです。

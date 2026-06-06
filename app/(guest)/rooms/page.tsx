@@ -2,6 +2,7 @@ import { ArrowRight, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { RoomRatingBadge } from '@/components/guest/RoomRatingBadge';
 import { seedRooms } from '@/lib/seed';
 
 export default function RoomsPage() {
@@ -42,6 +43,7 @@ export default function RoomsPage() {
                       <span className="text-xs text-ink/40">/ 泊</span>
                     </p>
                   </div>
+                  <RoomRatingBadge roomId={room.id} />
                   <p className="text-sm text-ink/70">{room.description}</p>
                   <div className="flex items-center justify-between pt-2 text-xs text-ink/50">
                     <span className="inline-flex items-center gap-1">

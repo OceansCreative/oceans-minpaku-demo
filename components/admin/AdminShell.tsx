@@ -13,6 +13,7 @@ import {
   Menu,
   Network,
   Settings,
+  Star,
   Tag,
   Users,
   X,
@@ -43,6 +44,7 @@ const NAV: NavItem[] = [
   { href: '/admin/cancellation', labelKey: 'navCancellation', icon: CreditCard },
   { href: '/admin/ota', labelKey: 'navOta', icon: Network },
   { href: '/admin/guest-register', labelKey: 'navGuestRegister', icon: Users },
+  { href: '/admin/reviews', labelKey: 'navReviews', icon: Star },
   { href: '/admin/settings', labelKey: 'navSettings', icon: Settings },
 ];
 

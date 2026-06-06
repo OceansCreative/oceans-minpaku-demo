@@ -22,6 +22,12 @@ export interface PriceContext {
   bookedAt?: Date;
   /** Month-of-stay occupancy as `YYYY-MM` → 0..1, drives occupancy rules. */
   monthlyOccupancy?: Record<string, number>;
+  /**
+   * Total nights of the stay, drives length-of-stay (連泊割) rules. Injected
+   * automatically by `calculateNightlyRates` from `[checkIn, checkOut)`; any
+   * value passed in by the caller is overwritten.
+   */
+  stayNights?: number;
 }
 
 export interface NightlyRate {
@@ -53,7 +59,10 @@ export function calculateNightlyRates(input: {
   }
   const checkInDate = parseIsoDate(input.checkIn);
   const checkOutDate = parseIsoDate(input.checkOut);
-  const ctx = input.context ?? {};
+  const ctx: PriceContext = {
+    ...(input.context ?? {}),
+    stayNights: Math.round((checkOutDate.getTime() - checkInDate.getTime()) / MS_PER_DAY),
+  };
 
   const rates: NightlyRate[] = [];
   const cursor = new Date(checkInDate);
@@ -117,6 +126,10 @@ function ruleAppliesToNight(
       if (occ === undefined) return false;
       return occ >= rule.condition.value.minOccupancyRate;
     }
+    case 'lengthOfStay':
+      // Length-of-stay applies to every night of a long-enough stay. stayNights
+      // is injected by calculateNightlyRates, so it is always present here.
+      return (context.stayNights ?? 0) >= rule.condition.value.minNights;
     default: {
       // Exhaustiveness check — adding a new rule type fails the build here.
       const _exhaustive: never = rule.condition;

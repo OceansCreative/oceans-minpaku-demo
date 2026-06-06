@@ -14,6 +14,7 @@ import {
   CreditCard,
   Loader2,
   Lock,
+  PlusCircle,
   Receipt,
   UserRound,
   X,
@@ -23,7 +24,9 @@ import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 import { DayPicker, type DateRange } from 'react-day-picker';
 
+import { seedAddons } from '@/lib/seed/addons';
 import { seedPromoCodes } from '@/lib/seed/promos';
+import { calculateAddonTotal, getSelectedAddonDetails } from '@/lib/services/addon';
 import { calculateStayTotal } from '@/lib/services/pricing';
 import { requestReservation } from '@/lib/services/reservation';
 import { useAppStore } from '@/lib/store';
@@ -36,12 +39,21 @@ interface BookingFlowProps {
   room: Room;
 }
 
-export type BookingStep = 'dates' | 'time' | 'parking' | 'review' | 'info' | 'payment' | 'done';
+export type BookingStep =
+  | 'dates'
+  | 'time'
+  | 'parking'
+  | 'options'
+  | 'review'
+  | 'info'
+  | 'payment'
+  | 'done';
 
 const STEPS: { id: BookingStep; label: string }[] = [
   { id: 'dates', label: '日程' },
   { id: 'time', label: '時刻' },
   { id: 'parking', label: '駐車場' },
+  { id: 'options', label: 'オプション' },
   { id: 'review', label: '料金確認' },
   { id: 'info', label: 'ゲスト情報' },
   { id: 'payment', label: '決済' },
@@ -62,6 +74,9 @@ export function BookingFlow({ room }: BookingFlowProps) {
   const promoError = useAppStore((s) => s.promoError);
   const applyPromo = useAppStore((s) => s.applyPromo);
   const clearPromo = useAppStore((s) => s.clearPromo);
+  const selectedAddons = useAppStore((s) => s.selectedAddons);
+  const toggleAddon = useAppStore((s) => s.toggleAddon);
+  const clearAddons = useAppStore((s) => s.clearAddons);
   const [promoInput, setPromoInput] = useState('');
   const [step, setStep] = useState<BookingStep>('dates');
   const [range, setRange] = useState<DateRange | undefined>();
@@ -118,12 +133,16 @@ export function BookingFlow({ room }: BookingFlowProps) {
         },
         reservations,
       );
+      const addonTotal = calculateAddonTotal(selectedAddons, seedAddons);
       upsertReservation({
         ...reservation,
         promoCode: appliedPromo?.code,
         promoDiscount: appliedPromo?.discountAmount,
+        addons: selectedAddons.length > 0 ? selectedAddons : undefined,
+        addonTotal: addonTotal > 0 ? addonTotal : undefined,
       });
       clearPromo();
+      clearAddons();
       router.push(`/reservations/${reservation.id}`);
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : '送信に失敗しました');
@@ -153,7 +172,9 @@ export function BookingFlow({ room }: BookingFlowProps) {
     });
   }, [range?.from, range?.to, room.basePrice, pricingRules]);
 
-  const finalAmount = appliedPromo ? appliedPromo.finalAmount : (quote?.total ?? 0);
+  const addonTotal = calculateAddonTotal(selectedAddons, seedAddons);
+  const baseTotal = appliedPromo ? appliedPromo.finalAmount : (quote?.total ?? 0);
+  const finalAmount = baseTotal + addonTotal;
 
   const canAdvanceFromDates = nights > 0;
   const stepIndex = STEPS.findIndex((s) => s.id === step);
@@ -398,16 +419,26 @@ export function BookingFlow({ room }: BookingFlowProps) {
                   </span>
                 </div>
               )}
+              {selectedAddons.length > 0 &&
+                getSelectedAddonDetails(selectedAddons, seedAddons).map(({ addon, subtotal }) => (
+                  <div
+                    key={addon.id}
+                    className="flex items-center justify-between border-t border-ink/5 px-4 py-2.5"
+                  >
+                    <span className="text-sm text-ink/70">{addon.icon} オプション</span>
+                    <span className="font-medium text-ink">+¥{subtotal.toLocaleString()}</span>
+                  </div>
+                ))}
               <div className="flex items-center justify-between border-t border-ink/10 bg-ink/[0.02] px-4 py-3">
                 <span className="text-sm text-ink/70">合計（{quote.nights} 泊）</span>
                 <div className="text-right">
-                  {appliedPromo && (
+                  {(appliedPromo || addonTotal > 0) && (
                     <p className="text-xs text-ink/40 line-through">
                       ¥{quote.total.toLocaleString()}
                     </p>
                   )}
                   <span className="font-serif text-xl text-ink">
-                    ¥{(appliedPromo ? appliedPromo.finalAmount : quote.total).toLocaleString()}
+                    ¥{finalAmount.toLocaleString()}
                   </span>
                 </div>
               </div>
@@ -530,6 +561,61 @@ export function BookingFlow({ room }: BookingFlowProps) {
           </div>
         )}
 
+        {step === 'options' && (
+          <div className="space-y-4">
+            <header className="flex items-center gap-2 text-sm text-ink/70">
+              <PlusCircle className="h-4 w-4 text-moss" />
+              <span>ご希望のオプションを追加できます</span>
+            </header>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {seedAddons
+                .filter((a) => a.available)
+                .map((addon) => {
+                  const isSelected = selectedAddons.some((s) => s.addonId === addon.id);
+                  return (
+                    <button
+                      key={addon.id}
+                      type="button"
+                      onClick={() => toggleAddon(addon.id)}
+                      className={cn(
+                        'flex items-start gap-3 rounded-xl border p-4 text-left transition-colors',
+                        isSelected
+                          ? 'border-moss bg-moss/5 ring-1 ring-moss/30'
+                          : 'border-ink/15 bg-sand hover:border-ink/30',
+                      )}
+                    >
+                      <span className="mt-0.5 text-2xl leading-none" aria-hidden>
+                        {addon.icon}
+                      </span>
+                      <div className="flex-1 space-y-0.5">
+                        <p className="text-sm font-medium text-ink">
+                          {addon.name.replace('addons.', '') === 'bbq'
+                            ? 'BBQセット'
+                            : addon.name.replace('addons.', '') === 'breakfast'
+                              ? '朝食サービス'
+                              : addon.name.replace('addons.', '') === 'sauna'
+                                ? 'サウナ貸切'
+                                : addon.name.replace('addons.', '') === 'bicycle'
+                                  ? '自転車レンタル'
+                                  : 'レイトチェックアウト'}
+                        </p>
+                        <p className="text-xs text-ink/50">
+                          ¥{addon.pricePerStay.toLocaleString()} / 1滞在あたり
+                        </p>
+                      </div>
+                      {isSelected && <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-moss" />}
+                    </button>
+                  );
+                })}
+            </div>
+            {selectedAddons.length === 0 && (
+              <p className="text-[11px] text-ink/40">
+                オプションは選択しなくても次のステップへ進めます。
+              </p>
+            )}
+          </div>
+        )}
+
         {submitError && (
           <div className="flex items-start gap-2 rounded-md border border-crimson/30 bg-crimson/5 px-3 py-2 text-xs text-crimson">
             <AlertTriangle className="mt-0.5 h-3.5 w-3.5" />
@@ -592,11 +678,15 @@ export function BookingFlow({ room }: BookingFlowProps) {
           <Row label="駐車場">
             {parkingId ? (parkingSlots.find((p) => p.id === parkingId)?.label ?? '—') : 'なし'}
           </Row>
+          {selectedAddons.length > 0 &&
+            getSelectedAddonDetails(selectedAddons, seedAddons).map(({ addon, subtotal }) => (
+              <Row key={addon.id} label={`${addon.icon} オプション`}>
+                +¥{subtotal.toLocaleString()}
+              </Row>
+            ))}
           {quote && (
             <Row label="合計">
-              <span className="font-serif text-base text-ink">
-                ¥{(appliedPromo ? appliedPromo.finalAmount : quote.total).toLocaleString()}
-              </span>
+              <span className="font-serif text-base text-ink">¥{finalAmount.toLocaleString()}</span>
             </Row>
           )}
         </dl>

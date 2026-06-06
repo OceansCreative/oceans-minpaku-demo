@@ -6,6 +6,8 @@ import { useTranslations } from 'next-intl';
 import { use, useState } from 'react';
 
 import { ReviewForm } from '@/components/guest/ReviewForm';
+import { seedAddons } from '@/lib/seed/addons';
+import { getSelectedAddonDetails } from '@/lib/services/addon';
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils/cn';
 import { toIsoDate } from '@/lib/utils/dates';
@@ -91,6 +93,18 @@ export default function ReservationStatusPage({ params }: PageProps) {
             </Link>
           )}
         </Card>
+        {reservation.addons && reservation.addons.length > 0 && (
+          <Card title="オプション">
+            {getSelectedAddonDetails(reservation.addons, seedAddons).map(({ addon, subtotal }) => (
+              <Row key={addon.id} label={`${addon.icon} ${addonDisplayName(addon.name)}`}>
+                ¥{subtotal.toLocaleString()}
+              </Row>
+            ))}
+            {reservation.addonTotal !== undefined && reservation.addonTotal > 0 && (
+              <Row label="オプション合計">¥{reservation.addonTotal.toLocaleString()}</Row>
+            )}
+          </Card>
+        )}
         <Card title="スマートロック">
           {reservation.passcode ? (
             <PasscodeReveal code={reservation.passcode.code} />
@@ -237,4 +251,16 @@ function paymentLabel(status: Reservation['payment']['status']): string {
     case 'refunded':
       return '返金済み';
   }
+}
+
+const addonNameMap: Record<string, string> = {
+  'addons.bbq': 'BBQセット',
+  'addons.breakfast': '朝食サービス',
+  'addons.sauna': 'サウナ貸切',
+  'addons.bicycle': '自転車レンタル',
+  'addons.lateCheckout': 'レイトチェックアウト',
+};
+
+function addonDisplayName(nameKey: string): string {
+  return addonNameMap[nameKey] ?? nameKey;
 }

@@ -1,3 +1,4 @@
+import type { SelectedAddon } from './addon';
 import type { HHmm, IsoDate, IsoDateTime, ReservationSource } from './common';
 
 export type ReservationStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
@@ -46,4 +47,8 @@ export interface Reservation {
   promoCode?: string;
   /** Discount amount in JPY applied via promo code. */
   promoDiscount?: number;
+  /** Add-ons selected at booking time, if any. */
+  addons?: SelectedAddon[];
+  /** Total add-on cost in JPY (sum of pricePerStay * quantity). */
+  addonTotal?: number;
 }

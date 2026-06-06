@@ -416,7 +416,9 @@
     "notFound": "Reservation not found.",
     "demoNote": "* This is an OceansBase sample build — not a real receipt.",
     "thanks": "Thank you for your stay.",
-    "promoDiscount": "Promo discount"
+    "promoDiscount": "Promo discount",
+    "addonLine": "Add-on",
+    "addonTotal": "Add-ons total"
   },
   "promo": {
     "title": "Promo Code",
@@ -438,6 +440,18 @@
     "monthLabel": "{month}/{year}",
     "weekdayNarrow": "S,M,T,W,T,F,S",
     "note": "Rates are indicative and finalized at checkout."
+  },
+  "addons": {
+    "title": "Add-ons",
+    "subtitle": "Enhance your stay with optional extras",
+    "bbq": "BBQ Set",
+    "breakfast": "Breakfast Service",
+    "sauna": "Private Sauna",
+    "bicycle": "Bicycle Rental",
+    "lateCheckout": "Late Check-out",
+    "perStay": "per stay",
+    "total": "Add-ons total",
+    "none": "No add-ons"
   },
   "review": {
     "title": "Guest Reviews",

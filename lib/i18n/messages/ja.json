@@ -416,7 +416,9 @@
     "notFound": "予約が見つかりませんでした。",
     "demoNote": "※ これは OceansBase の制作サンプルです。実際の領収書ではありません。",
     "thanks": "ご利用ありがとうございました。",
-    "promoDiscount": "プロモ割引"
+    "promoDiscount": "プロモ割引",
+    "addonLine": "オプション",
+    "addonTotal": "オプション合計"
   },
   "promo": {
     "title": "プロモコード",
@@ -438,6 +440,18 @@
     "monthLabel": "{year}年{month}月",
     "weekdayNarrow": "日,月,火,水,木,金,土",
     "note": "料金は目安です。ご予約画面で最終確定します。"
+  },
+  "addons": {
+    "title": "オプション",
+    "subtitle": "ご希望のオプションを追加できます",
+    "bbq": "BBQセット",
+    "breakfast": "朝食サービス",
+    "sauna": "サウナ貸切",
+    "bicycle": "自転車レンタル",
+    "lateCheckout": "レイトチェックアウト",
+    "perStay": "1滞在あたり",
+    "total": "オプション合計",
+    "none": "オプションなし"
   },
   "review": {
     "title": "ゲストレビュー",

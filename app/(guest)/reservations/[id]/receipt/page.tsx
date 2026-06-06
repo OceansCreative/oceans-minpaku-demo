@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { use } from 'react';
 
+import { seedAddons } from '@/lib/seed/addons';
+import { getSelectedAddonDetails } from '@/lib/services/addon';
 import { buildReceipt } from '@/lib/services/receipt';
 import { useAppStore } from '@/lib/store';
 import { toIsoDate } from '@/lib/utils/dates';
@@ -138,6 +140,26 @@ export default function ReceiptPage({ params }: PageProps) {
                 </td>
                 <td className="py-2.5 text-right tabular-nums text-moss">
                   -¥{reservation.promoDiscount.toLocaleString()}
+                </td>
+              </tr>
+            )}
+            {reservation.addons &&
+              reservation.addons.length > 0 &&
+              getSelectedAddonDetails(reservation.addons, seedAddons).map(({ addon, subtotal }) => (
+                <tr key={addon.id} className="border-b border-ink/10">
+                  <td className="py-2.5 text-ink/70">
+                    {addon.icon} {t('addonLine')}
+                  </td>
+                  <td className="py-2.5 text-right tabular-nums text-ink">
+                    +¥{subtotal.toLocaleString()}
+                  </td>
+                </tr>
+              ))}
+            {reservation.addonTotal !== undefined && reservation.addonTotal > 0 && (
+              <tr className="border-b border-ink/10">
+                <td className="py-2.5 font-medium text-ink/70">{t('addonTotal')}</td>
+                <td className="py-2.5 text-right tabular-nums text-ink">
+                  ¥{reservation.addonTotal.toLocaleString()}
                 </td>
               </tr>
             )}

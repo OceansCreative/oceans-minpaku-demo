@@ -42,4 +42,8 @@ export interface Reservation {
   payment: ReservationPayment;
   passcode?: Passcode;
   createdAt: IsoDateTime;
+  /** Promo code applied at booking time, if any. */
+  promoCode?: string;
+  /** Discount amount in JPY applied via promo code. */
+  promoDiscount?: number;
 }

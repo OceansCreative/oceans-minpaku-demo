@@ -10,6 +10,7 @@ import type { GuestRegisterSlice } from './guest-register-slice';
 import type { MessagesSlice } from './messages-slice';
 import type { PolicySlice } from './policy-slice';
 import type { PricingSlice } from './pricing-slice';
+import type { PromoSlice } from './promo-slice';
 import type { ReservationSlice } from './reservation-slice';
 
 export type AppStore = AppSlice &
@@ -17,4 +18,5 @@ export type AppStore = AppSlice &
   PricingSlice &
   PolicySlice &
   MessagesSlice &
-  GuestRegisterSlice;
+  GuestRegisterSlice &
+  PromoSlice;

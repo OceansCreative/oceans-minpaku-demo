@@ -7,6 +7,7 @@ import {
   AlertTriangle,
   Calendar as CalendarIcon,
   Car,
+  CheckCircle2,
   ChevronLeft,
   ChevronRight,
   Clock,
@@ -15,11 +16,14 @@ import {
   Lock,
   Receipt,
   UserRound,
+  X,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 import { DayPicker, type DateRange } from 'react-day-picker';
 
+import { seedPromoCodes } from '@/lib/seed/promos';
 import { calculateStayTotal } from '@/lib/services/pricing';
 import { requestReservation } from '@/lib/services/reservation';
 import { useAppStore } from '@/lib/store';
@@ -48,11 +52,17 @@ const CHECK_OUT_OPTIONS: HHmm[] = ['09:00', '10:00', '11:00'];
 
 export function BookingFlow({ room }: BookingFlowProps) {
   const router = useRouter();
+  const t = useTranslations('promo');
   const reservations = useAppStore((s) => s.reservations);
   const parkingSlots = useAppStore((s) => s.parkingSlots);
   const pricingRules = useAppStore((s) => s.pricingRules);
   const upsertGuest = useAppStore((s) => s.upsertGuest);
   const upsertReservation = useAppStore((s) => s.upsertReservation);
+  const appliedPromo = useAppStore((s) => s.appliedPromo);
+  const promoError = useAppStore((s) => s.promoError);
+  const applyPromo = useAppStore((s) => s.applyPromo);
+  const clearPromo = useAppStore((s) => s.clearPromo);
+  const [promoInput, setPromoInput] = useState('');
   const [step, setStep] = useState<BookingStep>('dates');
   const [range, setRange] = useState<DateRange | undefined>();
   const [checkInTime, setCheckInTime] = useState<HHmm>('15:00');
@@ -103,12 +113,17 @@ export function BookingFlow({ room }: BookingFlowProps) {
           checkOut: toIsoDate(range.to),
           checkInTime,
           checkOutTime,
-          amount: quote.total,
+          amount: finalAmount,
           source: 'direct',
         },
         reservations,
       );
-      upsertReservation(reservation);
+      upsertReservation({
+        ...reservation,
+        promoCode: appliedPromo?.code,
+        promoDiscount: appliedPromo?.discountAmount,
+      });
+      clearPromo();
       router.push(`/reservations/${reservation.id}`);
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : '送信に失敗しました');
@@ -137,6 +152,8 @@ export function BookingFlow({ room }: BookingFlowProps) {
       context: { bookedAt: new Date() },
     });
   }, [range?.from, range?.to, room.basePrice, pricingRules]);
+
+  const finalAmount = appliedPromo ? appliedPromo.finalAmount : (quote?.total ?? 0);
 
   const canAdvanceFromDates = nights > 0;
   const stepIndex = STEPS.findIndex((s) => s.id === step);
@@ -369,11 +386,101 @@ export function BookingFlow({ room }: BookingFlowProps) {
                   );
                 })}
               </ul>
+              {appliedPromo && (
+                <div className="flex items-center justify-between border-t border-ink/5 bg-moss/5 px-4 py-2.5">
+                  <span className="flex items-center gap-1.5 text-sm text-moss">
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                    {t('applied')}: {appliedPromo.code}
+                  </span>
+                  <span className="font-medium text-moss">
+                    -{'¥'}
+                    {appliedPromo.discountAmount.toLocaleString()}
+                  </span>
+                </div>
+              )}
               <div className="flex items-center justify-between border-t border-ink/10 bg-ink/[0.02] px-4 py-3">
                 <span className="text-sm text-ink/70">合計（{quote.nights} 泊）</span>
-                <span className="font-serif text-xl text-ink">¥{quote.total.toLocaleString()}</span>
+                <div className="text-right">
+                  {appliedPromo && (
+                    <p className="text-xs text-ink/40 line-through">
+                      ¥{quote.total.toLocaleString()}
+                    </p>
+                  )}
+                  <span className="font-serif text-xl text-ink">
+                    ¥{(appliedPromo ? appliedPromo.finalAmount : quote.total).toLocaleString()}
+                  </span>
+                </div>
               </div>
             </div>
+
+            {/* Promo code input */}
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-ink/70">{t('title')}</p>
+              {appliedPromo ? (
+                <div className="flex items-center justify-between rounded-lg border border-moss/30 bg-moss/5 px-3 py-2">
+                  <span className="flex items-center gap-1.5 text-sm text-moss">
+                    <CheckCircle2 className="h-4 w-4" />
+                    {t('applied')}:{' '}
+                    <span className="font-mono font-medium">{appliedPromo.code}</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      clearPromo();
+                      setPromoInput('');
+                    }}
+                    className="ml-2 rounded p-0.5 text-ink/40 hover:text-crimson"
+                    aria-label={t('remove')}
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={promoInput}
+                    onChange={(e) => setPromoInput(e.target.value)}
+                    placeholder={t('placeholder')}
+                    className={cn(
+                      inputClass,
+                      'flex-1 uppercase placeholder:normal-case',
+                      promoError && 'border-crimson focus:border-crimson focus:ring-crimson',
+                    )}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && promoInput.trim()) {
+                        applyPromo(promoInput.trim(), quote.total, nights);
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => applyPromo(promoInput.trim(), quote.total, nights)}
+                    disabled={!promoInput.trim()}
+                    className="shrink-0 rounded-md border border-ink/20 px-4 py-2 text-sm text-ink/70 transition-colors hover:border-ink/40 hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
+                  >
+                    {t('apply')}
+                  </button>
+                </div>
+              )}
+              {promoError && (
+                <p className="flex items-center gap-1.5 text-xs text-crimson">
+                  <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                  {promoError === 'MIN_NIGHTS_NOT_MET'
+                    ? t('error_MIN_NIGHTS', {
+                        minNights: String(
+                          seedPromoCodes.find(
+                            (p) => p.code.toUpperCase() === promoInput.trim().toUpperCase(),
+                          )?.minNights ?? 1,
+                        ),
+                      })
+                    : promoError === 'NOT_FOUND'
+                      ? t('error_NOT_FOUND')
+                      : t('error_INACTIVE')}
+                </p>
+              )}
+            </div>
+
             <p className="text-[11px] leading-relaxed text-ink/40">
               週末・季節・直前予約などのルールが適用されると基本料金から変動します。
               お支払いはご予約のリクエスト時に与信のみ確保し、ホストの承認をもって正式に決済されます。
@@ -487,7 +594,9 @@ export function BookingFlow({ room }: BookingFlowProps) {
           </Row>
           {quote && (
             <Row label="合計">
-              <span className="font-serif text-base text-ink">¥{quote.total.toLocaleString()}</span>
+              <span className="font-serif text-base text-ink">
+                ¥{(appliedPromo ? appliedPromo.finalAmount : quote.total).toLocaleString()}
+              </span>
             </Row>
           )}
         </dl>

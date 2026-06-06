@@ -414,7 +414,19 @@
     "notCapturedBody": "決済が完了すると、この予約の領収書を発行できます。",
     "notFound": "予約が見つかりませんでした。",
     "demoNote": "※ これは OceansBase の制作サンプルです。実際の領収書ではありません。",
-    "thanks": "ご利用ありがとうございました。"
+    "thanks": "ご利用ありがとうございました。",
+    "promoDiscount": "プロモ割引"
+  },
+  "promo": {
+    "title": "プロモコード",
+    "placeholder": "コードを入力",
+    "apply": "適用",
+    "remove": "削除",
+    "applied": "適用済み",
+    "discount": "割引",
+    "error_NOT_FOUND": "無効なコードです",
+    "error_INACTIVE": "このコードは使用できません",
+    "error_MIN_NIGHTS": "このコードは{minNights}泊以上でご利用いただけます"
   },
   "Availability": {
     "title": "空室・料金カレンダー",

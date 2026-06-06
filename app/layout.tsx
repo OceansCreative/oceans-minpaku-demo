@@ -34,7 +34,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ja" className={`${notoSansJp.variable} ${serif.variable}`}>
-      <body className="flex min-h-screen flex-col bg-sand font-sans text-ink antialiased">
+      <body className="flex min-h-screen flex-col bg-sand font-sans text-ink antialiased dark:bg-gray-900 dark:text-gray-100">
         <AppProviders>
           <DemoBanner />
           <main className="flex-1">{children}</main>

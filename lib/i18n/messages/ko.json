@@ -473,5 +473,11 @@
     "col_date": "날짜",
     "col_rating": "평점",
     "col_comment": "코멘트"
+  },
+  "theme": {
+    "light": "라이트 모드",
+    "dark": "다크 모드",
+    "system": "시스템 설정",
+    "toggle_aria": "테마 전환"
   }
 }

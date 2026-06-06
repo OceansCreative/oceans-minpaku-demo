@@ -473,5 +473,11 @@
     "col_date": "日期",
     "col_rating": "评分",
     "col_comment": "评论"
+  },
+  "theme": {
+    "light": "浅色模式",
+    "dark": "深色模式",
+    "system": "系统设置",
+    "toggle_aria": "切换主题"
   }
 }

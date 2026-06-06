@@ -12,6 +12,7 @@ import { createPricingSlice } from './pricing-slice';
 import { createPromoSlice } from './promo-slice';
 import { createReservationSlice } from './reservation-slice';
 import { createReviewSlice } from './review-slice';
+import { createThemeSlice } from './theme-slice';
 
 import type { AppStore } from './store-type';
 
@@ -39,6 +40,7 @@ export const useAppStore = create<AppStore>()(
         ...createPromoSlice(...a),
         ...createReviewSlice(...a),
         ...createAddonSlice(...a),
+        ...createThemeSlice(...a),
         // Override resetToSeed so it rebuilds every slice atomically.
         resetToSeed: () => {
           const state = get();

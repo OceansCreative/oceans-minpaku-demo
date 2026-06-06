@@ -473,5 +473,11 @@
     "col_date": "Date",
     "col_rating": "Rating",
     "col_comment": "Comment"
+  },
+  "theme": {
+    "light": "Light mode",
+    "dark": "Dark mode",
+    "system": "System setting",
+    "toggle_aria": "Toggle theme"
   }
 }

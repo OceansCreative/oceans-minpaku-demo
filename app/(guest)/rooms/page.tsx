@@ -10,8 +10,8 @@ export default function RoomsPage() {
     <div className="mx-auto max-w-6xl px-6 py-12">
       <div className="mb-10 space-y-2">
         <p className="text-xs uppercase tracking-[0.3em] text-moss">Rooms</p>
-        <h1 className="font-serif text-3xl text-ink">お部屋一覧</h1>
-        <p className="max-w-xl text-sm text-ink/60">
+        <h1 className="font-serif text-3xl text-ink dark:text-gray-100">お部屋一覧</h1>
+        <p className="max-w-xl text-sm text-ink/60 dark:text-gray-400">
           4室それぞれに異なる眺望と設えをご用意しています。ご利用人数や雰囲気に合わせてお選びください。
         </p>
       </div>
@@ -21,10 +21,10 @@ export default function RoomsPage() {
           return (
             <li
               key={room.id}
-              className="group overflow-hidden rounded-2xl border border-ink/10 bg-sand transition-shadow hover:shadow-lg"
+              className="group overflow-hidden rounded-2xl border border-ink/10 bg-sand transition-shadow hover:shadow-lg dark:border-gray-700 dark:bg-gray-800"
             >
               <Link href={`/rooms/${room.id}`} className="block">
-                <div className="relative aspect-[16/10] overflow-hidden bg-ink/10">
+                <div className="relative aspect-[16/10] overflow-hidden bg-ink/10 dark:bg-gray-700">
                   {cover && (
                     <Image
                       src={cover}
@@ -37,15 +37,15 @@ export default function RoomsPage() {
                 </div>
                 <div className="space-y-3 px-5 py-4">
                   <div className="flex items-baseline justify-between">
-                    <h2 className="font-serif text-xl text-ink">{room.name}</h2>
-                    <p className="text-sm text-ink/50">
+                    <h2 className="font-serif text-xl text-ink dark:text-gray-100">{room.name}</h2>
+                    <p className="text-sm text-ink/50 dark:text-gray-400">
                       ¥{room.basePrice.toLocaleString()}{' '}
-                      <span className="text-xs text-ink/40">/ 泊</span>
+                      <span className="text-xs text-ink/40 dark:text-gray-500">/ 泊</span>
                     </p>
                   </div>
                   <RoomRatingBadge roomId={room.id} />
-                  <p className="text-sm text-ink/70">{room.description}</p>
-                  <div className="flex items-center justify-between pt-2 text-xs text-ink/50">
+                  <p className="text-sm text-ink/70 dark:text-gray-400">{room.description}</p>
+                  <div className="flex items-center justify-between pt-2 text-xs text-ink/50 dark:text-gray-500">
                     <span className="inline-flex items-center gap-1">
                       <Users className="h-3.5 w-3.5" />
                       最大 {room.capacity} 名

@@ -7,6 +7,11 @@
   --foreground: 31 32 36; /* ink */
 }
 
+.dark {
+  --background: 17 24 39; /* gray-900 */
+  --foreground: 243 244 246; /* gray-100 */
+}
+
 html {
   scroll-behavior: smooth;
 }

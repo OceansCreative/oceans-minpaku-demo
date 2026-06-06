@@ -14,7 +14,10 @@ export function StarRating({ rating, size = 'md' }: StarRatingProps) {
       role="img"
     >
       {Array.from({ length: 5 }, (_, i) => (
-        <span key={i} className={i < filled ? 'text-yellow-400' : 'text-gray-300'}>
+        <span
+          key={i}
+          className={i < filled ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'}
+        >
           ★
         </span>
       ))}

@@ -73,13 +73,15 @@ export default function HomePage() {
         <div className="grid gap-12 md:grid-cols-2">
           <Reveal className="space-y-4">
             <p className="text-xs uppercase tracking-[0.3em] text-moss">Concept</p>
-            <h2 className="font-serif text-3xl text-ink sm:text-4xl">和モダンの一棟貸し、4室</h2>
-            <p className="text-sm leading-relaxed text-ink/70">
+            <h2 className="font-serif text-3xl text-ink dark:text-gray-100 sm:text-4xl">
+              和モダンの一棟貸し、4室
+            </h2>
+            <p className="text-sm leading-relaxed text-ink/70 dark:text-gray-400">
               旧家を改装した4室の客室と、土間ダイニング、囲炉裏のあるリビング。
               最大10台の駐車場、檜の内風呂、海の見えるテラス。
               一棟貸しなので、ご家族・ご友人だけの時間をお過ごしいただけます。
             </p>
-            <p className="text-xs leading-relaxed text-ink/50">
+            <p className="text-xs leading-relaxed text-ink/50 dark:text-gray-500">
               住所: {seedProperty.address}（架空）
             </p>
           </Reveal>
@@ -88,10 +90,10 @@ export default function HomePage() {
               {amenityIcons.map(({ icon: Icon, label }) => (
                 <li
                   key={label}
-                  className="flex items-center gap-3 rounded-lg border border-ink/10 bg-sand/50 px-4 py-3 transition-all hover:-translate-y-0.5 hover:border-moss/30 hover:shadow-sm"
+                  className="flex items-center gap-3 rounded-lg border border-ink/10 bg-sand/50 px-4 py-3 transition-all hover:-translate-y-0.5 hover:border-moss/30 hover:shadow-sm dark:border-gray-700 dark:bg-gray-800/50 dark:hover:border-moss/40"
                 >
                   <Icon className="h-5 w-5 text-moss" />
-                  <span className="text-sm text-ink">{label}</span>
+                  <span className="text-sm text-ink dark:text-gray-200">{label}</span>
                 </li>
               ))}
             </ul>
@@ -99,15 +101,17 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="border-y border-ink/10 bg-ink/[0.03] px-6 py-12 sm:py-16">
+      <section className="border-y border-ink/10 bg-ink/[0.03] px-6 py-12 dark:border-gray-700/60 dark:bg-gray-800/30 sm:py-16">
         <Reveal className="mx-auto max-w-6xl">
           <p className="text-xs uppercase tracking-[0.3em] text-moss">Amenities</p>
-          <h2 className="mt-2 font-serif text-2xl text-ink sm:text-3xl">館内設備</h2>
+          <h2 className="mt-2 font-serif text-2xl text-ink dark:text-gray-100 sm:text-3xl">
+            館内設備
+          </h2>
           <ul className="mt-6 flex flex-wrap gap-2">
             {seedProperty.amenities.map((a) => (
               <li
                 key={a}
-                className="rounded-full border border-ink/15 bg-sand px-3 py-1 text-xs text-ink/70 transition-colors hover:border-moss/40 hover:text-ink"
+                className="rounded-full border border-ink/15 bg-sand px-3 py-1 text-xs text-ink/70 transition-colors hover:border-moss/40 hover:text-ink dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-moss/40 dark:hover:text-gray-100"
               >
                 {a}
               </li>

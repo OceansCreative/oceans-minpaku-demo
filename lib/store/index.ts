@@ -3,14 +3,17 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+import { buildNotificationsFromReservations } from '@/lib/services/notifications';
+
 import { createAddonSlice } from './addon-slice';
 import { createAppSlice } from './app-slice';
 import { createGuestRegisterSlice } from './guest-register-slice';
 import { createMessagesSlice } from './messages-slice';
+import { createNotificationSlice } from './notification-slice';
 import { createPolicySlice } from './policy-slice';
 import { createPricingSlice } from './pricing-slice';
 import { createPromoSlice } from './promo-slice';
-import { createReservationSlice } from './reservation-slice';
+import { buildInitialReservations, createReservationSlice } from './reservation-slice';
 import { createReviewSlice } from './review-slice';
 import { createThemeSlice } from './theme-slice';
 
@@ -26,6 +29,9 @@ export const STORE_NAME = 'oceans-minpaku-store';
  *
  * Slices merged: app, reservation, pricing, policy.
  */
+/** Fixed demo "today" used when resetting to seed so notifications are stable. */
+const SEED_TODAY = '2026-06-07' as const;
+
 export const useAppStore = create<AppStore>()(
   persist(
     (...a) => {
@@ -41,6 +47,7 @@ export const useAppStore = create<AppStore>()(
         ...createReviewSlice(...a),
         ...createAddonSlice(...a),
         ...createThemeSlice(...a),
+        ...createNotificationSlice(...a),
         // Override resetToSeed so it rebuilds every slice atomically.
         resetToSeed: () => {
           const state = get();
@@ -52,6 +59,10 @@ export const useAppStore = create<AppStore>()(
           state.clearPromo();
           state.resetReviewSlice();
           state.clearAddons();
+          // Re-seed notifications from the freshly rebuilt reservations.
+          const anchorIso = state.seedAnchorIso ?? new Date().toISOString();
+          const seedReservations = buildInitialReservations(anchorIso);
+          state.seedNotifications(buildNotificationsFromReservations(seedReservations, SEED_TODAY));
         },
       };
     },

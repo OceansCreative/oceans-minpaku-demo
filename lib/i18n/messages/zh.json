@@ -479,5 +479,15 @@
     "dark": "深色模式",
     "system": "系统设置",
     "toggle_aria": "切换主题"
+  },
+  "notifications": {
+    "title": "通知",
+    "mark_all_read": "全部标为已读",
+    "empty": "暂无通知",
+    "new_reservation": "新预订申请",
+    "cancellation": "预订已取消",
+    "checkin_today": "今日入住",
+    "checkout_today": "今日退房",
+    "review_posted": "新评价"
   }
 }

@@ -6,6 +6,8 @@ import {
   seedProperty,
   seedRooms,
 } from '@/lib/seed';
+import { buildNotificationsFromReservations } from '@/lib/services/notifications';
+import { toIsoDate } from '@/lib/utils/dates';
 
 import type { SliceCreator } from './types';
 import type {
@@ -61,10 +63,15 @@ export const createReservationSlice: SliceCreator<ReservationSlice> = (set, get)
   upsertReservation: (reservation) =>
     set((state) => {
       const exists = state.reservations.some((r) => r.id === reservation.id);
+      const nextReservations = exists
+        ? state.reservations.map((r) => (r.id === reservation.id ? reservation : r))
+        : [...state.reservations, reservation];
+      const today = toIsoDate(new Date());
+      const notifs = buildNotificationsFromReservations(nextReservations, today);
       return {
-        reservations: exists
-          ? state.reservations.map((r) => (r.id === reservation.id ? reservation : r))
-          : [...state.reservations, reservation],
+        reservations: nextReservations,
+        notifications: notifs,
+        unreadCount: notifs.filter((n) => !n.read).length,
       };
     }),
 

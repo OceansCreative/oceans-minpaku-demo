@@ -479,5 +479,15 @@
     "dark": "다크 모드",
     "system": "시스템 설정",
     "toggle_aria": "테마 전환"
+  },
+  "notifications": {
+    "title": "알림",
+    "mark_all_read": "모두 읽음으로 표시",
+    "empty": "알림이 없습니다",
+    "new_reservation": "새 예약 신청",
+    "cancellation": "예약 취소",
+    "checkin_today": "오늘 체크인",
+    "checkout_today": "오늘 체크아웃",
+    "review_posted": "새 리뷰"
   }
 }

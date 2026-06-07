@@ -479,5 +479,15 @@
     "dark": "Dark mode",
     "system": "System setting",
     "toggle_aria": "Toggle theme"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "mark_all_read": "Mark all as read",
+    "empty": "No notifications",
+    "new_reservation": "New reservation request",
+    "cancellation": "Reservation cancelled",
+    "checkin_today": "Check-in today",
+    "checkout_today": "Check-out today",
+    "review_posted": "New review posted"
   }
 }

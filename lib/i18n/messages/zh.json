@@ -498,5 +498,15 @@
     "empty": "暂无收藏房间",
     "empty_cta": "浏览房间",
     "count": "已收藏{count}间"
+  },
+  "notifications": {
+    "title": "通知",
+    "mark_all_read": "全部标为已读",
+    "empty": "暂无通知",
+    "new_reservation": "新预订申请",
+    "cancellation": "预订已取消",
+    "checkin_today": "今日入住",
+    "checkout_today": "今日退房",
+    "review_posted": "新评价"
   }
 }

@@ -23,6 +23,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 
+import { NotificationBell } from '@/components/admin/NotificationBell';
 import { ThemeToggle } from '@/components/guest/ThemeToggle';
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils/cn';
@@ -93,7 +94,10 @@ export function AdminShell({ children }: { children: ReactNode }) {
             {t('brandSubtitle')}
           </p>
         </div>
-        <ThemeToggle />
+        <div className="flex items-center gap-1">
+          <NotificationBell />
+          <ThemeToggle />
+        </div>
       </div>
       <nav className="space-y-0.5 text-sm">
         {NAV.map((item) => {

@@ -498,5 +498,15 @@
     "empty": "お気に入りがまだありません",
     "empty_cta": "部屋を探す",
     "count": "{count}件"
+  },
+  "notifications": {
+    "title": "通知",
+    "mark_all_read": "すべて既読にする",
+    "empty": "通知はありません",
+    "new_reservation": "新しい予約リクエスト",
+    "cancellation": "予約キャンセル",
+    "checkin_today": "本日チェックイン",
+    "checkout_today": "本日チェックアウト",
+    "review_posted": "新しいレビュー"
   }
 }

@@ -1,5 +1,6 @@
 export * from './addon';
 export * from './common';
+export * from './notification';
 export * from './property';
 export * from './guest';
 export * from './reservation';

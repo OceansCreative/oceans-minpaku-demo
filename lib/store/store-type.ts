@@ -9,6 +9,7 @@ import type { AddonSlice } from './addon-slice';
 import type { AppSlice } from './app-slice';
 import type { GuestRegisterSlice } from './guest-register-slice';
 import type { MessagesSlice } from './messages-slice';
+import type { NotificationSlice } from './notification-slice';
 import type { PolicySlice } from './policy-slice';
 import type { PricingSlice } from './pricing-slice';
 import type { PromoSlice } from './promo-slice';
@@ -27,4 +28,5 @@ export type AppStore = AppSlice &
   ReviewSlice &
   AddonSlice &
   ThemeSlice &
-  WishlistSlice;
+  WishlistSlice &
+  NotificationSlice;

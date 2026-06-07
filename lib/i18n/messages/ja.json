@@ -390,7 +390,17 @@
     "occupancyDenominator": "全 {rooms} 室 × {nights} 日 = {roomNights} 室泊 を分母として算出。",
     "conflictsPanelTitle": "競合中の承認待ち予約: {count} 件",
     "conflictsDuplicate": "重複: {ids}",
-    "conflictsResolve": "対応する"
+    "conflictsResolve": "対応する",
+    "widgets": {
+      "occupancy_trend": "稼働率トレンド（6ヶ月）",
+      "revenue_compare": "売上 vs 見込み",
+      "actual": "確定",
+      "forecast": "見込み",
+      "today_status": "今日の稼働状況",
+      "total_rooms": "総客室数",
+      "occupied": "使用中",
+      "available": "空室"
+    }
   },
   "Receipt": {
     "title": "領収書",

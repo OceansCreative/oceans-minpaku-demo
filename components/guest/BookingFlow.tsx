@@ -33,6 +33,8 @@ import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils/cn';
 import { nightsBetween, toIsoDate } from '@/lib/utils/dates';
 
+import { Reveal } from './Reveal';
+
 import type { HHmm, LanguageCode, Reservation, Room } from '@/types';
 
 interface BookingFlowProps {
@@ -194,429 +196,446 @@ export function BookingFlow({ room }: BookingFlowProps) {
         <StepIndicator current={step} onJump={(target) => setStep(target)} />
 
         {step === 'dates' && (
-          <div className="space-y-4">
-            <header className="flex items-center gap-2 text-sm text-ink/70">
-              <CalendarIcon className="h-4 w-4 text-moss" />
-              <span>チェックイン / アウトを選択してください</span>
-            </header>
-            <div className="overflow-x-auto rounded-2xl border border-ink/10 bg-sand p-4 dark:border-gray-700 dark:bg-gray-800">
-              <DayPicker
-                mode="range"
-                numberOfMonths={2}
-                locale={ja}
-                disabled={[{ before: new Date() }, ...bookedDays.map((d) => new Date(d))]}
-                selected={range}
-                onSelect={setRange}
-                classNames={{
-                  today: 'text-moss font-semibold',
-                  selected: 'bg-ink text-sand',
-                  range_start: 'bg-ink text-sand rounded-l-md',
-                  range_end: 'bg-ink text-sand rounded-r-md',
-                  range_middle: 'bg-ink/10 text-ink',
-                  disabled: 'text-ink/20 line-through',
-                }}
-              />
+          <Reveal>
+            <div className="space-y-4">
+              <header className="flex items-center gap-2 text-sm text-ink/70">
+                <CalendarIcon className="h-4 w-4 text-moss" />
+                <span>チェックイン / アウトを選択してください</span>
+              </header>
+              <div className="overflow-x-auto rounded-2xl border border-ink/10 bg-sand p-4 dark:border-gray-700 dark:bg-gray-800">
+                <DayPicker
+                  mode="range"
+                  numberOfMonths={2}
+                  locale={ja}
+                  disabled={[{ before: new Date() }, ...bookedDays.map((d) => new Date(d))]}
+                  selected={range}
+                  onSelect={setRange}
+                  classNames={{
+                    today: 'text-moss font-semibold',
+                    selected: 'bg-ink text-sand',
+                    range_start: 'bg-ink text-sand rounded-l-md',
+                    range_end: 'bg-ink text-sand rounded-r-md',
+                    range_middle: 'bg-ink/10 text-ink',
+                    disabled: 'text-ink/20 line-through',
+                  }}
+                />
+              </div>
+              <ul className="flex flex-wrap gap-3 text-[11px] text-ink/60 dark:text-gray-400">
+                <li className="inline-flex items-center gap-1.5">
+                  <span className="inline-block h-3 w-3 rounded-sm bg-ink dark:bg-gray-300" />{' '}
+                  選択中
+                </li>
+                <li className="inline-flex items-center gap-1.5">
+                  <span className="inline-block h-3 w-3 rounded-sm bg-ink/10 dark:bg-gray-600" />{' '}
+                  滞在期間
+                </li>
+                <li className="inline-flex items-center gap-1.5">
+                  <span className="inline-block h-3 w-3 rounded-sm border border-ink/30 bg-sand line-through dark:border-gray-600 dark:bg-gray-700" />
+                  予約済み
+                </li>
+              </ul>
             </div>
-            <ul className="flex flex-wrap gap-3 text-[11px] text-ink/60 dark:text-gray-400">
-              <li className="inline-flex items-center gap-1.5">
-                <span className="inline-block h-3 w-3 rounded-sm bg-ink dark:bg-gray-300" /> 選択中
-              </li>
-              <li className="inline-flex items-center gap-1.5">
-                <span className="inline-block h-3 w-3 rounded-sm bg-ink/10 dark:bg-gray-600" />{' '}
-                滞在期間
-              </li>
-              <li className="inline-flex items-center gap-1.5">
-                <span className="inline-block h-3 w-3 rounded-sm border border-ink/30 bg-sand line-through dark:border-gray-600 dark:bg-gray-700" />
-                予約済み
-              </li>
-            </ul>
-          </div>
+          </Reveal>
         )}
 
         {step === 'time' && (
-          <div className="space-y-5">
-            <header className="flex items-center gap-2 text-sm text-ink/70">
-              <Clock className="h-4 w-4 text-moss" />
-              <span>チェックイン / アウトの時刻をお選びください</span>
-            </header>
-            <TimeChoice
-              label="チェックイン"
-              value={checkInTime}
-              onChange={setCheckInTime}
-              options={CHECK_IN_OPTIONS}
-            />
-            <TimeChoice
-              label="チェックアウト"
-              value={checkOutTime}
-              onChange={setCheckOutTime}
-              options={CHECK_OUT_OPTIONS}
-            />
-            <p className="text-[11px] leading-relaxed text-ink/40">
-              鍵のパスコードはチェックイン15分前から、チェックアウト時刻まで有効です。
-            </p>
-          </div>
+          <Reveal>
+            <div className="space-y-5">
+              <header className="flex items-center gap-2 text-sm text-ink/70">
+                <Clock className="h-4 w-4 text-moss" />
+                <span>チェックイン / アウトの時刻をお選びください</span>
+              </header>
+              <TimeChoice
+                label="チェックイン"
+                value={checkInTime}
+                onChange={setCheckInTime}
+                options={CHECK_IN_OPTIONS}
+              />
+              <TimeChoice
+                label="チェックアウト"
+                value={checkOutTime}
+                onChange={setCheckOutTime}
+                options={CHECK_OUT_OPTIONS}
+              />
+              <p className="text-[11px] leading-relaxed text-ink/40">
+                鍵のパスコードはチェックイン15分前から、チェックアウト時刻まで有効です。
+              </p>
+            </div>
+          </Reveal>
         )}
 
         {step === 'info' && (
-          <div className="space-y-5">
-            <header className="flex items-center gap-2 text-sm text-ink/70">
-              <UserRound className="h-4 w-4 text-moss" />
-              <span>ご宿泊代表者の情報をご入力ください</span>
-            </header>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="お名前 / Name" required>
-                <input
-                  type="text"
-                  value={guestInfo.name}
-                  onChange={(e) => setGuestInfo({ ...guestInfo, name: e.target.value })}
-                  className={inputClass}
-                  placeholder="山田 太郎"
-                  autoComplete="name"
-                />
-              </Field>
-              <Field label="メールアドレス / Email" required>
-                <input
-                  type="email"
-                  value={guestInfo.email}
-                  onChange={(e) => setGuestInfo({ ...guestInfo, email: e.target.value })}
-                  className={inputClass}
-                  placeholder="you@example.com"
-                  autoComplete="email"
-                />
-              </Field>
-              <Field label="電話番号 / Phone" required>
-                <input
-                  type="tel"
-                  value={guestInfo.phone}
-                  onChange={(e) => setGuestInfo({ ...guestInfo, phone: e.target.value })}
-                  className={inputClass}
-                  placeholder="+81-90-1234-5678"
-                  autoComplete="tel"
-                />
-              </Field>
-              <Field label="国籍 / Nationality">
-                <input
-                  type="text"
-                  value={guestInfo.nationality}
-                  onChange={(e) => setGuestInfo({ ...guestInfo, nationality: e.target.value })}
-                  className={inputClass}
-                  placeholder="JP"
-                />
-              </Field>
-              <Field label="連絡言語 / Language">
-                <select
-                  value={guestInfo.language}
-                  onChange={(e) =>
-                    setGuestInfo({ ...guestInfo, language: e.target.value as LanguageCode })
-                  }
-                  className={inputClass}
-                >
-                  <option value="ja">日本語</option>
-                  <option value="en">English</option>
-                  <option value="zh">中文</option>
-                  <option value="ko">한국어</option>
-                </select>
-              </Field>
+          <Reveal>
+            <div className="space-y-5">
+              <header className="flex items-center gap-2 text-sm text-ink/70">
+                <UserRound className="h-4 w-4 text-moss" />
+                <span>ご宿泊代表者の情報をご入力ください</span>
+              </header>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="お名前 / Name" required>
+                  <input
+                    type="text"
+                    value={guestInfo.name}
+                    onChange={(e) => setGuestInfo({ ...guestInfo, name: e.target.value })}
+                    className={inputClass}
+                    placeholder="山田 太郎"
+                    autoComplete="name"
+                  />
+                </Field>
+                <Field label="メールアドレス / Email" required>
+                  <input
+                    type="email"
+                    value={guestInfo.email}
+                    onChange={(e) => setGuestInfo({ ...guestInfo, email: e.target.value })}
+                    className={inputClass}
+                    placeholder="you@example.com"
+                    autoComplete="email"
+                  />
+                </Field>
+                <Field label="電話番号 / Phone" required>
+                  <input
+                    type="tel"
+                    value={guestInfo.phone}
+                    onChange={(e) => setGuestInfo({ ...guestInfo, phone: e.target.value })}
+                    className={inputClass}
+                    placeholder="+81-90-1234-5678"
+                    autoComplete="tel"
+                  />
+                </Field>
+                <Field label="国籍 / Nationality">
+                  <input
+                    type="text"
+                    value={guestInfo.nationality}
+                    onChange={(e) => setGuestInfo({ ...guestInfo, nationality: e.target.value })}
+                    className={inputClass}
+                    placeholder="JP"
+                  />
+                </Field>
+                <Field label="連絡言語 / Language">
+                  <select
+                    value={guestInfo.language}
+                    onChange={(e) =>
+                      setGuestInfo({ ...guestInfo, language: e.target.value as LanguageCode })
+                    }
+                    className={inputClass}
+                  >
+                    <option value="ja">日本語</option>
+                    <option value="en">English</option>
+                    <option value="zh">中文</option>
+                    <option value="ko">한국어</option>
+                  </select>
+                </Field>
+              </div>
+              <p className="text-[11px] text-ink/40">
+                ご入力いただいた情報は宿泊者名簿（民泊新法対応）として記録されます。
+                チェックイン時に身分証のご提示をお願いする場合があります。
+              </p>
             </div>
-            <p className="text-[11px] text-ink/40">
-              ご入力いただいた情報は宿泊者名簿（民泊新法対応）として記録されます。
-              チェックイン時に身分証のご提示をお願いする場合があります。
-            </p>
-          </div>
+          </Reveal>
         )}
 
         {step === 'payment' && quote && (
-          <div className="space-y-5">
-            <header className="flex items-center gap-2 text-sm text-ink/70">
-              <CreditCard className="h-4 w-4 text-moss" />
-              <span>お支払い方法（モック）</span>
-            </header>
-            <div className="rounded-2xl border border-ink/10 bg-sand p-5 dark:border-gray-700 dark:bg-gray-800">
-              <div className="mb-4 flex items-center gap-2 rounded-md bg-moss/10 px-3 py-2 text-[11px] text-moss dark:bg-moss/20">
-                <Lock className="h-3.5 w-3.5" />
-                これはデモ用のフォームです。実際のカード情報は送信されません。
-              </div>
-              <div className="space-y-4">
-                <Field label="カード番号" required>
-                  <input
-                    type="text"
-                    value={card.number}
-                    onChange={(e) => setCard({ ...card, number: e.target.value })}
-                    className={inputClass}
-                    placeholder="4242 4242 4242 4242"
-                    autoComplete="cc-number"
-                    inputMode="numeric"
-                  />
-                </Field>
-                <div className="grid grid-cols-2 gap-4">
-                  <Field label="有効期限 (MM/YY)" required>
+          <Reveal>
+            <div className="space-y-5">
+              <header className="flex items-center gap-2 text-sm text-ink/70">
+                <CreditCard className="h-4 w-4 text-moss" />
+                <span>お支払い方法（モック）</span>
+              </header>
+              <div className="rounded-2xl border border-ink/10 bg-sand p-5 dark:border-gray-700 dark:bg-gray-800">
+                <div className="mb-4 flex items-center gap-2 rounded-md bg-moss/10 px-3 py-2 text-[11px] text-moss dark:bg-moss/20">
+                  <Lock className="h-3.5 w-3.5" />
+                  これはデモ用のフォームです。実際のカード情報は送信されません。
+                </div>
+                <div className="space-y-4">
+                  <Field label="カード番号" required>
                     <input
                       type="text"
-                      value={card.expiry}
-                      onChange={(e) => setCard({ ...card, expiry: e.target.value })}
+                      value={card.number}
+                      onChange={(e) => setCard({ ...card, number: e.target.value })}
                       className={inputClass}
-                      placeholder="12/29"
-                      autoComplete="cc-exp"
-                    />
-                  </Field>
-                  <Field label="CVC" required>
-                    <input
-                      type="text"
-                      value={card.cvc}
-                      onChange={(e) => setCard({ ...card, cvc: e.target.value })}
-                      className={inputClass}
-                      placeholder="123"
-                      autoComplete="cc-csc"
+                      placeholder="4242 4242 4242 4242"
+                      autoComplete="cc-number"
                       inputMode="numeric"
                     />
                   </Field>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Field label="有効期限 (MM/YY)" required>
+                      <input
+                        type="text"
+                        value={card.expiry}
+                        onChange={(e) => setCard({ ...card, expiry: e.target.value })}
+                        className={inputClass}
+                        placeholder="12/29"
+                        autoComplete="cc-exp"
+                      />
+                    </Field>
+                    <Field label="CVC" required>
+                      <input
+                        type="text"
+                        value={card.cvc}
+                        onChange={(e) => setCard({ ...card, cvc: e.target.value })}
+                        className={inputClass}
+                        placeholder="123"
+                        autoComplete="cc-csc"
+                        inputMode="numeric"
+                      />
+                    </Field>
+                  </div>
                 </div>
+                <p className="mt-4 border-t border-ink/10 pt-3 text-[11px] text-ink/50 dark:border-gray-700 dark:text-gray-400">
+                  ご予約のリクエスト時点では <strong className="text-ink">与信のみ</strong>{' '}
+                  を確保します（authorized）。ホストが承認した時点で正式に決済（captured）
+                  となります。承認されなかった場合は決済されません。
+                </p>
               </div>
-              <p className="mt-4 border-t border-ink/10 pt-3 text-[11px] text-ink/50 dark:border-gray-700 dark:text-gray-400">
-                ご予約のリクエスト時点では <strong className="text-ink">与信のみ</strong>{' '}
-                を確保します（authorized）。ホストが承認した時点で正式に決済（captured）
-                となります。承認されなかった場合は決済されません。
-              </p>
             </div>
-          </div>
+          </Reveal>
         )}
 
         {step === 'review' && quote && (
-          <div className="space-y-4">
-            <header className="flex items-center gap-2 text-sm text-ink/70">
-              <Receipt className="h-4 w-4 text-moss" />
-              <span>料金の内訳をご確認ください</span>
-            </header>
-            <div className="overflow-hidden rounded-2xl border border-ink/10 bg-sand dark:border-gray-700 dark:bg-gray-800">
-              <ul className="divide-y divide-ink/5 text-sm dark:divide-gray-700">
-                {quote.rates.map((rate) => {
-                  const isPremium = rate.price !== room.basePrice;
-                  return (
-                    <li key={rate.date} className="flex items-center justify-between px-4 py-2.5">
-                      <div>
-                        <p className="text-ink">{rate.date}</p>
-                        {rate.appliedRules.length > 0 && (
-                          <p className="text-[11px] text-ink/40">
-                            適用ルール: {rate.appliedRules.join(', ')}
-                          </p>
-                        )}
-                      </div>
-                      <p className={cn('font-medium', isPremium ? 'text-moss' : 'text-ink')}>
-                        ¥{rate.price.toLocaleString()}
-                      </p>
-                    </li>
-                  );
-                })}
-              </ul>
-              {appliedPromo && (
-                <div className="flex items-center justify-between border-t border-ink/5 bg-moss/5 px-4 py-2.5">
-                  <span className="flex items-center gap-1.5 text-sm text-moss">
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                    {t('applied')}: {appliedPromo.code}
-                  </span>
-                  <span className="font-medium text-moss">
-                    -{'¥'}
-                    {appliedPromo.discountAmount.toLocaleString()}
-                  </span>
-                </div>
-              )}
-              {selectedAddons.length > 0 &&
-                getSelectedAddonDetails(selectedAddons, seedAddons).map(({ addon, subtotal }) => (
-                  <div
-                    key={addon.id}
-                    className="flex items-center justify-between border-t border-ink/5 px-4 py-2.5"
-                  >
-                    <span className="text-sm text-ink/70">{addon.icon} オプション</span>
-                    <span className="font-medium text-ink">+¥{subtotal.toLocaleString()}</span>
+          <Reveal>
+            <div className="space-y-4">
+              <header className="flex items-center gap-2 text-sm text-ink/70">
+                <Receipt className="h-4 w-4 text-moss" />
+                <span>料金の内訳をご確認ください</span>
+              </header>
+              <div className="overflow-hidden rounded-2xl border border-ink/10 bg-sand dark:border-gray-700 dark:bg-gray-800">
+                <ul className="divide-y divide-ink/5 text-sm dark:divide-gray-700">
+                  {quote.rates.map((rate) => {
+                    const isPremium = rate.price !== room.basePrice;
+                    return (
+                      <li key={rate.date} className="flex items-center justify-between px-4 py-2.5">
+                        <div>
+                          <p className="text-ink">{rate.date}</p>
+                          {rate.appliedRules.length > 0 && (
+                            <p className="text-[11px] text-ink/40">
+                              適用ルール: {rate.appliedRules.join(', ')}
+                            </p>
+                          )}
+                        </div>
+                        <p className={cn('font-medium', isPremium ? 'text-moss' : 'text-ink')}>
+                          ¥{rate.price.toLocaleString()}
+                        </p>
+                      </li>
+                    );
+                  })}
+                </ul>
+                {appliedPromo && (
+                  <div className="flex items-center justify-between border-t border-ink/5 bg-moss/5 px-4 py-2.5">
+                    <span className="flex items-center gap-1.5 text-sm text-moss">
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      {t('applied')}: {appliedPromo.code}
+                    </span>
+                    <span className="font-medium text-moss">
+                      -{'¥'}
+                      {appliedPromo.discountAmount.toLocaleString()}
+                    </span>
                   </div>
-                ))}
-              <div className="flex items-center justify-between border-t border-ink/10 bg-ink/[0.02] px-4 py-3 dark:border-gray-700 dark:bg-gray-700/30">
-                <span className="text-sm text-ink/70 dark:text-gray-400">
-                  合計（{quote.nights} 泊）
-                </span>
-                <div className="text-right">
-                  {(appliedPromo || addonTotal > 0) && (
-                    <p className="text-xs text-ink/40 line-through">
-                      ¥{quote.total.toLocaleString()}
-                    </p>
-                  )}
-                  <span className="font-serif text-xl text-ink">
-                    ¥{finalAmount.toLocaleString()}
+                )}
+                {selectedAddons.length > 0 &&
+                  getSelectedAddonDetails(selectedAddons, seedAddons).map(({ addon, subtotal }) => (
+                    <div
+                      key={addon.id}
+                      className="flex items-center justify-between border-t border-ink/5 px-4 py-2.5"
+                    >
+                      <span className="text-sm text-ink/70">{addon.icon} オプション</span>
+                      <span className="font-medium text-ink">+¥{subtotal.toLocaleString()}</span>
+                    </div>
+                  ))}
+                <div className="flex items-center justify-between border-t border-ink/10 bg-ink/[0.02] px-4 py-3 dark:border-gray-700 dark:bg-gray-700/30">
+                  <span className="text-sm text-ink/70 dark:text-gray-400">
+                    合計（{quote.nights} 泊）
                   </span>
+                  <div className="text-right">
+                    {(appliedPromo || addonTotal > 0) && (
+                      <p className="text-xs text-ink/40 line-through">
+                        ¥{quote.total.toLocaleString()}
+                      </p>
+                    )}
+                    <span className="font-serif text-xl text-ink">
+                      ¥{finalAmount.toLocaleString()}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Promo code input */}
-            <div className="space-y-2">
-              <p className="text-xs font-medium text-ink/70">{t('title')}</p>
-              {appliedPromo ? (
-                <div className="flex items-center justify-between rounded-lg border border-moss/30 bg-moss/5 px-3 py-2">
-                  <span className="flex items-center gap-1.5 text-sm text-moss">
-                    <CheckCircle2 className="h-4 w-4" />
-                    {t('applied')}:{' '}
-                    <span className="font-mono font-medium">{appliedPromo.code}</span>
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      clearPromo();
-                      setPromoInput('');
-                    }}
-                    className="ml-2 rounded p-0.5 text-ink/40 hover:text-crimson"
-                    aria-label={t('remove')}
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              ) : (
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={promoInput}
-                    onChange={(e) => setPromoInput(e.target.value)}
-                    placeholder={t('placeholder')}
-                    className={cn(
-                      inputClass,
-                      'flex-1 uppercase placeholder:normal-case',
-                      promoError && 'border-crimson focus:border-crimson focus:ring-crimson',
-                    )}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && promoInput.trim()) {
-                        applyPromo(promoInput.trim(), quote.total, nights);
-                      }
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => applyPromo(promoInput.trim(), quote.total, nights)}
-                    disabled={!promoInput.trim()}
-                    className="shrink-0 rounded-md border border-ink/20 px-4 py-2 text-sm text-ink/70 transition-colors hover:border-ink/40 hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
-                  >
-                    {t('apply')}
-                  </button>
-                </div>
-              )}
-              {promoError && (
-                <p className="flex items-center gap-1.5 text-xs text-crimson">
-                  <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-                  {promoError === 'MIN_NIGHTS_NOT_MET'
-                    ? t('error_MIN_NIGHTS', {
-                        minNights: String(
-                          seedPromoCodes.find(
-                            (p) => p.code.toUpperCase() === promoInput.trim().toUpperCase(),
-                          )?.minNights ?? 1,
-                        ),
-                      })
-                    : promoError === 'NOT_FOUND'
-                      ? t('error_NOT_FOUND')
-                      : t('error_INACTIVE')}
-                </p>
-              )}
-            </div>
+              {/* Promo code input */}
+              <div className="space-y-2">
+                <p className="text-xs font-medium text-ink/70">{t('title')}</p>
+                {appliedPromo ? (
+                  <div className="flex items-center justify-between rounded-lg border border-moss/30 bg-moss/5 px-3 py-2">
+                    <span className="flex items-center gap-1.5 text-sm text-moss">
+                      <CheckCircle2 className="h-4 w-4" />
+                      {t('applied')}:{' '}
+                      <span className="font-mono font-medium">{appliedPromo.code}</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        clearPromo();
+                        setPromoInput('');
+                      }}
+                      className="ml-2 rounded p-0.5 text-ink/40 hover:text-crimson"
+                      aria-label={t('remove')}
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={promoInput}
+                      onChange={(e) => setPromoInput(e.target.value)}
+                      placeholder={t('placeholder')}
+                      className={cn(
+                        inputClass,
+                        'flex-1 uppercase placeholder:normal-case',
+                        promoError && 'border-crimson focus:border-crimson focus:ring-crimson',
+                      )}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && promoInput.trim()) {
+                          applyPromo(promoInput.trim(), quote.total, nights);
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => applyPromo(promoInput.trim(), quote.total, nights)}
+                      disabled={!promoInput.trim()}
+                      className="shrink-0 rounded-md border border-ink/20 px-4 py-2 text-sm text-ink/70 transition-colors hover:border-ink/40 hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
+                    >
+                      {t('apply')}
+                    </button>
+                  </div>
+                )}
+                {promoError && (
+                  <p className="flex items-center gap-1.5 text-xs text-crimson">
+                    <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                    {promoError === 'MIN_NIGHTS_NOT_MET'
+                      ? t('error_MIN_NIGHTS', {
+                          minNights: String(
+                            seedPromoCodes.find(
+                              (p) => p.code.toUpperCase() === promoInput.trim().toUpperCase(),
+                            )?.minNights ?? 1,
+                          ),
+                        })
+                      : promoError === 'NOT_FOUND'
+                        ? t('error_NOT_FOUND')
+                        : t('error_INACTIVE')}
+                  </p>
+                )}
+              </div>
 
-            <p className="text-[11px] leading-relaxed text-ink/40">
-              週末・季節・直前予約などのルールが適用されると基本料金から変動します。
-              お支払いはご予約のリクエスト時に与信のみ確保し、ホストの承認をもって正式に決済されます。
-            </p>
-          </div>
+              <p className="text-[11px] leading-relaxed text-ink/40">
+                週末・季節・直前予約などのルールが適用されると基本料金から変動します。
+                お支払いはご予約のリクエスト時に与信のみ確保し、ホストの承認をもって正式に決済されます。
+              </p>
+            </div>
+          </Reveal>
         )}
 
         {step === 'parking' && (
-          <div className="space-y-4">
-            <header className="flex items-center gap-2 text-sm text-ink/70">
-              <Car className="h-4 w-4 text-moss" />
-              <span>駐車場のご利用予定はありますか？</span>
-            </header>
-            <p className="text-[11px] text-ink/40">
-              当宿は最大10台まで駐車可能です。お一台あたり1区画をご予約いただきます（追加料金なし）。
-            </p>
-            <div className="grid grid-cols-5 gap-2 sm:grid-cols-10">
-              <button
-                type="button"
-                onClick={() => setParkingId(undefined)}
-                className={cn(
-                  'col-span-5 rounded-md border px-3 py-2 text-xs sm:col-span-10',
-                  parkingId === undefined
-                    ? 'border-ink bg-ink text-sand dark:border-gray-600 dark:bg-gray-600 dark:text-gray-100'
-                    : 'border-ink/15 bg-sand text-ink/70 hover:border-ink/30 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-gray-400',
-                )}
-              >
-                利用しない
-              </button>
-              {parkingSlots.map((slot) => (
+          <Reveal>
+            <div className="space-y-4">
+              <header className="flex items-center gap-2 text-sm text-ink/70">
+                <Car className="h-4 w-4 text-moss" />
+                <span>駐車場のご利用予定はありますか？</span>
+              </header>
+              <p className="text-[11px] text-ink/40">
+                当宿は最大10台まで駐車可能です。お一台あたり1区画をご予約いただきます（追加料金なし）。
+              </p>
+              <div className="grid grid-cols-5 gap-2 sm:grid-cols-10">
                 <button
-                  key={slot.id}
                   type="button"
-                  onClick={() => setParkingId(slot.id)}
+                  onClick={() => setParkingId(undefined)}
                   className={cn(
-                    'rounded-md border py-2 text-xs',
-                    parkingId === slot.id
+                    'col-span-5 rounded-md border px-3 py-2 text-xs sm:col-span-10',
+                    parkingId === undefined
                       ? 'border-ink bg-ink text-sand dark:border-gray-600 dark:bg-gray-600 dark:text-gray-100'
                       : 'border-ink/15 bg-sand text-ink/70 hover:border-ink/30 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-gray-400',
                   )}
-                  aria-label={`駐車場区画 ${slot.label}`}
                 >
-                  {slot.label}
+                  利用しない
                 </button>
-              ))}
+                {parkingSlots.map((slot) => (
+                  <button
+                    key={slot.id}
+                    type="button"
+                    onClick={() => setParkingId(slot.id)}
+                    className={cn(
+                      'rounded-md border py-2 text-xs',
+                      parkingId === slot.id
+                        ? 'border-ink bg-ink text-sand dark:border-gray-600 dark:bg-gray-600 dark:text-gray-100'
+                        : 'border-ink/15 bg-sand text-ink/70 hover:border-ink/30 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-gray-400',
+                    )}
+                    aria-label={`駐車場区画 ${slot.label}`}
+                  >
+                    {slot.label}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          </Reveal>
         )}
 
         {step === 'options' && (
-          <div className="space-y-4">
-            <header className="flex items-center gap-2 text-sm text-ink/70">
-              <PlusCircle className="h-4 w-4 text-moss" />
-              <span>ご希望のオプションを追加できます</span>
-            </header>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {seedAddons
-                .filter((a) => a.available)
-                .map((addon) => {
-                  const isSelected = selectedAddons.some((s) => s.addonId === addon.id);
-                  return (
-                    <button
-                      key={addon.id}
-                      type="button"
-                      onClick={() => toggleAddon(addon.id)}
-                      className={cn(
-                        'flex items-start gap-3 rounded-xl border p-4 text-left transition-colors',
-                        isSelected
-                          ? 'border-moss bg-moss/5 ring-1 ring-moss/30 dark:bg-moss/10'
-                          : 'border-ink/15 bg-sand hover:border-ink/30 dark:border-gray-600 dark:bg-gray-800 dark:hover:border-gray-400',
-                      )}
-                    >
-                      <span className="mt-0.5 text-2xl leading-none" aria-hidden>
-                        {addon.icon}
-                      </span>
-                      <div className="flex-1 space-y-0.5">
-                        <p className="text-sm font-medium text-ink">
-                          {addon.name.replace('addons.', '') === 'bbq'
-                            ? 'BBQセット'
-                            : addon.name.replace('addons.', '') === 'breakfast'
-                              ? '朝食サービス'
-                              : addon.name.replace('addons.', '') === 'sauna'
-                                ? 'サウナ貸切'
-                                : addon.name.replace('addons.', '') === 'bicycle'
-                                  ? '自転車レンタル'
-                                  : 'レイトチェックアウト'}
-                        </p>
-                        <p className="text-xs text-ink/50">
-                          ¥{addon.pricePerStay.toLocaleString()} / 1滞在あたり
-                        </p>
-                      </div>
-                      {isSelected && <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-moss" />}
-                    </button>
-                  );
-                })}
+          <Reveal>
+            <div className="space-y-4">
+              <header className="flex items-center gap-2 text-sm text-ink/70">
+                <PlusCircle className="h-4 w-4 text-moss" />
+                <span>ご希望のオプションを追加できます</span>
+              </header>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {seedAddons
+                  .filter((a) => a.available)
+                  .map((addon) => {
+                    const isSelected = selectedAddons.some((s) => s.addonId === addon.id);
+                    return (
+                      <button
+                        key={addon.id}
+                        type="button"
+                        onClick={() => toggleAddon(addon.id)}
+                        className={cn(
+                          'flex items-start gap-3 rounded-xl border p-4 text-left transition-colors',
+                          isSelected
+                            ? 'border-moss bg-moss/5 ring-1 ring-moss/30 dark:bg-moss/10'
+                            : 'border-ink/15 bg-sand hover:border-ink/30 dark:border-gray-600 dark:bg-gray-800 dark:hover:border-gray-400',
+                        )}
+                      >
+                        <span className="mt-0.5 text-2xl leading-none" aria-hidden>
+                          {addon.icon}
+                        </span>
+                        <div className="flex-1 space-y-0.5">
+                          <p className="text-sm font-medium text-ink">
+                            {addon.name.replace('addons.', '') === 'bbq'
+                              ? 'BBQセット'
+                              : addon.name.replace('addons.', '') === 'breakfast'
+                                ? '朝食サービス'
+                                : addon.name.replace('addons.', '') === 'sauna'
+                                  ? 'サウナ貸切'
+                                  : addon.name.replace('addons.', '') === 'bicycle'
+                                    ? '自転車レンタル'
+                                    : 'レイトチェックアウト'}
+                          </p>
+                          <p className="text-xs text-ink/50">
+                            ¥{addon.pricePerStay.toLocaleString()} / 1滞在あたり
+                          </p>
+                        </div>
+                        {isSelected && (
+                          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-moss" />
+                        )}
+                      </button>
+                    );
+                  })}
+              </div>
+              {selectedAddons.length === 0 && (
+                <p className="text-[11px] text-ink/40">
+                  オプションは選択しなくても次のステップへ進めます。
+                </p>
+              )}
             </div>
-            {selectedAddons.length === 0 && (
-              <p className="text-[11px] text-ink/40">
-                オプションは選択しなくても次のステップへ進めます。
-              </p>
-            )}
-          </div>
+          </Reveal>
         )}
 
         {submitError && (

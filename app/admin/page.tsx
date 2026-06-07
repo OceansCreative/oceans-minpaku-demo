@@ -6,8 +6,10 @@ import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 
 import { CapCounterWidget } from '@/components/admin/widgets/CapCounterWidget';
+import { OccupancyTrendWidget } from '@/components/admin/widgets/OccupancyTrendWidget';
 import { OccupancyWidget } from '@/components/admin/widgets/OccupancyWidget';
 import { PeriodFilter } from '@/components/admin/widgets/PeriodFilter';
+import { RevenueCompareWidget } from '@/components/admin/widgets/RevenueCompareWidget';
 import { SalesSummaryWidget } from '@/components/admin/widgets/SalesSummaryWidget';
 import { resolvePeriod, type PeriodPreset } from '@/lib/services/metrics';
 import { useAppStore } from '@/lib/store';
@@ -32,6 +34,17 @@ export default function AdminDashboardPage() {
     [reservations, today],
   );
 
+  // Today's occupancy snapshot: approved stays that span today (checkIn <= today < checkOut)
+  const occupiedToday = useMemo(
+    () =>
+      reservations.filter(
+        (r) => r.status === 'approved' && r.checkIn <= today && r.checkOut > today,
+      ).length,
+    [reservations, today],
+  );
+  const totalRooms = rooms.length;
+  const availableToday = totalRooms - occupiedToday;
+
   return (
     <div className="space-y-6">
       <header className="flex flex-wrap items-start justify-between gap-3">
@@ -47,6 +60,44 @@ export default function AdminDashboardPage() {
         <SalesSummaryWidget range={range} />
         <CapCounterWidget />
       </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <OccupancyTrendWidget today={today} />
+        <RevenueCompareWidget today={today} />
+      </div>
+
+      {/* Today's occupancy status strip */}
+      <section className="rounded-2xl border border-ink/10 bg-sand p-5 dark:border-gray-700 dark:bg-gray-800">
+        <h2 className="mb-4 font-serif text-base text-ink/80 dark:text-gray-200">
+          {t('widgets.today_status')}
+        </h2>
+        <div className="grid grid-cols-3 divide-x divide-ink/10 dark:divide-gray-700">
+          <div className="px-4 text-center first:pl-0 last:pr-0">
+            <p className="text-2xl font-semibold tabular-nums text-ink dark:text-gray-100">
+              {totalRooms}
+            </p>
+            <p className="mt-1 text-[11px] text-ink/50 dark:text-gray-500">
+              {t('widgets.total_rooms')}
+            </p>
+          </div>
+          <div className="px-4 text-center">
+            <p className="text-2xl font-semibold tabular-nums text-teal-600 dark:text-teal-400">
+              {occupiedToday}
+            </p>
+            <p className="mt-1 text-[11px] text-ink/50 dark:text-gray-500">
+              {t('widgets.occupied')}
+            </p>
+          </div>
+          <div className="px-4 text-center">
+            <p className="text-2xl font-semibold tabular-nums text-moss dark:text-moss">
+              {availableToday}
+            </p>
+            <p className="mt-1 text-[11px] text-ink/50 dark:text-gray-500">
+              {t('widgets.available')}
+            </p>
+          </div>
+        </div>
+      </section>
 
       <div className="grid gap-4 md:grid-cols-2">
         <TodaySection

@@ -390,7 +390,17 @@
     "occupancyDenominator": "전체 {rooms}실 × {nights}일 = {roomNights}실박을 분모로 하여 산출.",
     "conflictsPanelTitle": "경합 중인 승인 대기 예약: {count}건",
     "conflictsDuplicate": "중복: {ids}",
-    "conflictsResolve": "대응하기"
+    "conflictsResolve": "대응하기",
+    "widgets": {
+      "occupancy_trend": "가동률 트렌드（6개월）",
+      "revenue_compare": "매출 vs 예상",
+      "actual": "확정",
+      "forecast": "예상",
+      "today_status": "오늘의 가동 현황",
+      "total_rooms": "총 객실 수",
+      "occupied": "사용 중",
+      "available": "공실"
+    }
   },
   "Receipt": {
     "title": "영수증",

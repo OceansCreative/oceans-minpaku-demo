@@ -15,6 +15,7 @@ import type { PromoSlice } from './promo-slice';
 import type { ReservationSlice } from './reservation-slice';
 import type { ReviewSlice } from './review-slice';
 import type { ThemeSlice } from './theme-slice';
+import type { WishlistSlice } from './wishlist-slice';
 
 export type AppStore = AppSlice &
   ReservationSlice &
@@ -25,4 +26,5 @@ export type AppStore = AppSlice &
   PromoSlice &
   ReviewSlice &
   AddonSlice &
-  ThemeSlice;
+  ThemeSlice &
+  WishlistSlice;

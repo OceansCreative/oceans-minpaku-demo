@@ -2,6 +2,7 @@ import { MapPin } from 'lucide-react';
 import Link from 'next/link';
 
 import { ThemeToggle } from '@/components/guest/ThemeToggle';
+import { WishlistNavLink } from '@/components/guest/WishlistNavLink';
 import { LanguageSwitcher } from '@/components/i18n/LanguageSwitcher';
 
 import type { ReactNode } from 'react';
@@ -33,6 +34,7 @@ export default function GuestLayout({ children }: { children: ReactNode }) {
               <MapPin className="-mt-0.5 mr-1 inline h-3.5 w-3.5" />
               アクセス
             </Link>
+            <WishlistNavLink />
             <LanguageSwitcher />
             <ThemeToggle />
             <Link

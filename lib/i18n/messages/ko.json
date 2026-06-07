@@ -2,7 +2,8 @@
   "Nav": {
     "rooms": "객실",
     "access": "오시는 길",
-    "admin": "관리자"
+    "admin": "관리자",
+    "wishlist": "찜 목록"
   },
   "Common": {
     "back": "돌아가기",
@@ -479,5 +480,13 @@
     "dark": "다크 모드",
     "system": "시스템 설정",
     "toggle_aria": "테마 전환"
+  },
+  "wishlist": {
+    "title": "찜 목록",
+    "add": "찜 목록에 추가",
+    "remove": "찜 목록에서 제거",
+    "empty": "찜한 숙소가 없습니다",
+    "empty_cta": "객실 둘러보기",
+    "count": "{count}개 저장됨"
   }
 }

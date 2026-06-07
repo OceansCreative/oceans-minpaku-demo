@@ -389,7 +389,17 @@
     "occupancyDenominator": "Computed against {rooms} rooms × {nights} days = {roomNights} room-nights as the denominator.",
     "conflictsPanelTitle": "Conflicting pending reservations: {count}",
     "conflictsDuplicate": "Overlaps: {ids}",
-    "conflictsResolve": "Resolve"
+    "conflictsResolve": "Resolve",
+    "widgets": {
+      "occupancy_trend": "Occupancy Trend (6 months)",
+      "revenue_compare": "Revenue vs Forecast",
+      "actual": "Confirmed",
+      "forecast": "Forecast",
+      "today_status": "Today's Occupancy",
+      "total_rooms": "Total rooms",
+      "occupied": "In use",
+      "available": "Vacant"
+    }
   },
   "Receipt": {
     "title": "Receipt",

@@ -389,7 +389,17 @@
     "occupancyDenominator": "以全 {rooms} 间客房 × {nights} 天 = {roomNights} 间夜 作为分母计算。",
     "conflictsPanelTitle": "存在冲突的待批准预订: {count} 条",
     "conflictsDuplicate": "重复: {ids}",
-    "conflictsResolve": "处理"
+    "conflictsResolve": "处理",
+    "widgets": {
+      "occupancy_trend": "入住率趋势（6个月）",
+      "revenue_compare": "营收 vs 预测",
+      "actual": "已确认",
+      "forecast": "预测",
+      "today_status": "今日入住状况",
+      "total_rooms": "客房总数",
+      "occupied": "使用中",
+      "available": "空房"
+    }
   },
   "Receipt": {
     "title": "收据",

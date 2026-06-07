@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { AvailabilityCalendar } from '@/components/guest/AvailabilityCalendar';
+import { Reveal } from '@/components/guest/Reveal';
 import { RoomReviews } from '@/components/guest/RoomReviews';
 import { seedProperty, seedRooms } from '@/lib/seed';
 
@@ -78,23 +79,25 @@ export default async function RoomDetailPage({ params }: RoomDetailPageProps) {
               </dd>
             </div>
           </dl>
-          <div className="space-y-2">
+
+          <Reveal className="space-y-2">
             <h2 className="font-serif text-lg text-ink dark:text-gray-100">館内設備</h2>
             <ul className="flex flex-wrap gap-2">
-              {seedProperty.amenities.map((a) => (
-                <li
-                  key={a}
-                  className="rounded-full border border-ink/15 bg-ink/[0.02] px-3 py-1 text-xs text-ink/70 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400"
-                >
-                  {a}
-                </li>
+              {seedProperty.amenities.map((a, index) => (
+                <Reveal key={a} delay={index * 40}>
+                  <li className="rounded-full border border-ink/15 bg-ink/[0.02] px-3 py-1 text-xs text-ink/70 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                    {a}
+                  </li>
+                </Reveal>
               ))}
             </ul>
-          </div>
+          </Reveal>
 
           <AvailabilityCalendar roomId={room.id} basePrice={room.basePrice} />
 
-          <RoomReviews roomId={room.id} />
+          <Reveal>
+            <RoomReviews roomId={room.id} />
+          </Reveal>
         </div>
 
         <aside className="h-fit space-y-4 rounded-2xl border border-ink/10 bg-sand/60 p-6 dark:border-gray-700 dark:bg-gray-800/60">

@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { RoomRatingBadge } from '@/components/guest/RoomRatingBadge';
+import { WishlistButton } from '@/components/guest/WishlistButton';
 import { seedRooms } from '@/lib/seed';
 
 export default function RoomsPage() {
@@ -21,8 +22,9 @@ export default function RoomsPage() {
           return (
             <li
               key={room.id}
-              className="group overflow-hidden rounded-2xl border border-ink/10 bg-sand transition-shadow hover:shadow-lg dark:border-gray-700 dark:bg-gray-800"
+              className="group relative overflow-hidden rounded-2xl border border-ink/10 bg-sand transition-shadow hover:shadow-lg dark:border-gray-700 dark:bg-gray-800"
             >
+              <WishlistButton roomId={room.id} className="absolute right-3 top-3 z-10" />
               <Link href={`/rooms/${room.id}`} className="block">
                 <div className="relative aspect-[16/10] overflow-hidden bg-ink/10 dark:bg-gray-700">
                   {cover && (

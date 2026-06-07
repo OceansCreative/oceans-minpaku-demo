@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 
 import { AvailabilityCalendar } from '@/components/guest/AvailabilityCalendar';
 import { RoomReviews } from '@/components/guest/RoomReviews';
+import { WishlistButton } from '@/components/guest/WishlistButton';
 import { seedProperty, seedRooms } from '@/lib/seed';
 
 interface RoomDetailPageProps {
@@ -51,7 +52,10 @@ export default async function RoomDetailPage({ params }: RoomDetailPageProps) {
             <p className="text-xs uppercase tracking-[0.3em] text-moss">
               {seedProperty.name} / Room
             </p>
-            <h1 className="font-serif text-3xl text-ink dark:text-gray-100">{room.name}</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="font-serif text-3xl text-ink dark:text-gray-100">{room.name}</h1>
+              <WishlistButton roomId={room.id} />
+            </div>
             <p className="text-sm leading-relaxed text-ink/70 dark:text-gray-400">
               {room.description}
             </p>

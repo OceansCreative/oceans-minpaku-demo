@@ -2,7 +2,8 @@
   "Nav": {
     "rooms": "お部屋",
     "access": "アクセス",
-    "admin": "管理画面"
+    "admin": "管理画面",
+    "wishlist": "お気に入り"
   },
   "Common": {
     "back": "戻る",
@@ -479,5 +480,13 @@
     "dark": "ダークモード",
     "system": "システム設定",
     "toggle_aria": "テーマを切り替える"
+  },
+  "wishlist": {
+    "title": "お気に入り",
+    "add": "お気に入りに追加",
+    "remove": "お気に入りから削除",
+    "empty": "お気に入りがまだありません",
+    "empty_cta": "部屋を探す",
+    "count": "{count}件"
   }
 }

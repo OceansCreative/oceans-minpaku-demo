@@ -2,7 +2,8 @@
   "Nav": {
     "rooms": "Rooms",
     "access": "Access",
-    "admin": "Admin"
+    "admin": "Admin",
+    "wishlist": "Saved"
   },
   "Common": {
     "back": "Back",
@@ -479,5 +480,13 @@
     "dark": "Dark mode",
     "system": "System setting",
     "toggle_aria": "Toggle theme"
+  },
+  "wishlist": {
+    "title": "Saved",
+    "add": "Save to wishlist",
+    "remove": "Remove from wishlist",
+    "empty": "No saved properties yet",
+    "empty_cta": "Browse rooms",
+    "count": "{count} saved"
   }
 }
